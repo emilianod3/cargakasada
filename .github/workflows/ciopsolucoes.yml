@@ -1,0 +1,59 @@
+
+name: 🚀 CIOP - Deploy CargaKasada to Hostgator 
+
+on:
+  push: 
+    branches: [ "ciopsolucoes" ]
+    paths-ignore:
+      - README.md
+      - databaseapply
+      - databasehistory
+      - datainit
+      - .vscode/**
+      - .env
+      - .env.*
+      - 'public/storage/**'
+
+jobs:
+ web-deploy:
+      name: 🎉 Deploy - ciopsolucoes.com.br/cargakasada
+      runs-on: ubuntu-latest
+      steps:
+      - name: 🚚 CheckOut do Repository
+        uses: actions/checkout@v3
+      
+      - name: 📂 Sync files
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.ciop_host }}
+          username: ${{ secrets.ciop_user }}
+          password: ${{ secrets.ciop_pass }}
+          server-dir: /public_html/cargakasada/
+
+      - name: Composer Dependences
+        run: composer install --optimize-autoloader --no-dev
+
+
+ test-output:
+    name: 🎉 Checks de Deploy
+    runs-on: ubuntu-latest
+    needs: web-deploy
+    steps:
+      - name: Check Version PHP
+        run: php --version
+
+      #- name: Check Version Laravel
+      #  run: laravel --version
+
+      - name: Check Version Composer
+        run: composer --version
+
+        
+      - run: echo "Situação do Job ${{ job.status}}."
+
+
+      - name: Check http status site project in Production
+        uses: lakuapik/gh-actions-http-status@v1
+        with:
+          sites: '["https://www.ciopsolucoes.com.br/cargakasada"]'
+          expected: '[301, 200]'

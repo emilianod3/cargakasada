@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# Atualiza a versão do Laravel automaticamente
+npm run version
+
+# Comita as alterações na versão automaticamente
+git add composer.json
+git commit -m "Increment version"

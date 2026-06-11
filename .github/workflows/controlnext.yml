@@ -1,0 +1,73 @@
+
+name: 🚀 CTRLNEXT - Deploy CargaKasada to Hostgator CtrlNext
+
+on:
+  push: 
+    branches: [ "ctrlnext" ]
+    paths-ignore:
+      - README.md
+      - databaseapply
+      - databasehistory
+      - datainit
+      - .vscode/**
+      - .env
+      - .env.*
+      - 'public/storage/**'
+
+jobs:
+ web-deploy:
+      name: 🎉 Deploy - controlnext.com.br/cargakasada
+      runs-on: ubuntu-latest
+      steps:
+      - name: 🚚 CheckOut do Repository
+        uses: actions/checkout@v3
+      
+      - name: 📂 Sync files
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.ctrl_host }}
+          username: ${{ secrets.ctrl_user }}
+          password: ${{ secrets.ctrl_pass }}
+          server-dir: cargakasada/
+
+      - name: Composer Dependences
+        run: composer install --no-dev --no-scripts --optimize-autoloader
+
+
+ test-output:
+    name: 🎉 Checks de Deploy
+    runs-on: ubuntu-latest
+    needs: web-deploy
+    steps:
+      - name: Check Version PHP
+        run: php --version
+
+      #- name: Check Version Laravel
+      #  run: laravel --version
+
+      - name: Check Version Composer
+        run: composer --version
+
+        
+      - run: echo "Situação do Job ${{ job.status}}."
+
+
+      - name: Check http status site project in Production
+        uses: lakuapik/gh-actions-http-status@v1
+        with:
+          sites: '["https://www.controlnext.com.br/cargakasada"]'
+          expected: '[301, 200]'
+
+
+ connect-remote:
+    name: 🎉 Checks Database
+    runs-on: ubuntu-latest
+    needs: test-output
+    steps:
+      - name: Database
+        uses: actions/checkout@v3
+        
+      #- run: mysql -h${{ secrets.DB_HOST }} --port 3306 -u${{ secrets.DB_USER }} -p${{ secrets.DB_PASS }} -e "SHOW DATABASES";
+
+      #- name: Run a SQL on remote
+      #  run: mysql -h${{ secrets.DB_HOST }} --port 3306 -u${{ secrets.DB_USER }} -p${{ secrets.DB_PASS }} -e "source databaseapply";
