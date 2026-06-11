@@ -1,6 +1,15 @@
 import './bootstrap';
 import { createApp, h } from 'vue'
-import { createInertiaApp } from '@inertiajs/vue3'
+import { createInertiaApp, router } from '@inertiajs/vue3'
+//import { ZiggyVue } from 'ziggy-js';
+import { ZiggyVue } from '../../vendor/tightenco/ziggy';
+import FloatingVue from 'floating-vue';
+import 'floating-vue/dist/style.css';
+
+import '../css/app.css';
+import '@fortawesome/fontawesome-free/css/all.min.css';
+//import { varloading, mostrarPopup, mostrarPopupDecisao } from '@/sistema.js';
+import * as jssistema from '@/sistema.js';
 
 createInertiaApp({
   resolve: name => {
@@ -21,8 +30,8 @@ createInertiaApp({
     // 4. Ativamos os plugins e montamos o app no HTML
     return app
         .use(plugin)
-        // .use(ZiggyVue)     <-- Se der erro neles, certifique-se de que estão importados no topo do arquivo
-        // .use(FloatingVue)  <-- Se der erro neles, certifique-se de que estão importados no topo do arquivo
+        .use(ZiggyVue)    
+        .use(FloatingVue)
         .mount(el);
   },
 })

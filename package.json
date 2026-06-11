@@ -19,6 +19,8 @@
         "@fortawesome/fontawesome-free": "^7.2.0",
         "@inertiajs/vue3": "^3.4.0",
         "@vitejs/plugin-vue": "^6.0.7",
-        "vue": "^3.5.38"
+        "floating-vue": "^5.2.2",
+        "vue": "^3.5.38",
+        "ziggy-js": "^2.6.2"
     }
 }

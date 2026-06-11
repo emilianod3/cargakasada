@@ -44,6 +44,20 @@ class HandleInertiaRequests extends Middleware
                 'laravel_version' => \Illuminate\Foundation\Application::VERSION,
                 'php_version' => PHP_VERSION,
             ],
+            'auth' => [
+                //'user' => $request->user(),
+                'user'   => $request->session()->get('user'), // null se deslogado
+                'grupo' => $request->session()->get('grupo'),  // null se deslogado
+            ],
+            'sistema' => [
+                'versao'    => config('version.number', '1.0.0'), // Fallback caso não exista
+                'hash'      => config('version.hash', '0000000'),
+                'atualizado' => config('version.timestamp', ''),
+            ],
+            'app_url' => config('app.url'),
+            'app_debug' => (bool) env('APP_DEBUG', false),  
+            'SISTEMA_CONTEXTBTNDIR' => (bool) env('SISTEMA_CONTEXTBTNDIR', 0), 
+            'menus' => $request->session()->get('menus'),           
         ]);        
     }
 }
