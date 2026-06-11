@@ -27,7 +27,7 @@ DB_HOST=127.0.0.1
 DB_PORT=3307
 DB_DATABASE=cargakasada
 DB_USERNAME=admin
-DB_PASSWORD=999999999
+DB_PASSWORD=9Pcr8*Mrtfq
 
 SESSION_DRIVER=file
 SESSION_LIFETIME=120
@@ -49,15 +49,6 @@ REDIS_HOST=127.0.0.1
 REDIS_PASSWORD=null
 REDIS_PORT=6379
 
-MAIL_MAILER=smtp
-MAIL_HOST=smtp-relay.brevo.com
-MAIL_PORT=587
-MAIL_USERNAME=9999999999@smtp-brevo.com # O e-mail que você usou para se registrar na Brevo
-MAIL_PASSWORD="" # Cole a chave API que você copiou (xkeysib-XXXXX)
-MAIL_ENCRYPTION=tls
-MAIL_FROM_ADDRESS="controlnext@controlnext.com.br" # Use um e-mail com o domínio que você verificou
-MAIL_FROM_NAME="${APP_NAME} - Sistema de Controle de Cargas"
-
 #MAIL_MAILER=log
 #MAIL_SCHEME=null
 #MAIL_HOST=127.0.0.1
@@ -68,6 +59,14 @@ MAIL_FROM_NAME="${APP_NAME} - Sistema de Controle de Cargas"
 #MAIL_FROM_NAME="${APP_NAME}"
 
 
+MAIL_MAILER=smtp
+MAIL_HOST=smtp-relay.brevo.com
+MAIL_PORT=587
+MAIL_USERNAME=9a7d2c001@smtp-brevo.com # O e-mail que você usou para se registrar na Brevo
+MAIL_PASSWORD="xsmtpsib-0fe5c0280c78a149653d4a22fc043f1aea8d46fcf060389cdf0cfaaeae4024aa-e1NTnXv94q7Eg4LA" # Cole a chave API que você copiou (xkeysib-XXXXX)
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS="controlnext@controlnext.com.br" # Use um e-mail com o domínio que você verificou
+MAIL_FROM_NAME="${APP_NAME} - Sistema de Controle de Cargas"
 
 AWS_ACCESS_KEY_ID=
 AWS_SECRET_ACCESS_KEY=
@@ -80,8 +79,8 @@ VITE_COMPANY="${COMPANY}"
 VITE_COMPANY_LOGO="${COMPANY_LOGO}"
 VITE_FOOTER="${COMPANY_COPYRIGHT} - ${COMPANY_COPYRIGHT2}"
 
-VITE_DEV_USERNAME=usuario
-VITE_DEV_PASSWORD=senha
+VITE_DEV_USERNAME=sistema
+VITE_DEV_PASSWORD=Sistem@
 
 #dados desenvolvedor
 COMPANY_URL="https://www.controlnext.com.br"
