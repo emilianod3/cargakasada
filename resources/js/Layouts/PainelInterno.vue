@@ -98,7 +98,7 @@ onMounted(() => {
     window.addEventListener('touchstart', resetTimer, { passive: true });
     window.addEventListener('scroll', resetTimer, { passive: true });
     window.addEventListener('scroll', loadButtonToTop);
-    document.addEventListener('contextmenu', bloquearContextMenu);    
+   // document.addEventListener('contextmenu', bloquearContextMenu);    
 });
 
 
@@ -109,7 +109,7 @@ onUnmounted(() => {
     window.removeEventListener('touchstart', resetTimer);
     window.removeEventListener('scroll', resetTimer);
     window.removeEventListener('scroll', loadButtonToTop);
-    document.removeEventListener('contextmenu', bloquearContextMenu);    
+    //document.removeEventListener('contextmenu', bloquearContextMenu);    
 });
 
 </script>

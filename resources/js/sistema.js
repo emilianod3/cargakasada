@@ -1,4 +1,5 @@
 import { ref } from 'vue';
+import { nextTick } from 'vue';
 
 // Estados Globais
 const modoAtual = ref(localStorage.getItem('sistema-modo') || 'claro'); // 'escuro' ou 'claro'
@@ -166,7 +167,15 @@ export function mostrarPopupDecisao({
     };
     
     popupDecisaoAtivo.value = true;
-
+    nextTick(() => {
+        // Busca o primeiro botão ativo de dentro do container do seu popup customizado
+        // (Ajuste a classe '.v-popper__inner' se o seu container usar outra classe)
+        const botaoPrincipal = document.querySelector('.v-popper__inner button, .popup-decisao button');
+        
+        if (botaoPrincipal) {
+            botaoPrincipal.focus();
+        }
+    });
     // Retorna a Promise que tornará o fechamento síncrono na sua função externa
     return new Promise((resolve) => {
         popupDecisaoResolvePromise = resolve;

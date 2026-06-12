@@ -35,4 +35,126 @@ createInertiaApp({
         .use(FloatingVue)
         .mount(el);
   },
-})
+});
+
+
+
+
+// Ativa a cortina quando qualquer requisição para o controller iniciar
+router.on('start', () => {
+    jssistema.varloading.value = true;
+});
+
+// Desativa a cortina quando o controller responder (sucesso ou erro)
+router.on('finish', () => {
+    jssistema.varloading.value = false;
+});
+
+
+
+// 1. Interceptador de INÍCIO (Antes de enviar a requisição)
+axios.interceptors.request.use((config) => {
+    jssistema.varloading.value = true;
+    return config;
+}, (error) => {
+    // Se der erro antes mesmo de enviar, desliga a cortina
+    jssistema.varloading.value = false;
+    return Promise.reject(error);
+});
+
+// 2. Interceptador de FIM (Quando recebe a resposta do servidor)
+axios.interceptors.response.use((response) => {
+    jssistema.varloading.value = false;
+    return response;
+}, (error) => {
+    jssistema.varloading.value = false;
+    return Promise.reject(error);
+});
+
+// Intercepta respostas inválidas do servidor (como expiração de sessão)
+/*
+router.on('invalid', (event) => {
+    const status = event.detail.response.status;
+
+    // 419 = Token/Sessão expirou no Laravel
+    // 401 = Usuário perdeu a autenticação
+    if (status === 419 || status === 401 ) {
+        // 1. Evita que a tela cinza padrão de erro do Laravel apareça
+        event.preventDefault(); 
+
+        // 2. Dispara o seu popup reativo na tela
+        mostrarPopup({
+            titulo: 'Sessão Expirada',
+            conteudo: 'Seu tempo de Sessão Acabou. Você será redirecionado o login...',
+            tipo: 'warning',
+            tempo: 4000
+        });
+
+        // 3. Aguarda o tempo do popup para redirecionar o navegador de forma limpa
+        setTimeout(() => {
+            window.location.href = '/login';
+        }, 4000);
+
+    }else if (status === 500) {
+        event.preventDefault(); // Impede a tela preta padrão do Laravel
+        
+        mostrarPopup({
+            titulo: 'Estamos Enfrentando Instabilidade',
+            conteudo: 'Aguarde! O Sistema Fará a Tentativa de Recuperação.',
+            tipo: 'danger',
+            tempo: 6000
+        });
+
+        setTimeout(() => {
+            //window.location.href = '/login';
+            //route('login');
+            window.location.href = route('login');
+        }, 6000);        
+    }
+});*/
+
+
+// Intercepta respostas inválidas do servidor (como expiração de sessão)
+router.on('invalid', (event) => {
+    const status = event.detail.response.status;
+    const urlAtual = window.location.href; // Captura a tela onde o usuário estava
+
+    // 419 = Token/Sessão expirou no Laravel
+    // 401 = Usuário perdeu a autenticação
+    if (status === 419 || status === 401 ) {
+        event.preventDefault(); 
+
+        // 🚀 ENVIAR LOG PARA O BACKEND VIA AXIOS
+        /*axios.post('/log-frontend-erro', { status: status, url: urlAtual })
+            .catch(err => console.error('Falha ao registrar log de sessão', err));*/
+
+        jssistema.mostrarPopup({
+            titulo: 'Sessão Expirada',
+            conteudo: 'Seu tempo de Sessão Acabou. Você será redirecionado para o login...',
+            tipo: 'warning',
+            tempo: 4000
+        });
+
+        setTimeout(() => {
+            window.location.href = route('login');
+        }, 4000);
+
+    } else if (status === 500) {
+        event.preventDefault(); 
+        
+        // 🚀 ENVIAR LOG PARA O BACKEND VIA AXIOS
+        /*axios.post('/log-frontend-erro', { status: status, url: urlAtual })
+            .catch(err => console.error('Falha ao registrar log de erro 500', err));*/
+
+        jssistema.mostrarPopup({
+            titulo: 'Estamos Enfrentando Instabilidade',
+            conteudo: 'Aguarde! O Sistema Fará a Tentativa de Recuperação.',
+            tipo: 'danger',
+            tempo: 6000
+        });
+
+        setTimeout(() => {
+            window.location.href = route('login');
+        }, 6000);        
+    }
+});
