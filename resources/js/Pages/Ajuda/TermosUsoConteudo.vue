@@ -13,10 +13,12 @@ defineProps({
 </script>
 
 <template>
-    <div class="flex flex-col items-center text-center border-b border-comum/20 pb-6 mb-6">
-        <img alt="Logo" class="max-w-xs md:max-w-sm mb-4 rounded-lg" :src="`${appUrl}/build/assets/images/company/${logoEmpresa}_005.png`"> 
+    <div class="flex flex-col items-center text-center border-b border-comum/20 pb-6 mb-6 w-full">
+        <img alt="Logo" 
+            class="w-full max-w-xs md:max-w-sm h-auto mb-4 rounded-lg object-contain" 
+            :src="`${appUrl}/build/assets/images/company/${logoEmpresa}_005.png`"> 
         <h2 class="text-2xl font-bold text-texto-claro">Termos e Condições de Uso</h2>
-    </div> 
+    </div>    
 
     <div class="space-y-6 text-sm text-justify leading-relaxed">
         <div>

@@ -8,7 +8,7 @@ Analise que o Falcao Mandou
 Fazer o controle de acesso, cal, menus, permissoes
 Configuração de sistema e usuarios
 Tipos de Escuro, tom azul escuro, preto e acinzentado
-mesmo com a cortina ativa consigo clicar nos items na tela que está atrás da cortina
+
 
 Recaptcha
 E-mail
@@ -48,7 +48,7 @@ Senha do Login quando em Debug - Preencher Automatico - OK
 btndir Browser - OK
 Btn Voltar ao Topo - OK
 Cal permissao remover as cals que não estao neste sistema - OK
-
+mesmo com a cortina ativa consigo clicar nos items na tela que está atrás da cortina - OK
 
 
 
@@ -128,4 +128,15 @@ Seeders para Popular os dados iniciais no Banco de Dados
 php artisan db:seed CargaInicialSeeder
 php artisan db:seed EnderecoSeeder
 php artisan db:seed ColumnCalSeeder
+php artisan db:seed CalPermissaoSeeder
 php artisan db:seed CalSeeder
+php artisan db:seed CfgSistSeeder
+php artisan db:seed CfgUserCalSeeder
+php artisan db:seed ConfigForUserSeeder
+php artisan db:seed ConfigSeeder
+php artisan db:seed ConfigUserSeeder
+php artisan db:seed GrupoSeeder
+php artisan db:seed UsuarioSeeder
+
+
+cal;cfg;conf;grupo;usu;log;audi

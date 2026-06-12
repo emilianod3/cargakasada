@@ -29,7 +29,7 @@ const classesTipoPopup = computed(() => {
         information: {
             borda: 'border-blue-500',
             iconeBg: 'bg-blue-500/10 text-blue-500',
-            botao: 'bg-blue-500 hover:bg-blue-600 focus:ring-blue-500',
+            botao: 'bg-blue-500 hover:bg-emerald-600 focus:ring-blue-500', // Alinhado hover padrão
             icone: 'ℹ'
         }
     };
@@ -53,8 +53,8 @@ watch(popupAtivo, async (novoValor) => {
 
 <template>
     <Teleport to="body">
-        <div class="fixed inset-0 z-[99999] flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 transition-all duration-300 opacity-0 pointer-events-none"
-             :class="{ 'opacity-100 pointer-events-auto': popupAtivo }"
+        <div class="fixed inset-0 z-[99999] flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 transition-all duration-300"
+             :class="popupAtivo ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'"
              @click="cliqueNoFundo">
             
             <div ref="cardPopupSimples"

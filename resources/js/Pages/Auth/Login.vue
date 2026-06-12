@@ -168,10 +168,15 @@ function esquecisenha() {
             <div class="transition-all duration-300">
                 <form @submit.prevent="submeterLogin" class="flex flex-col gap-4">
                     
-                    <div class="flex flex-col items-center gap-2 mb-4">
-                        <img :src="`${appUrl1}/build/assets/images/company/logo_text_003.png`" alt="Logo Fixa" width="250" style="cursor: pointer; border-radius: 10px;">
-                        <img alt="Logo" width="250" :src="`${appUrl1}/build/assets/images/company/${logoEmpresa}_005.png`" style="cursor: pointer; border-radius: 10px;">
-                    </div>
+                    <div class="flex flex-col items-center gap-2 mb-4 w-full">
+                        <img :src="`${appUrl1}/build/assets/images/company/logo_text_003.png`" 
+                            alt="Logo Fixa" 
+                            class="w-full max-w-62.5 h-auto cursor-pointer rounded-xl">
+
+                        <img :src="`${appUrl1}/build/assets/images/company/${logoEmpresa}_005.png`" 
+                            alt="Logo" 
+                            class="w-full max-w-62.5 h-auto cursor-pointer rounded-xl">
+                    </div>                    
 
                     <div class="flex flex-col gap-1">
                         <input v-model="loginForm.username" ref="username1"

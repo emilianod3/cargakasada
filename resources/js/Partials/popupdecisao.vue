@@ -22,7 +22,7 @@ const classesTipoPopup = computed(() => {
         danger: {
             borda: 'border-red-500',
             iconeBg: 'bg-red-500/10 text-red-500',
-            botao: 'bg-red-500 hover:bg-red-600 focus:ring-red-500',
+            botao: 'bg-red-500 hover:bg-red-700 focus:ring-red-500', // Ajustado hover para consistência
             icone: '✕'
         },
         information: {
@@ -47,8 +47,8 @@ watch(popupDecisaoAtivo, async (velhoValor) => {
 
 <template>
     <Teleport to="body">
-        <div class="fixed inset-0 z-[99999] flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 transition-all duration-300 opacity-0 pointer-events-none"
-             :class="{ 'opacity-100 pointer-events-auto': popupDecisaoAtivo }"
+        <div class="fixed inset-0 z-[99999] flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 transition-all duration-300"
+             :class="popupDecisaoAtivo ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'"
              @click="() => { if (!popupDecisaoConfig.bloquearCliqueFora) fecharPopupDecisao('fechar') }">
             
             <div ref="cardPopup"
