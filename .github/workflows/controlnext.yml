@@ -3,7 +3,7 @@ name: 🚀 CTRLNEXT - Deploy CargaKasada to Hostgator CtrlNext
 
 on:
   push: 
-    branches: [ "ctrlnext" ]
+    branches: [ "crtlnext" ]
     paths-ignore:
       - README.md
       - databaseapply
