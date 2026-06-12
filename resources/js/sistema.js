@@ -102,6 +102,7 @@ const submenusAbertos = ref({
 });
 
 // FUNÇÃO CENTRALIZADA QUE VOCÊ VAI CHAMAR NO SISTEMA INTEIRO
+/*
 export function mostrarPopup({ titulo, conteudo, tipo = 'information', tempo = 0, bloquearCliqueFora = false }) {
     // Limpa qualquer timeout pendente de um popup anterior
     if (popupTimeoutId) clearTimeout(popupTimeoutId);
@@ -109,6 +110,33 @@ export function mostrarPopup({ titulo, conteudo, tipo = 'information', tempo = 0
     // Define as configurações
     popupConfig.value = { titulo, conteudo, tipo, bloquearCliqueFora };
     popupAtivo.value = true;
+
+    // Se foi passado um tempo (ex: 5000 para 5 segundos), fecha automaticamente
+    if (tempo > 0) {
+        popupTimeoutId = setTimeout(() => {
+            fecharPopup();
+        }, tempo);
+    }
+}*/
+
+export function mostrarPopup({ titulo, conteudo, tipo = 'information', tempo = 0, bloquearCliqueFora = false }) {
+    // Limpa qualquer timeout pendente de um popup anterior
+    if (popupTimeoutId) clearTimeout(popupTimeoutId);
+
+    // Define as configurações
+    popupConfig.value = { titulo, conteudo, tipo, bloquearCliqueFora };
+    popupAtivo.value = true;
+
+    // ==========================================================================
+    // CAPTURA DE FOCO ASSÍNCRONA
+    // ==========================================================================
+    nextTick(() => {
+        // Encontra o botão de OK do popup e crava o foco nele
+        const botaoOk = document.querySelector('.popup-simples-card button');
+        if (botaoOk) {
+            botaoOk.focus();
+        }
+    });
 
     // Se foi passado um tempo (ex: 5000 para 5 segundos), fecha automaticamente
     if (tempo > 0) {

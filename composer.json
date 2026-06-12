@@ -71,7 +71,11 @@
         ],
         "pre-package-uninstall": [
             "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"
-        ]
+        ],
+        "version": [
+            "php version_atualizar.php",
+            "git add config/version.php"
+        ]        
     },
     "extra": {
         "laravel": {

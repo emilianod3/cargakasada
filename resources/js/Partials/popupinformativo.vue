@@ -1,6 +1,9 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, watch, nextTick, ref } from 'vue';
 import { popupAtivo, popupConfig, fecharPopup, coresBases, corAtual } from '@/sistema.js';
+
+// Referência reativa para o card interno do popup receber foco
+const cardPopupSimples = ref(null);
 
 // Mapeamento de cores do Tailwind
 const classesTipoPopup = computed(() => {
@@ -30,48 +33,60 @@ const classesTipoPopup = computed(() => {
             icone: 'ℹ'
         }
     };
-    return mapa[popupConfig.value.tipo] || mapa.information;
+    return mapa[popupConfig.value?.tipo] || mapa.information;
 });
 
 const cliqueNoFundo = () => {
-    if (!popupConfig.value.bloquearCliqueFora) {
+    if (!popupConfig.value?.bloquearCliqueFora) {
         fecharPopup();
     }
 };
+
+// VIGIA A ABERTURA DO POPUP PARA FORÇAR O FOCO DO NAVEGADOR
+watch(popupAtivo, async (novoValor) => {
+    if (novoValor) {
+        await nextTick();
+        cardPopupSimples.value?.focus();
+    }
+});
 </script>
 
 <template>
-    <div class="fixed inset-0 z-[9998] flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 transition-all duration-300 opacity-0 pointer-events-none"
-         :class="{ 'opacity-100 pointer-events-auto': popupAtivo }"
-         @click="cliqueNoFundo">
-        
-        <div class="w-full max-w-md rounded-xl p-6 shadow-2xl border-t-4 transform transition-all duration-300 bg-[rgb(var(--cor-painel-rgb))] text-[rgb(var(--cor-texto-claro))]"
-             :class="[classesTipoPopup.borda, popupAtivo ? 'scale-100' : 'scale-95']"
-             @click.stop>
+    <Teleport to="body">
+        <div class="fixed inset-0 z-[99999] flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 transition-all duration-300 opacity-0 pointer-events-none"
+             :class="{ 'opacity-100 pointer-events-auto': popupAtivo }"
+             @click="cliqueNoFundo">
             
-            <div class="flex items-start gap-4">
-                <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 font-bold text-lg"
-                     :class="classesTipoPopup.iconeBg">
-                    {{ classesTipoPopup.icone }}
+            <div ref="cardPopupSimples"
+                 tabindex="-1"
+                 class="popup-simples-card w-full max-w-md rounded-xl p-6 shadow-2xl border-t-4 transform transition-all duration-300 bg-[rgb(var(--cor-painel-rgb))] text-[rgb(var(--cor-texto-claro))] focus:outline-none select-none"
+                 :class="[classesTipoPopup.borda, popupAtivo ? 'scale-100' : 'scale-95']"
+                 @click.stop>
+                
+                <div class="flex items-start gap-4">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 font-bold text-lg"
+                         :class="classesTipoPopup.iconeBg">
+                        {{ classesTipoPopup.icone }}
+                    </div>
+
+                    <div class="flex-1">
+                        <h3 class="text-lg font-bold tracking-wide">
+                            {{ popupConfig.titulo }}
+                        </h3>
+                        <p class="text-sm mt-2 opacity-80 leading-relaxed whitespace-pre-line">
+                            {{ popupConfig.conteudo }}
+                        </p>
+                    </div>
                 </div>
 
-                <div class="flex-1">
-                    <h3 class="text-lg font-bold tracking-wide">
-                        {{ popupConfig.titulo }}
-                    </h3>
-                    <p class="text-sm mt-2 opacity-80 leading-relaxed whitespace-pre-line">
-                        {{ popupConfig.conteudo }}
-                    </p>
+                <div class="mt-6 flex justify-end">
+                    <button @click="fecharPopup"
+                            class="px-4 py-2 rounded-lg text-white font-medium text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 cursor-pointer pointer-events-auto"
+                            :class="classesTipoPopup.botao">
+                        OK
+                    </button>
                 </div>
-            </div>
-
-            <div class="mt-6 flex justify-end">
-                <button @click="fecharPopup"
-                        class="px-4 py-2 rounded-lg text-white font-medium text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900"
-                        :class="classesTipoPopup.botao">
-                    OK
-                </button>
             </div>
         </div>
-    </div>
+    </Teleport>
 </template>

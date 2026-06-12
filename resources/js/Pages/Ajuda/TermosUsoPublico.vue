@@ -91,7 +91,7 @@ const setTermosdeuso = (tipo) => {
                                 <button 
                                     v-if="usuarioLogado.uaceitetermosuso == 0"
                                     @click="setTermosdeuso(1)"
-                                    class="flex items-center gap-2 px-6 py-2.5 bg-transparent border-2 border-green-600 text-green-600 font-medium rounded-full hover:bg-green-600 hover:text-white transition-all duration-300 ease-in-out focus:outline-none"
+                                    class="flex items-center gap-2 px-6 py-2.5 bg-transparent border-2 border-green-600 text-green-600 font-medium rounded-full hover:bg-green-600 hover:text-white transition-all duration-300 ease-in-out focus:outline-none cursor-pointer"
                                     title="Clique para aceitar os termos e liberar o uso sem Restrições">
                                     <i class="fas fa-thumbs-up"></i> Aceitar Termos
                                 </button>
@@ -99,7 +99,7 @@ const setTermosdeuso = (tipo) => {
                                 <button 
                                     v-else
                                     @click="setTermosdeuso(0)"
-                                    class="flex items-center gap-2 px-6 py-2.5 bg-transparent border-2 border-red-600 text-red-600 font-medium rounded-full hover:bg-red-600 hover:text-white transition-all duration-300 ease-in-out focus:outline-none"
+                                    class="flex items-center gap-2 px-6 py-2.5 bg-transparent border-2 border-red-600 text-red-600 font-medium rounded-full hover:bg-red-600 hover:text-white transition-all duration-300 ease-in-out focus:outline-none cursor-pointer"
                                     title="Ao clicar você declina dos termos e seu acesso poderá ser Restringido">
                                     <i class="fas fa-thumbs-down"></i> Revogar Aceite
                                 </button>
@@ -121,7 +121,7 @@ const setTermosdeuso = (tipo) => {
                                 <div class="flex items-center gap-3">
                                     <button disabled
                                         class="bg-success/50 text-texto-claro/20 font-bold px-5 py-2.5 rounded-full text-sm flex items-center gap-2 cursor-not-allowed border border-text-texto-claro/10"
-                                        title="Só será possível aceitar os termos criando uma conta">
+                                        title="Só será possível aceitar os termos criando uma conta ">
                                         <i class="fas fa-thumbs-up"></i> Aceitar Termos
                                     </button>
                                 </div>
