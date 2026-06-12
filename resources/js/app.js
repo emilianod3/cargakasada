@@ -1,8 +1,8 @@
 import './bootstrap';
 import { createApp, h } from 'vue'
 import { createInertiaApp, router } from '@inertiajs/vue3'
-//import { ZiggyVue } from 'ziggy-js';
-import { ZiggyVue } from '../../vendor/tightenco/ziggy';
+import { ZiggyVue } from 'ziggy-js';
+//import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 import FloatingVue from 'floating-vue';
 import 'floating-vue/dist/style.css';
 
@@ -25,12 +25,13 @@ createInertiaApp({
 
     // 3. Injetamos as propriedades globais na variável 'app' que agora existe
     app.config.globalProperties.$appUrl = globalAppUrl;
-    app.provide('appUrl', globalAppUrl);                
+    app.provide('appUrl', globalAppUrl);  
     
+    const ziggyConfig = props.initialPage?.props?.ziggy;
     // 4. Ativamos os plugins e montamos o app no HTML
     return app
         .use(plugin)
-        .use(ZiggyVue)    
+        .use(ZiggyVue, ziggyConfig)    
         .use(FloatingVue)
         .mount(el);
   },

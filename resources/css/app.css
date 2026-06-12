@@ -1,4 +1,6 @@
 @import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -6,6 +8,324 @@
 @source '../**/*.js';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    /*--font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji','Segoe UI Symbol', 'Noto Color Emoji';*/
+    --font-sans: 'Figtree', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+
+    --color-primary: rgb(var(--cor-marca-rgb));
+    --color-primary-hover: rgb(var(--cor-marca-hover));
+
+    --color-layout-fundo: rgb(var(--cor-fundo-rgb));
+    --color-layout-painel: rgb(var(--cor-painel-rgb));
+
+    --color-texto-claro: rgb(var(--cor-texto-claro));
+    --color-texto-escuro: rgb(var(--cor-texto-escuro));        
+}
+
+
+
+:root {
+  /* Configuração dinâmica automática dos Tooltips */
+  --v-popper-theme-tooltip-bg: rgb(var(--cor-marca-rgb));
+  --v-popper-theme-tooltip-color: rgb(var(--cor-texto-escuro));
+}
+
+/* Bordas dinâmicas inteligentes que funcionam tanto no branco quanto no preto */
+.border-comum {
+  border-color: rgba(var(--cor-texto-claro) / 0.12) !important;
+}
+
+/* ==========================================================================
+   FORÇAR ALTERAÇÃO VISUAL DO FLOATING VUE DE MANEIRA DINÂMICA
+   ========================================================================== */
+
+/* Altera o balão de texto em si, consumindo as variáveis ativas do tema */
+body .v-popper__theme-tooltip .v-popper__inner,
+.v-popper__inner {
+    background-color: rgb(var(--cor-marca-rgb)) !important;    /* Cor Base Ativa (Cinza, Azul, Verde...) */
+    color: rgb(var(--cor-texto-escuro)) !important;            /* Texto adaptado para o fundo do Tooltip */
+    font-weight: 600 !important;                               /* font-semibold */
+    font-size: 12px !important;                                /* text-xs */
+    border-radius: 6px !important;                             /* rounded */
+    padding: 6px 10px !important;                              /* px-2.5 py-1.5 */
+    border: 1px solid rgba(var(--cor-texto-claro) / 0.1) !important; /* Borda sutil adaptável */
+}
+
+/* Altera a cor das setinhas indicativas (Arrow) para casar com a cor base ativa */
+body .v-popper__theme-tooltip .v-popper__arrow-container .v-popper__arrow-outer,
+body .v-popper__theme-tooltip .v-popper__arrow-container .v-popper__arrow-inner,
+.v-popper__arrow-outer, 
+.v-popper__arrow-inner {
+    border-color: rgb(var(--cor-marca-rgb)) !important;
+}
+
+/* Força o preenchimento automático a respeitar o tema dark/customizado */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-text-fill-color: #f3f4f6 !important; /* Cor correspondente ao seu text-texto-claro (ex: gray-100) */
+    transition: background-color 5000s ease-in-out 0s; /* Truque para congelar o fundo transparente */
+    box-shadow: inset 0 0 0px 1000px transparent !important;
+}
+
+/* ==========================================================================
+   CONFIGURAÇÃO BASE DO BOTÃO (Comportamento Geral)
+   ========================================================================== */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.625rem 1.25rem; /* Equivalente a px-5 py-2.5 */
+    font-size: 0.875rem;       /* text-sm */
+    font-weight: 500;          /* font-medium */
+    border-radius: 0.5rem;     /* rounded-lg */
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
+}
+
+/* Efeito ao clicar fisicamente no botão */
+.btn:active {
+    transform: scale(0.98);
+}
+
+/* Remove contornos feios, mas mantém acessibilidade no teclado */
+.btn:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+}
+
+.btn i {
+    font-size: 1rem;       /* Tamanho ideal para alinhar com o texto */
+    line-height: 1;
+    flex-shrink: 0;        /* Impede o ícone de achatar em telas pequenas */
+    color: inherit;        /* Força o ícone a usar a mesma cor do texto (branco ou escuro) */
+}
+
+/* ==========================================================================
+   ESTRUTURA DO GRUPO DE BOTÕES
+   ========================================================================== */
+.btn-group {
+    display: inline-flex; /* Mantém os botões um ao lado do outro na horizontal */
+    border-radius: 0.5rem; /* O arredondamento principal do grupo */
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* 1. Remove o arredondamento padrão de TODOS os botões de dentro do grupo */
+.btn-group .btn {
+    border-radius: 0;
+    margin: 0;
+    border-right-width: 0; 
+}
+
+/* 2. Arredonda APENAS os cantos esquerdos do PRIMEIRO botão */
+.btn-group .btn:first-child {
+    border-top-left-radius: 0.5rem;
+    border-bottom-left-radius: 0.5rem;
+}
+
+/* 3. Arredonda APENAS os cantos direitos do ÚLTIMO botão */
+.btn-group .btn:last-child {
+    border-top-right-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+    border-right-width: 1px; 
+}
+
+/* ==========================================================================
+   ESTRUTURA PARA BOTÕES 100% REDONDOS (CIRCULARES)
+   ========================================================================== */
+.btn-circle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* Define tamanhos idênticos para garantir o círculo perfeito */
+    width: 2.75rem;  /* 44px (tamanho ideal para clique) */
+    height: 2.75rem; /* 44px */
+    
+    border-radius: 50%; /* Faz ficar redondo */
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Efeito físico ao clicar */
+.btn-circle:active {
+    transform: scale(0.92);
+}
+
+/* Centralização do ícone do Font Awesome */
+.btn-circle i {
+    font-size: 1.1rem; /* Ícone levemente maior já que não tem texto */
+    line-height: 1;
+    color: inherit;
+}
+
+/* ==========================================================================
+   PALETA DE CORES DOS BOTÕES (Fundo + Texto + Hovers)
+   ========================================================================== */
+
+/* ROXO */
+.btn-purple {
+    background-color: #7c3aed; 
+    color: #ffffff;
+}
+.btn-purple:hover { background-color: #6d28d9; }
+.btn-purple:active { background-color: #5b21b6; }
+
+/* VERMELHO */
+.btn-red {
+    background-color: #dc2626;
+    color: #ffffff;
+}
+.btn-red:hover { background-color: #b91c1c; }
+.btn-red:active { background-color: #991b1b; }
+
+/* VERDE */
+.btn-green {
+    background-color: #16a34a;
+    color: #ffffff;
+}
+.btn-green:hover { background-color: #15803d; }
+.btn-green:active { background-color: #166534; }
+
+/* AMARELO */
+.btn-yellow {
+    background-color: #f59e0b;
+    color: #0f172a; 
+}
+.btn-yellow:hover { background-color: #d97706; }
+.btn-yellow:active { background-color: #b45309; }
+
+/* AZUL */
+.btn-blue {
+    background-color: #2563eb;
+    color: #ffffff;
+}
+.btn-blue:hover { background-color: #1d4ed8; }
+.btn-blue:active { background-color: #1e40af; }
+
+/* CIANO */
+.btn-cyan {
+    background-color: #06b6d4;
+    color: #0f172a; 
+}
+.btn-cyan:hover { background-color: #0891b2; }
+.btn-cyan:active { background-color: #0e7490; }
+
+/* PRETO */
+.btn-black {
+    background-color: #171717;
+    color: #ffffff;
+}
+.btn-black:hover { background-color: #262626; }
+.btn-black:active { background-color: #000000; }
+
+/* CINZA */
+.btn-gray {
+    background-color: #64748b;
+    color: #ffffff;
+}
+.btn-gray:hover { background-color: #475569; }
+.btn-gray:active { background-color: #334155; }
+
+/* BRANCO */
+.btn-white {
+    background-color: #ffffff;
+    color: #334155;
+    border-color: #cbd5e1; 
+}
+.btn-white:hover { background-color: #f8fafc; }
+.btn-white:active { background-color: #f1f5f9; }
+
+/* ==========================================================================
+   ESTILOS ESPECIAIS (Neon Button)
+   ========================================================================== */
+.neon-btn__wrapper {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.neon-btn {
+  min-width: 300px;
+  min-height: 60px;
+  display: inline-flex;
+  font-family: 'Nunito', sans-serif;
+  font-size: 22px;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  text-align: center;
+  letter-spacing: 1.3px;
+  font-weight: 700;
+  color: #313133;
+  background: #4FD1C5;
+  background: linear-gradient(90deg, rgba(129,230,217,1) 0%, rgba(79,209,197,1) 100%);
+  border: none;
+  border-radius: 1000px;
+  box-shadow: 0px 12px 24px rgba(79,209,197,.64);
+  transition: all 0.3s ease-in-out 0s;
+  cursor: pointer;
+  outline: none;
+  position: relative;
+  padding: 10px;
+}
+
+.neon-btn::before {
+  content: '';
+  border-radius: 1000px;
+  min-width: calc(300px + 12px);
+  min-height: calc(60px + 12px);
+  border: 6px solid #00FFCB;
+  box-shadow: 0 0 60px rgba(0,255,203,.64);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: all .3s ease-in-out 0s;
+}
+
+.neon-btn:hover, .neon-btn:focus {
+  color: #313133;
+  transform: translateY(-6px);
+}
+
+.neon-btn:hover::before, .neon-btn:focus::before {
+  opacity: 1;
+}
+
+.neon-btn::after {
+  content: '';
+  width: 30px; 
+  height: 30px;
+  border-radius: 100%;
+  border: 6px solid #00FFCB;
+  position: absolute;
+  z-index: -1;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: neon-ring-glow 1.5s infinite;
+}
+
+.neon-btn:hover::after, .neon-btn:focus::after {
+  animation: none;
+  display: none;
+}
+
+@keyframes neon-ring-glow {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(10);
+    opacity: 0;
+  }
 }
