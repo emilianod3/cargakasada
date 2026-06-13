@@ -2,7 +2,7 @@
 
 
 Fazer o esqueci minha Senha
-Termos de uso e politica de privacidade aberto  fechado
+
 Fazer o não tenho conta
 Analise que o Falcao Mandou
 Fazer o controle de acesso, cal, menus, permissoes
@@ -51,7 +51,8 @@ btndir Browser - OK
 Btn Voltar ao Topo - OK
 Cal permissao remover as cals que não estao neste sistema - OK
 mesmo com a cortina ativa consigo clicar nos items na tela que está atrás da cortina - OK
-
+Termos de uso e politica de privacidade aberto  fechado - OK
+Tela e Sobre e Dados do Servidor e Versoes de Tecnologia - OK
 
 
 Rodas Migrations nesta ordem de dependencia para criar as Tabelas no Banco
