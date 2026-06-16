@@ -10,9 +10,13 @@ on:
       - databasehistory
       - datainit
       - .vscode/**
+      - git/**
+      - github/**  
       - .env
       - .env.*
+      - 'vendor/'
       - 'vendor/**'
+      - '**/vendor/**'
       - 'public/storage/**'
 
 jobs:
@@ -24,13 +28,13 @@ jobs:
         uses: actions/checkout@v3
       
       - name: 📂 Sync files
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.ctrl_host }}
           username: ${{ secrets.ctrl_user }}
           password: ${{ secrets.ctrl_pass }}
           server-dir: cargakasada/
-          exclude: '["**/vendor/**", ".git/**", ".vscode/**"]'
+          exclude: '["vendor/**", "vendor/", "**/vendor/**", ".git/**", ".vscode/**"]'
 
       - name: Composer Dependences
         run: composer update

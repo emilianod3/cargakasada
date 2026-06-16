@@ -10,11 +10,6 @@ Route::middleware(['throttle:100,1'])->group(function () {
     ->middleware(['web', 'redirectlogado'])
     ->name('inicio');  
 });
-/*
-Route::get('/', function () {
-    return view('welcome');
-});
-*/
 
 Route::get('/dashboard', function () {
     return Inertia::render('Core/Dashboard');
