@@ -148,7 +148,8 @@ const submeterRecuperacao = () => {
             const rsucesso = usePage().props.flash?.resultado;
             //console.log('Saida:', rsucesso);
             const djson = JSON.parse(rsucesso);
-            /*console.log('Texto:', djson.message);
+            /*
+            console.log('Texto:', djson.message);
             console.log('Código:', djson.status);
             console.log('Dados Lidos:', djson.data);*/
             sistemajs.mostrarPopup({ 
