@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redirect;
+use Inertia\Inertia;
 use PHPJasper\PHPJasper;
 use stdClass;
 
@@ -1447,7 +1448,7 @@ class UnicoController extends Controller
             'undatanasc' => 'required|string|min:8',
             'uncpf' => 'required|string|min:13',
             'euemail' => 'required|email|min:4',
-            'aceitatermos' => 'required|integer|min:0',
+            'aceitatermos' => 'required|boolean|accepted',
             
         ],
         [
@@ -1463,13 +1464,15 @@ class UnicoController extends Controller
             'euemail.required' => 'Informe um e-mail Válido',
             'euemail.string' => 'Informe um e-mail Válido',
             'euemail.min' => 'Informe um e-mail Válido',
-            'aceitatermos.required' => 'Aceite os Termos de Uso para Prosseguir',
-            'aceitatermos.string' => 'Aceite os Termos de Uso para Prosseguir',
-            'aceitatermos.min' => 'Aceite os Termos de Uso para Prosseguir',
+            'aceitatermos.required' => 'Aceite os Termos de Uso para Prosseguir.',
+            'aceitatermos.boolean'  => 'Aceite os Termos de Uso para Prosseguir.',
+            'aceitatermos.accepted'  => 'Aceite os Termos de Uso para Prosseguir.',
         ]);
         
         if ($validator->fails()) {
-            return Tools::setResponse('fail', null, $validator->errors()->first());
+            //return Tools::setResponse('fail', null, $validator->errors()->first());
+            //return back()->withErrors($validator->errors());
+            return back()->withErrors(Tools::setResult('fail', null, $validator->errors()->first()));
         } else {
             try{
                 $unico = Unico::where('unidentificacao',trim($request->unidentificacao))->where('undatanasc',$request->undatanasc)
@@ -1481,18 +1484,25 @@ class UnicoController extends Controller
                 $email = self::getEmailUnico($request->euemail);
 
                 if (empty($unico) || empty($email)) {
-                    return Tools::setResponse('fail', null, 'Impossível Prosseguir, Informe Dados Reais');
+                    //return Tools::setResponse('fail', null, 'Impossível Prosseguir, Informe Dados Reais');
+                    Tools::setAtividade(0, 8, 0, 'Falha na Tentativa de Recuperação de Senha', 'Não correspondem Dados da Pessoa ou e-mail');
+                    return back()->withErrors(Tools::setResult('fail', null, 'Impossível Prosseguir, Informe Dados Reais'));
+
                 }else{
                     if($unico->id == $email->unico->id){
                         $user = Usuario::where('fkidunico', $unico->id)->where('ustatus', 1)->with('unico', 'gestor')->first();
                         if (empty($user)) {
-                            return Tools::setResponse('fail', null, 'Impossível Prosseguir com a Recuperação, Tente Novamente');
+                            //return Tools::setResponse('fail', null, 'Impossível Prosseguir com a Recuperação, Tente Novamente');
+                            Tools::setAtividade(0, 8, 0, 'Falha na Tentativa de Recuperação de Senha', 'Usuário não Identificado para a Pessoa: '.$unico->unidentificacao.' com E-mail: '.$email->euemail);
+                            return back()->withErrors(Tools::setResult('fail', null, 'Impossível Prosseguir com a Recuperação, Tente Novamente'));
                         }else{
                             self::updatetermouso($user->id, 1);
                         }
                         $passrecovery = self::gerarToken($user->id, $email->id);
                         if (empty($passrecovery)) {
-                            return Tools::setResponse('fail', null, 'Impossível Prosseguir com a Recuperação de Senha, Tente Novamente');
+                            Tools::setAtividade($user->id, 8, $user->id, 'Falha na Tentativa de Recuperação de Senha', 'Falha ao gerar Token para a Pessoa: '.$unico->unidentificacao.' com E-mail: '.$email->euemail.' Usuário: '.$user->id);
+                            //return Tools::setResponse('fail', null, 'Impossível Prosseguir com a Recuperação de Senha, Tente Novamente');
+                            return back()->withErrors(Tools::setResult('fail', null, 'Impossível Prosseguir com a Recuperação, Tente Novamente'));
                         }
                         $tokenrecovery = self::getToken($passrecovery->id);
                         $emaildata = new stdClass();
@@ -1502,14 +1512,21 @@ class UnicoController extends Controller
                         $emaildata->urlsistema = route('redefinir.senha', $tokenrecovery);
                         //$emaildata->urlsistema = url().'/redefinir/senha/'.$tokenrecovery;  
                         Mail::to($email->euemail)->send(new recuperarSenha($emaildata));
-                        return Tools::setResponse('success', null, 'Acesse seu e-mail para Finalizar o Procedimento');
+                        //return Tools::setResponse('success', null, 'Acesse seu e-mail para Finalizar o Procedimento');
+                        Tools::setAtividade($user->id, 8, $user->id, 'Envio de E-mail', 'Acesse seu e-mail para Finalizar o Procedimento Pessoa: '.$unico->unidentificacao.' com E-mail: '.$email->euemail.' Usuário: '.$user->id);
+                        return back()->with(Tools::setResult('success', null, 'Acesse seu e-mail para Finalizar o Procedimento'));
+
                     }else{
-                        return Tools::setResponse('fail', null, 'Impossível Prosseguir, Tente Novamente');
+                        //return Tools::setResponse('fail', null, 'Impossível Prosseguir, Tente Novamente');
+                        Tools::setAtividade(0, 8, 0, 'Falha na Tentativa de Recuperação de Senha', 'Pessoa e e-mail não correspondem, Pessoa: '.$unico->unidentificacao.' com E-mail: '.$email->euemail);
+                        return back()->withErrors(Tools::setResult('fail', null, 'Impossível Prosseguir, Tente Novamente'));
                     }
                 }
             } catch (Exception $e) {
                 $except = $e->getMessage();
-                return Tools::setResponse('fail', null, 'Impossível Prosseguir, Tente Novamente');
+                //return Tools::setResponse('fail', null, 'Impossível Prosseguir, Tente Novamente');
+                Tools::setAtividade(0, 8, 0, 'Falha na Tentativa de Recuperação de Senha', $except);
+                return back()->withErrors(Tools::setResult('fail', null, 'Impossível Prosseguir, Tente Novamente'));
             }
         }
     }
@@ -1539,12 +1556,12 @@ class UnicoController extends Controller
         return $reg;
     }
 
-    protected function getToken($idPassRec)
+    protected function getToken(mixed $idPassRec)
     {
         return Crypt::encrypt($idPassRec);
     }
 
-    public function showRecoveryForm($token)
+    public function showRecoveryForm(String $token)
     {
         if (strlen($token)>15) {
             $idPass = self::checkToken($token);
@@ -1554,51 +1571,56 @@ class UnicoController extends Controller
                 if ($passRecovery && $passRecovery->prstatus == 1) {
                     if(self::setRecovery($token, $passRecovery->id))
                     {
-                        return view('auth.novasenha', ['recoverytoken' => $token]);
+                        //return view('auth.novasenha', ['recoverytoken' => $token]);
+                        return Inertia::render('Auth/RedefineSenha', ['recoverytoken' => $token]);
                     }else {
-                        return redirect()->route('esqueci.senha');
+                        return redirect()->route('esquecisenha');
                     }
                 }else {
-                    return redirect()->route('esqueci.senha');
+                    return redirect()->route('esquecisenha');
                 }
             }
             else {
-                return redirect()->route('esqueci.senha');
+                return redirect()->route('esquecisenha');
             }
         } else {
-            return redirect()->route('esqueci.senha');
+            return redirect()->route('esquecisenha');
         }
     }
 
-    protected function checkToken($token)
+    protected function checkToken(String $token)
     {
-        if (strlen($token)>15) {
-            $resultado = Crypt::decrypt($token);
-            return $resultado;
-        } else {
+        try{
+            if (strlen($token)>15) {
+                $resultado = Crypt::decrypt($token);
+                return $resultado;
+            } else {
+                return null;
+            }
+        } catch (Exception $e) {
             return null;
         }
     }
     
-    protected function validaRecovery($id)
+    protected function validaRecovery(Int $id)
     {
         $reg = PassRecovery::where('id', $id)->where('prdtregistro', '>', Carbon::now()->toDateTimeString())->where('prstatus', 1)->first();
         return $reg;
     }
 
-    protected function validaForSenha($id)
+    protected function validaForSenha(Int $id)
     {
         $reg = PassRecovery::where('id', $id)->where('prdtregistro', '>', Carbon::now()->toDateTimeString())->first();
         return $reg;
     }
 
-    protected function getPassRecoveryForId($id)
+    protected function getPassRecoveryForId(Int $id)
     {
         $reg = PassRecovery::find($id);
         return $reg;
     }
     
-    protected function setRecovery($token, $id)
+    protected function setRecovery(mixed $token, Int $id)
     {
         $passRecovery = PassRecovery::find($id);
         if($passRecovery) {
@@ -1618,7 +1640,8 @@ class UnicoController extends Controller
             $idtoken = Crypt::decrypt($request->token);
             $passrecovery = self::validaForSenha($idtoken);
             if (empty($passrecovery)) {
-                return Tools::setResponse('fail', null, 'Impossível Prosseguir, Verifique os Requisitos de Senha');
+                //return Tools::setResponse('fail', null, 'Impossível Prosseguir, Verifique os Requisitos de Senha');
+                return back()->withErrors(Tools::setResult('fail', null, 'Impossível Prosseguir, Verifique os Requisitos de Senha'));
             }
             $reguser = Usuario::where('id', $passrecovery->fkidusuario)->where('ustatus', 1)->first();
             $reguser->upassword = Hash::make($request->senha);
@@ -1630,13 +1653,16 @@ class UnicoController extends Controller
             $reguser->flagatualiza = 1;
             $reguser->uversao = Carbon::now()->toDateTimeString();
             if($reguser->save()){
-                return Tools::setResponse('success', null, 'Nova Senha Registrada com Sucesso');
+                //return Tools::setResponse('success', null, 'Nova Senha Registrada com Sucesso');
+                return back()->with(Tools::setResult('success', null, 'Nova Senha Registrada com Sucesso'));
             }else{
-                return Tools::setResponse('fail', null, 'Impossível Prosseguir, Verifique os Requisitos de Senha');
+                //return Tools::setResponse('fail', null, 'Impossível Prosseguir, Verifique os Requisitos de Senha');
+                return back()->withErrors(Tools::setResult('fail', null, 'Impossível Prosseguir, Verifique os Requisitos de Senha'));
             }
         } catch (Exception $e) {
             $except = $e->getMessage();
-            return Tools::setResponse('fail', null, 'Impossível Prosseguir, Verifique os Requisitos de Senha');
+            //return Tools::setResponse('fail', null, 'Impossível Prosseguir, Verifique os Requisitos de Senha');
+            return back()->withErrors(Tools::setResult('fail', null, 'Impossível Prosseguir, Verifique os Requisitos de Senha'));
         }
     }    
 

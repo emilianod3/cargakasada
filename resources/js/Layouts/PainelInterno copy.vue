@@ -1,6 +1,6 @@
 <script setup>
 import { usePage } from '@inertiajs/vue3';
-import { jssistema, formataDataHora } from '@/sistema';
+import { sistemajs, formataDataHora } from '@/sistema';
 import { onMounted, onUnmounted, ref, inject } from 'vue';
 
 // Importação das Partials
@@ -13,7 +13,7 @@ import Configuracao from '../Partials/config.vue';
 import Rodape from '../Partials/footer.vue';
 
 const appUrl1 = inject('appUrl');
-const { userMenuAberto } = jssistema();
+const { userMenuAberto } = sistemajs();
 const page = usePage();
 
 const logoutTime = 30 * 60 * 1000; // 15 minutos em milissegundos (ou o seu tempo padrão)

@@ -32,10 +32,22 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             \App\Http\Middleware\HandleInertiaRequests::class,
         ]);
+
+        // 🚀 OPÇÃO A: Aplicar em ABSOLUTAMENTE TODAS as rotas (Web, API, etc.)
+        $middleware->append(\App\Http\Middleware\IpWhitelist::class);
+
+        /*
+        // 💡 OPÇÃO B: Aplicar APENAS nas rotas Web (Recomendado se tiver APIs públicas no futuro)
+        $middleware->web(append: [
+            \App\Http\Middleware\IpWhitelist::class,
+        ]);
+        */
+
         // 🚀 Registra um apelido (alias) para o seu middleware manual
         $middleware->alias([
             'authcheck' => \App\Http\Middleware\AuthenticateCheck::class,
             'redirectlogado' => \App\Http\Middleware\RedirectLogado::class,
+            'ip.whitelist' => \App\Http\Middleware\IpWhitelist::class,
         ]);
 
         $middleware->redirectTo(fn () => route('login'));        
