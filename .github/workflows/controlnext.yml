@@ -41,7 +41,10 @@ jobs:
           exclude: '["vendor/**", "vendor/", "**/vendor/**", ".git/**", ".vscode/**"]'
       - name: Composer Dependences
         run: composer update
-
+        
+      # 2. Gera a vendor otimizada para produção (Rápido e sem pacotes de teste)
+      - name: 📦 Instalar Dependências do Composer
+        run: composer install --no-dev --optimize-autoloader
 
  test-output:
     name: 🎉 Checks de Deploy
