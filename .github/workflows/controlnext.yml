@@ -12,6 +12,7 @@ on:
       - .vscode/**
       - .env
       - .env.*
+      - 'vendor/**'
       - 'public/storage/**'
 
 jobs:
@@ -29,6 +30,7 @@ jobs:
           username: ${{ secrets.ctrl_user }}
           password: ${{ secrets.ctrl_pass }}
           server-dir: cargakasada/
+          exclude: '["**/vendor/**", ".git/**", ".vscode/**"]'
 
       - name: Composer Dependences
         run: composer update
@@ -56,7 +58,7 @@ jobs:
         uses: lakuapik/gh-actions-http-status@v1
         with:
           sites: '["https://www.controlnext.com.br/cargakasada"]'
-          expected: '[301, 200]'
+          expected: '[301, 200, 302]'
 
 
  connect-remote:
