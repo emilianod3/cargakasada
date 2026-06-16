@@ -48,7 +48,6 @@ Route::middleware(['throttle:100,1'])->group(function () {
     Route::get('/redefinir/senha/{token}', [UnicoController::class, 'showRecoveryForm'])->where('token', '[a-zA-Z0-9\/\+]+=*')->name('redefinir.senha');
     Route::post('/envio/nova/senha', [UnicoController::class, 'salvarnovasenha'])->name('envio.nova.senha');    
 
-    
     /*
     Route::get('/registro/usuario', function () {
         return view('auth.register');
