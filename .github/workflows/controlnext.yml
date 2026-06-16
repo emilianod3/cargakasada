@@ -12,6 +12,7 @@ on:
       - .vscode/**
       - .env
       - .env.*
+      - vendor/**
       - 'public/storage/**'
 
 jobs:
