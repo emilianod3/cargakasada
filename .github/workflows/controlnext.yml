@@ -26,6 +26,10 @@ jobs:
       steps:
       - name: 🚚 CheckOut do Repository
         uses: actions/checkout@v3
+
+        # Isso garante que o FTP não veja a pasta e não envie nada para a Hostgator
+      - name: 🗑️ Remover Vendor do ambiente temporário de Deploy
+        run: rm -rf vendor        
       
       - name: 📂 Sync files
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -35,7 +39,6 @@ jobs:
           password: ${{ secrets.ctrl_pass }}
           server-dir: cargakasada/
           exclude: '["vendor/**", "vendor/", "**/vendor/**", ".git/**", ".vscode/**"]'
-
       - name: Composer Dependences
         run: composer update
 
