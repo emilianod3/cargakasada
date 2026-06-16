@@ -16,22 +16,22 @@
     "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-v4compatibility.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-CbMFT9vO.css",
-    "src": "resources/css/app.css",
-    "isEntry": true,
+    "file": "assets/app-DVK2VGkG.css",
     "name": "app",
     "names": [
       "app.css"
-    ]
+    ],
+    "src": "resources/css/app.css",
+    "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-CP6yEQqN.js",
+    "file": "assets/app-BP9l0oDQ.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "css": [
-      "assets/app-BPRKGWk2.css",
-      "assets/app-CbMFT9vO.css"
+      "assets/app-CqkUOMeV.css",
+      "assets/app-DVK2VGkG.css"
     ],
     "assets": [
       "assets/fa-brands-400-BP5tdqmh.woff2",

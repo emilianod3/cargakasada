@@ -1,16 +1,14 @@
 <script setup>
 import Layout from '@/Layouts/PainelInterno.vue';
-import { ref, onMounted, inject, computed } from 'vue';
-import { usePage, router, Link } from '@inertiajs/vue3';
-import { mostrarPopup, formataDataHora } from '@/sistema.js';
-import TermosUsoConteudo from '@/Pages/Ajuda/TermosUsoConteudo.vue';
+import { onMounted, inject, computed } from 'vue';
+import { usePage} from '@inertiajs/vue3';
+import { formataDataHora } from '@/sistema.js';
 
 const appUrl1 = inject('appUrl');
 const page = usePage();
 const logoEmpresa = import.meta.env.VITE_COMPANY_LOGO || 'logo_text';
 const usuarioLogado = computed(() => page.props.auth?.user || null);
 const grupoLogado = computed(() => page.props.auth?.grupo || null);
-const storagepath = computed(() => page.props.storagepath || null);
 
 
 const voltar = () => {

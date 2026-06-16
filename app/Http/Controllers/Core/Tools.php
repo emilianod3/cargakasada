@@ -467,6 +467,24 @@ class Tools{
         ]);*/
     }
 
+
+    public static function setResult(string $status, $data = null, string $message = null)
+    {
+        /*return json_encode([
+            'status'       => $status,
+            'data'       => $data,
+            'message'    => $message
+        ]);*****/
+
+        return ['resultado' => json_encode([
+                'status'       => $status,
+                'data'       => $data,
+                'message'    => $message
+            ])
+        ];
+
+    }    
+
     public static function setResponseRel(string $status, string $extensao, string $arquivo, $data = null, string $message = null)
     {
         return [

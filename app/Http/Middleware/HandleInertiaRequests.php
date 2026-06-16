@@ -41,7 +41,8 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             //
         ];*/
-        $serverIp = $_SERVER['SERVER_ADDR'] ?? request()->server('SERVER_ADDR') ?? '127.0.0.1';
+        //$serverIp = $_SERVER['SERVER_ADDR'] ?? request()->server('SERVER_ADDR') ?? '127.0.0.1';
+        $serverIp = $request->server('SERVER_ADDR', '127.0.0.1');
         
         return array_merge(parent::share($request), [
             'versions' => [
@@ -68,8 +69,12 @@ class HandleInertiaRequests extends Middleware
             'app_url' => config('app.url'),
             'app_debug' => (bool) env('APP_DEBUG', false),
             'storagepath' => public_path('storage'), //Storage::path('public'),
-            'SISTEMA_CONTEXTBTNDIR' => (bool) env('SISTEMA_CONTEXTBTNDIR', 0), 
-            'menus' => $request->session()->get('menus'),   
+            'SISTEMA_CONTEXTBTNDIR' => (bool) env('SISTEMA_CONTEXTBTNDIR', 0),
+            'NOCAPTCHA_SITEKEY' => env('NOCAPTCHA_SITEKEY', ''), 
+            'menus' => $request->session()->get('menus'),
+            'flash' => [
+                'resultado' => $request->session()->get('resultado'),
+            ],
             'ziggy' => fn () => array_merge((new Ziggy())->toArray(), [
                 'location' => $request->url(),
             ]),        

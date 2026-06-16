@@ -9,7 +9,7 @@ import 'floating-vue/dist/style.css';
 import '../css/app.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 //import { varloading, mostrarPopup, mostrarPopupDecisao } from '@/sistema.js';
-import * as jssistema from '@/sistema.js';
+import * as sistemajs from '@/sistema.js';
 import axios from 'axios';
 
 
@@ -19,32 +19,32 @@ import axios from 'axios';
 
 // Ativa a cortina quando qualquer requisição para o controller iniciar
 router.on('start', () => {
-    jssistema.varloading.value = true;
+    sistemajs.varloading.value = true;
 });
 
 // Desativa a cortina quando o controller responder (sucesso ou erro)
 router.on('finish', () => {
-    jssistema.varloading.value = false;
+    sistemajs.varloading.value = false;
 });
 
 
 
 // 1. Interceptador de INÍCIO (Antes de enviar a requisição)
 axios.interceptors.request.use((config) => {
-    jssistema.varloading.value = true;
+    sistemajs.varloading.value = true;
     return config;
 }, (error) => {
     // Se der erro antes mesmo de enviar, desliga a cortina
-    jssistema.varloading.value = false;
+    sistemajs.varloading.value = false;
     return Promise.reject(error);
 });
 
 // 2. Interceptador de FIM (Quando recebe a resposta do servidor)
 axios.interceptors.response.use((response) => {
-    jssistema.varloading.value = false;
+    sistemajs.varloading.value = false;
     return response;
 }, (error) => {
-    jssistema.varloading.value = false;
+    sistemajs.varloading.value = false;
     return Promise.reject(error);
 });
 
@@ -61,7 +61,7 @@ axios.interceptors.response.use(
             /*axios.post('/log-frontend-erro', { status: status, url: urlAtual })
                 .catch(err => console.error('Falha ao registrar log de sessão', err));*/
 
-            jssistema.mostrarPopup({
+            sistemajs.mostrarPopup({
                 titulo: 'Sessão Expirada',
                 conteudo: 'Seu tempo de sessão acabou. Você será redirecionado para o login...',
                 tipo: 'warning',
@@ -80,7 +80,7 @@ axios.interceptors.response.use(
             /*axios.post('/log-frontend-erro', { status: status, url: urlAtual })
                 .catch(err => console.error('Falha ao registrar log de erro 500', err));*/
 
-            jssistema.mostrarPopup({
+            sistemajs.mostrarPopup({
                 titulo: 'Estamos Enfrentando Instabilidade',
                 conteudo: 'Aguarde! O sistema fará a tentativa de recuperação.',
                 tipo: 'danger',
@@ -157,7 +157,7 @@ router.on('invalid', (event) => {
         /*axios.post('/log-frontend-erro', { status: status, url: urlAtual })
             .catch(err => console.error('Falha ao registrar log de sessão', err));*/
 
-        jssistema.mostrarPopup({
+        sistemajs.mostrarPopup({
             titulo: 'Sessão Expirada',
             conteudo: 'Seu tempo de Sessão Acabou. Você será redirecionado para o login...',
             tipo: 'warning',
@@ -175,7 +175,7 @@ router.on('invalid', (event) => {
         /*axios.post('/log-frontend-erro', { status: status, url: urlAtual })
             .catch(err => console.error('Falha ao registrar log de erro 500', err));*/
 
-        jssistema.mostrarPopup({
+        sistemajs.mostrarPopup({
             titulo: 'Estamos Enfrentando Instabilidade',
             conteudo: 'Aguarde! O Sistema Fará a Tentativa de Recuperação.',
             tipo: 'danger',
