@@ -65,7 +65,10 @@ Route::middleware(['throttle:100,1'])->group(function () {
     })->middleware('guest')->name('termos');
     Route::get('/termos/uso', function () {
         return Inertia::render('Ajuda/TermosUso');
-    })->middleware(['web','authcheck'])->name('termosuso');    
+    })->middleware(['web','authcheck'])->name('termosuso');
+    Route::get('/sobre', function () {
+        return Inertia::render('Ajuda/Sobre');
+    })->middleware(['web','authcheck'])->name('sobre');       
 });
 
 

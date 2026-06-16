@@ -79,8 +79,7 @@ const voltarAoTopo = () => {
 // --- 3. BLOQUEIO DE CLIQUE DIREITO (CONTEXT MENU) ---
 const bloquearContextMenu = (e) => {
     // Captura a variável de ambiente injetada globalmente pelo Share do Inertia no HandleInertiaRequests.php
-    const contextoDesabilitado = page.props.SISTEMA_CONTEXTBTNDIR; 
-    console.log('BTN DIR '+page.props.SISTEMA_CONTEXTBTNDIR);
+    const contextoDesabilitado = page.props.SISTEMA_CONTEXTBTNDIR;
     if (contextoDesabilitado == 0) {
         e.preventDefault();
         return false;
@@ -98,7 +97,7 @@ onMounted(() => {
     window.addEventListener('touchstart', resetTimer, { passive: true });
     window.addEventListener('scroll', resetTimer, { passive: true });
     window.addEventListener('scroll', loadButtonToTop);
-   // document.addEventListener('contextmenu', bloquearContextMenu);    
+    document.addEventListener('contextmenu', bloquearContextMenu);    
 });
 
 
@@ -109,7 +108,7 @@ onUnmounted(() => {
     window.removeEventListener('touchstart', resetTimer);
     window.removeEventListener('scroll', resetTimer);
     window.removeEventListener('scroll', loadButtonToTop);
-    //document.removeEventListener('contextmenu', bloquearContextMenu);    
+    document.removeEventListener('contextmenu', bloquearContextMenu);    
 });
 
 </script>

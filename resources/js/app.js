@@ -9,67 +9,96 @@ import 'floating-vue/dist/style.css';
 import '../css/app.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 //import { varloading, mostrarPopup, mostrarPopupDecisao } from '@/sistema.js';
-import * as jssistema from '@/sistema.js';
+import * as sistemajs from '@/sistema.js';
+import axios from 'axios';
 
-createInertiaApp({
-  resolve: name => {
-    const pages = import.meta.glob('./Pages/**/*.vue', { eager: true })
-    return pages[`./Pages/${name}.vue`]
-  },
-  setup({ el, App, props, plugin }) {
-    // 1. Criamos a instância do App e guardamos na variável 'app'
-    const app = createApp({ render: () => h(App, props) });
 
-    // 2. Capturamos a URL global com segurança
-    const globalAppUrl = props.initialPage?.props?.app_url || window.location.origin;
-
-    // 3. Injetamos as propriedades globais na variável 'app' que agora existe
-    app.config.globalProperties.$appUrl = globalAppUrl;
-    app.provide('appUrl', globalAppUrl);  
-    
-    const ziggyConfig = props.initialPage?.props?.ziggy;
-    // 4. Ativamos os plugins e montamos o app no HTML
-    return app
-        .use(plugin)
-        .use(ZiggyVue, ziggyConfig)    
-        .use(FloatingVue)
-        .mount(el);
-  },
-});
 
 
 
 
 // Ativa a cortina quando qualquer requisição para o controller iniciar
 router.on('start', () => {
-    jssistema.varloading.value = true;
+    sistemajs.varloading.value = true;
 });
 
 // Desativa a cortina quando o controller responder (sucesso ou erro)
 router.on('finish', () => {
-    jssistema.varloading.value = false;
+    sistemajs.varloading.value = false;
 });
 
 
 
 // 1. Interceptador de INÍCIO (Antes de enviar a requisição)
 axios.interceptors.request.use((config) => {
-    jssistema.varloading.value = true;
+    sistemajs.varloading.value = true;
     return config;
 }, (error) => {
     // Se der erro antes mesmo de enviar, desliga a cortina
-    jssistema.varloading.value = false;
+    sistemajs.varloading.value = false;
     return Promise.reject(error);
 });
 
 // 2. Interceptador de FIM (Quando recebe a resposta do servidor)
 axios.interceptors.response.use((response) => {
-    jssistema.varloading.value = false;
+    sistemajs.varloading.value = false;
     return response;
 }, (error) => {
-    jssistema.varloading.value = false;
+    sistemajs.varloading.value = false;
     return Promise.reject(error);
 });
+
+
+axios.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (!error.response) return Promise.reject(error);
+
+        const status = error.response.status;
+        const urlAtual = window.location.href;
+
+        if (status === 419 || status === 401) {
+            /*axios.post('/log-frontend-erro', { status: status, url: urlAtual })
+                .catch(err => console.error('Falha ao registrar log de sessão', err));*/
+
+            sistemajs.mostrarPopup({
+                titulo: 'Sessão Expirada',
+                conteudo: 'Seu tempo de sessão acabou. Você será redirecionado para o login...',
+                tipo: 'warning',
+                tempo: 4000
+            });
+
+            setTimeout(() => {
+                //window.location.href = typeof router !== 'undefined' ? router('login') : '/login';
+                window.location.href = router('login');
+            }, 4000);
+
+            return new Promise(() => {}); 
+        }
+
+        if (status === 500) {
+            /*axios.post('/log-frontend-erro', { status: status, url: urlAtual })
+                .catch(err => console.error('Falha ao registrar log de erro 500', err));*/
+
+            sistemajs.mostrarPopup({
+                titulo: 'Estamos Enfrentando Instabilidade',
+                conteudo: 'Aguarde! O sistema fará a tentativa de recuperação.',
+                tipo: 'danger',
+                tempo: 6000
+            });
+
+            setTimeout(() => {
+                //window.location.href = typeof route !== 'undefined' ? route('login') : '/login';
+                window.location.href = router('login');
+            }, 6000);
+
+            return new Promise(() => {});
+        }
+
+        return Promise.reject(error);
+    }
+);
+
 
 // Intercepta respostas inválidas do servidor (como expiração de sessão)
 /*
@@ -128,7 +157,7 @@ router.on('invalid', (event) => {
         /*axios.post('/log-frontend-erro', { status: status, url: urlAtual })
             .catch(err => console.error('Falha ao registrar log de sessão', err));*/
 
-        jssistema.mostrarPopup({
+        sistemajs.mostrarPopup({
             titulo: 'Sessão Expirada',
             conteudo: 'Seu tempo de Sessão Acabou. Você será redirecionado para o login...',
             tipo: 'warning',
@@ -136,7 +165,7 @@ router.on('invalid', (event) => {
         });
 
         setTimeout(() => {
-            window.location.href = route('login');
+            window.location.href = router('login');
         }, 4000);
 
     } else if (status === 500) {
@@ -146,7 +175,7 @@ router.on('invalid', (event) => {
         /*axios.post('/log-frontend-erro', { status: status, url: urlAtual })
             .catch(err => console.error('Falha ao registrar log de erro 500', err));*/
 
-        jssistema.mostrarPopup({
+        sistemajs.mostrarPopup({
             titulo: 'Estamos Enfrentando Instabilidade',
             conteudo: 'Aguarde! O Sistema Fará a Tentativa de Recuperação.',
             tipo: 'danger',
@@ -154,7 +183,35 @@ router.on('invalid', (event) => {
         });
 
         setTimeout(() => {
-            window.location.href = route('login');
+            window.location.href = router('login');
         }, 6000);        
     }
+});
+
+
+
+createInertiaApp({
+  resolve: name => {
+    const pages = import.meta.glob('./Pages/**/*.vue', { eager: true })
+    return pages[`./Pages/${name}.vue`]
+  },
+  setup({ el, App, props, plugin }) {
+    // 1. Criamos a instância do App e guardamos na variável 'app'
+    const app = createApp({ render: () => h(App, props) });
+
+    // 2. Capturamos a URL global com segurança
+    const globalAppUrl = props.initialPage?.props?.app_url || window.location.origin;
+
+    // 3. Injetamos as propriedades globais na variável 'app' que agora existe
+    app.config.globalProperties.$appUrl = globalAppUrl;
+    app.provide('appUrl', globalAppUrl);  
+    
+    const ziggyConfig = props.initialPage?.props?.ziggy;
+    // 4. Ativamos os plugins e montamos o app no HTML
+    return app
+        .use(plugin)
+        .use(ZiggyVue, ziggyConfig)    
+        .use(FloatingVue)
+        .mount(el);
+  },
 });

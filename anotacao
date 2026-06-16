@@ -1,17 +1,16 @@
 
 
 
-Fazer o esqueci minha Senha
-Termos de uso e politica de privacidade aberto  fechado
+
+No esqueci senha se demorar e tiver inatividade redirecionar para login
+Cadastro de novo usuário
 Fazer o não tenho conta
 Analise que o Falcao Mandou
 Fazer o controle de acesso, cal, menus, permissoes
 Configuração de sistema e usuarios
 Tipos de Escuro, tom azul escuro, preto e acinzentado
 
-
-Recaptcha
-E-mail
+add google analitics
 
 Criar componentes para usar em todo o sistema
 Revisar temas em cada tipo de componente
@@ -49,8 +48,12 @@ btndir Browser - OK
 Btn Voltar ao Topo - OK
 Cal permissao remover as cals que não estao neste sistema - OK
 mesmo com a cortina ativa consigo clicar nos items na tela que está atrás da cortina - OK
-
-
+Termos de uso e politica de privacidade aberto  fechado - OK
+Tela e Sobre e Dados do Servidor e Versoes de Tecnologia - OK
+Fazer o esqueci minha Senha - OK
+Limitar o acesso aos IPs - OK
+Recaptcha - OK
+E-mail - OK
 
 Rodas Migrations nesta ordem de dependencia para criar as Tabelas no Banco
 
@@ -140,3 +143,5 @@ php artisan db:seed UsuarioSeeder
 
 
 cal;cfg;conf;grupo;usu;log;audi
+
+usu;grupo;uni;emai;fon;reco

@@ -1,5 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 @import 'tailwindcss';
 @plugin '@tailwindcss/forms';
+
 
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -8,8 +10,9 @@
 @source '../**/*.js';
 
 @theme {
-    /*--font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji','Segoe UI Symbol', 'Noto Color Emoji';*/
-    --font-sans: 'Figtree', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    /*--font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji','Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Figtree', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';*/
+    --font-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
 
     --color-primary: rgb(var(--cor-marca-rgb));
@@ -21,6 +24,7 @@
     --color-texto-claro: rgb(var(--cor-texto-claro));
     --color-texto-escuro: rgb(var(--cor-texto-escuro));        
 }
+
 
 
 
@@ -373,4 +377,30 @@ input:-webkit-autofill:active {
     transform: translate(-50%, -50%) scale(10);
     opacity: 0;
   }
+}
+
+
+
+.dadorequerido {
+    color: #ef4444; /* Cor vermelha idêntica ao text-red-500 do Tailwind */
+    padding-left: 0.25rem; /* Espaçamento de 4px idêntico ao pl-1 */
+}
+
+/* Estado padrão do campo quando estiver inválido */
+.dadoinvalido {
+    border-color: #ef4444 !important; /* Cor vermelha do red-500 */
+}
+
+/* Estado quando o usuário clicar/focar no campo inválido */
+.dadoinvalido:focus {
+    border-color: #ef4444 !important;
+    outline: 2px solid transparent; /* Reseta o outline padrão do navegador */
+    outline-offset: 2px;
+    --tw-ring-bleed: 0px;
+    --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) #ef4444;
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000); /* Efeito do focus:ring-1 */
+}
+
+.dadoinvalido-texto {
+    color: #f87171; /* Cor vermelha idêntica ao text-red-400 do Tailwind */
 }

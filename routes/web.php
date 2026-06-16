@@ -8,20 +8,7 @@ use Inertia\Inertia;
 Route::middleware(['throttle:100,1'])->group(function () {
     Route::get('/', [AuthController::class, 'index'])
     ->middleware(['web', 'redirectlogado'])
-    ->name('inicio');
-
-    // 🟢 ROTA 1: Carrega a página de login (Abre a tela no navegador)
-    Route::get('/login', [AuthController::class, 'index'])
-    ->middleware(['web', 'redirectlogado'])
-    ->name('login');
-
-    Route::get('/lockscreen', [AuthController::class, 'lockscreen'])
-    ->middleware(['web'])
-    ->name('lockscreen');
-
-    Route::get('/esqueci/senha', [AuthController::class, 'telaesquecisenha'])
-    ->middleware(['web', 'redirectlogado'])
-    ->name('esquecisenha');  
+    ->name('inicio');  
 });
 /*
 Route::get('/', function () {

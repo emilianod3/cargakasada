@@ -29,6 +29,44 @@ Route::group(['middleware' => 'throttle:100,1'], function () {
     Route::get('/userchange/{id}', [UsuarioController::class, 'setUserChange'])->where('id', '[0-9]+')->name('userchange')->middleware('authcheck');*/
 });
 
+Route::middleware(['throttle:100,1'])->group(function () {
+
+    // 🟢 ROTA 1: Carrega a página de login (Abre a tela no navegador)
+    Route::get('/login', [AuthController::class, 'index'])
+    ->middleware(['web', 'redirectlogado'])
+    ->name('login');
+
+    Route::get('/lockscreen', [AuthController::class, 'lockscreen'])
+    ->middleware(['web'])
+    ->name('lockscreen');
+
+    Route::get('/esqueci/senha', [AuthController::class, 'telaesquecisenha'])
+    ->middleware(['web', 'redirectlogado'])
+    ->name('esquecisenha');
+
+    Route::post('/envio/para/recuperarsenha', [UnicoController::class, 'gerartokenrecuperarsenha'])->name('envio.recuperar.senha');
+    Route::get('/redefinir/senha/{token}', [UnicoController::class, 'showRecoveryForm'])->where('token', '[a-zA-Z0-9\/\+]+=*')->name('redefinir.senha');
+    Route::post('/envio/nova/senha', [UnicoController::class, 'salvarnovasenha'])->name('envio.nova.senha');    
+
+    
+    /*
+    Route::get('/registro/usuario', function () {
+        return view('auth.register');
+    })->name('registro.usuario');
+    Route::post('/cadastro/novousuario', [UnicoController::class, 'cadastronovousuario'])->name('cadastro.novo.usuario');
+    Route::get('/esqueci/senha', function () {
+        return view('auth.esquecisenha');
+    })->name('esqueci.senha');
+    
+  */  
+});
+
+
+
+
+
+
+
 /*
 Route::group(['prefix' => 'auth', 'middleware' => 'throttle:100,1'], function () {
     Route::post('/autenticar', [AuthController::class, 'autenticar'])->name('autenticar');
