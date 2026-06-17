@@ -255,6 +255,7 @@ const submeterNovaSenha = () => {
 
                     <div class="text-right text-xs font-medium dadorequerido">* Dados Obrigatórios</div>
 
+                    <!--
                     <div class="text-center my-2">
                         <label class="text-sm text-texto-claro/80 cursor-pointer select-none leading-relaxed">
                             <input 
@@ -264,7 +265,23 @@ const submeterNovaSenha = () => {
                             />
                             <span class="align-middle">Estou ciente e concordo com os <a :href="route('termos')" target="_blank" class="text-primary hover:underline mx-1">Termos de Uso e a Política de Privacidade </a>deste serviço.</span>
                         </label>
-                    </div>                     
+                    </div>-->
+                    
+                    <div class="text-center my-2">
+                        <label class="inline-flex items-center justify-center text-sm text-texto-claro/80 cursor-pointer select-none leading-relaxed align-middle">
+                            <input 
+                                type="checkbox" 
+                                v-model="newPasswordForm.aceitatermos" 
+                                class="sr-only peer"
+                            />
+                            
+                            <div class="w-11 h-6 bg-comum/40 border border-comum peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-px after:inset-px after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary peer-checked:border-primary relative shrink-0"></div>
+                            
+                            <span class="ms-3 text-left">
+                                Estou ciente e concordo com os <a :href="route('termos')" target="_blank" class="text-primary hover:underline mx-1">Termos de Uso e a Política de Privacidade</a> deste serviço.
+                            </span>
+                        </label>
+                    </div>                      
 
                     <div class="flex justify-center my-1">
                         <Link :href="route('login')" class="text-primary hover:text-primary-hover font-medium flex items-center gap-2 text-sm transition-colors">
