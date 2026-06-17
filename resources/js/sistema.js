@@ -893,11 +893,35 @@ export function aplicarMascaraCEP(valor, callback) {
  */
 export function aplicarMascaraRG(valor, callback) {
     if (valor === undefined || valor === null) return;
-    let limpo = valor.replace(/\D/g, '');
-    limpo = limpo.replace(/^(\d{2})(\d)/, '$1.$2');
-    limpo = limpo.replace(/(\d{3})(\d)/, '$1.$2');
-    limpo = limpo.replace(/(\d{3})(\d{1})$/, '$1-$2');
-    callback(limpo.substring(0, 12));
+
+    // 1. Remove caracteres especiais (pontos e traços), mas mantém números e letras
+    let limpo = valor.replace(/[^a-zA-Z0-9]/g, '');
+
+    // 2. Transforma todas as letras em maiúsculas (ex: 'x' vira 'X')
+    limpo = limpo.toUpperCase();
+
+    // 3. Se o usuário digitar letras antes do final, removemos para manter o padrão do RG
+    // Garante que os primeiros 8 caracteres sejam apenas números
+    let parteInicial = limpo.slice(0, 8).replace(/\D/g, '');
+    let parteFinal = limpo.slice(8, 11); // Aceita números e letras (até 3 caracteres)
+    
+    limpo = parteInicial + parteFinal;
+
+    // 4. Aplica a máscara progressiva (00.000.000-A)
+    if (limpo.length > 2) {
+        limpo = limpo.replace(/^([0-9]{2})/, '$1.');
+    }
+    if (limpo.length > 5) {
+        limpo = limpo.replace(/^([0-9]{2})\.([0-9]{3})/, '$1.$2.');
+    }
+    if (limpo.length > 8) {
+        // O traço separa a parte inicial do dígito (que pode ser letra)
+        limpo = limpo.replace(/^([0-9]{2})\.([0-9]{3})\.([0-9]{3})/, '$1.$2.$3-');
+    }
+
+    // 5. Retorna limitando ao tamanho máximo de um RG mascarado (12 caracteres: 00.000.000-0)
+    // Nota: Aumentei para 14 caso seu estado use formatos mais longos com mais dígitos
+    callback(limpo.substring(0, 14));
 }
 
 /**

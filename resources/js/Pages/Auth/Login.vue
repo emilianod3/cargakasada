@@ -223,7 +223,7 @@ function esquecisenha() {
 
                     <div class="text-center text-xs text-texto-claro/60 mt-2">
                         Não tem Conta? 
-                        <Link :href="route('dashboard')" class="text-primary font-bold ml-1 hover:underline">Crie uma</Link>
+                        <Link :href="route('registrar.usuario')" class="text-primary font-bold ml-1 hover:underline">Crie uma</Link>
                     </div>
                 </form>
             </div>

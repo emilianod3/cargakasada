@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Core\UnicoController;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 Route::group(['middleware' => 'throttle:100,1'], function () {
     Route::post('/autenticar', [AuthController::class, 'autenticar'])->name('autenticar');
@@ -47,17 +48,12 @@ Route::middleware(['throttle:100,1'])->group(function () {
     Route::post('/envio/para/recuperarsenha', [UnicoController::class, 'gerartokenrecuperarsenha'])->name('envio.recuperar.senha');
     Route::get('/redefinir/senha/{token}', [UnicoController::class, 'showRecoveryForm'])->where('token', '[a-zA-Z0-9\/\+]+=*')->name('redefinir.senha');
     Route::post('/envio/nova/senha', [UnicoController::class, 'salvarnovasenha'])->name('envio.nova.senha');    
-
-    /*
-    Route::get('/registro/usuario', function () {
-        return view('auth.register');
-    })->name('registro.usuario');
-    Route::post('/cadastro/novousuario', [UnicoController::class, 'cadastronovousuario'])->name('cadastro.novo.usuario');
-    Route::get('/esqueci/senha', function () {
-        return view('auth.esquecisenha');
-    })->name('esqueci.senha');
     
-  */  
+    Route::get('/registro/usuario', function () {
+        return Inertia::render('Auth/RegistrarUsuario');
+    })->middleware(['web', 'redirectlogado'])->name('registrar.usuario');
+    Route::post('/registrar/novousuario', [UnicoController::class, 'cadastronovousuario'])->name('registrar.novo.usuario');
+  
 });
 
 

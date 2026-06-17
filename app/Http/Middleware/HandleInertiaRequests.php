@@ -70,6 +70,7 @@ class HandleInertiaRequests extends Middleware
             'app_debug' => (bool) env('APP_DEBUG', false),
             'storagepath' => public_path('storage'), //Storage::path('public'),
             'SISTEMA_CONTEXTBTNDIR' => (bool) env('SISTEMA_CONTEXTBTNDIR', 0),
+            'SISTEMA_LIMITE_UPLOAD ' => env('SISTEMA_LIMITE_UPLOAD ', 3),
             'NOCAPTCHA_SITEKEY' => env('NOCAPTCHA_SITEKEY', ''), 
             'menus' => $request->session()->get('menus'),
             'flash' => [
