@@ -1140,10 +1140,10 @@ class UnicoController extends Controller
             $reg->unserie = '';
             $reg->undatacadastro = Carbon::now()->toDateString();
             $reg->undatanasc = $request->undatanasc;
-            $reg->unrg = $request->unrg;
+            $reg->unrg = (strlen($request->unrg) > 0 ? $request->unrg : '');
             $reg->untituloeleitor = '';
             $reg->unnumcarttrabalho = '';
-            $reg->uncpf = $request->uncpf;
+            $reg->uncpf = (strlen($request->uncpf) > 0 ? $request->uncpf : '');
             $reg->unpis = '';
             $reg->unzonaeleitoral = '';
             $reg->unsecaoeleitoral = '';
@@ -1180,14 +1180,15 @@ class UnicoController extends Controller
                     $emailok = true;
                 }else{
                     $reg->delete();
-                    return Tools::setResponse('fail', null, 'Impossível Prosseguir, Informações Inconsistentes');
+                    //return Tools::setResponse('fail', null, 'Impossível Prosseguir, Informações Inconsistentes');
+                    return back()->withErrors(Tools::setResult('fail', null, 'Impossível Prosseguir, Informações Inconsistentes'));
                 }
 
                 if(self::verificaUsuario($request->euemail, $reg) <= 0){
                     $userok = true;
                 }else{
                     $reg->delete();
-                    return Tools::setResponse('fail', null, 'Impossível Prosseguir, Informações Inconsistentes');
+                    return back()->withErrors(Tools::setResult('fail', null, 'Impossível Prosseguir, Informações Inconsistentes'));
                 }
 
                 try{
@@ -1222,7 +1223,7 @@ class UnicoController extends Controller
                             $reguser->uversao = Carbon::now()->toDateTimeString();
                             if($reguser->save()){
                                 $arquivos = true;
-                                if ($request->file('files')){
+                                if ($request->file('arquivos')){
                                     $arquivos = self::uploads($reg->id, $reguser->id, $request->file('files'));
                                 }
                                 $regfone = new Fone();
@@ -1235,7 +1236,9 @@ class UnicoController extends Controller
                                 $regfone->flagatualiza = 1;
                                 $regfone->fnversao = Carbon::now()->toDateTimeString();
                                 if($regfone->save()){
-                                    return Tools::setResponse('success', $reg, 'Usuário Cadastrado com Sucesso');
+                                    //return Tools::setResponse('success', $reg, 'Usuário Cadastrado com Sucesso');
+                                    Tools::setAtividade(0, 1, 0, 'Sucesso no Cadastro de Novo Usuário', 'Nome: '.$request->unidentificacao.' CPF: '.$request->uncpf.' Usuário: '.$reguser->id.'-'.$reguser->ulogin);
+                                    return back()->with(Tools::setResult('success', $reg, 'Usuário Cadastrado com Sucesso'));
                                 }else{
                                     if($request->file('files') && $arquivos == false){
                                         self::removerarquivos($reg->id);
@@ -1243,16 +1246,16 @@ class UnicoController extends Controller
                                     $reg->delete();
                                     $regemail->delete();
                                     $reguser->delete();
-                                    return Tools::setResponse('fail', null, 'Impossível Prosseguir, Informações Inconsistentes');
+                                    return back()->withErrors(Tools::setResult('fail', null, 'Impossível Prosseguir, Informações Inconsistentes'));
                                 }
                             }else{
                                 $reg->delete();
                                 $regemail->delete();
-                                return Tools::setResponse('fail', null, 'Impossível Prosseguir, Informações Inconsistentes');
+                                return back()->withErrors(Tools::setResult('fail', null, 'Impossível Prosseguir, Informações Inconsistentes'));
                             }                      
                         }else{
                             $reg->delete();
-                            return Tools::setResponse('fail', null, 'Impossível Prosseguir, Informações Inconsistentes');
+                            return back()->withErrors(Tools::setResult('fail', null, 'Impossível Prosseguir, Informações Inconsistentes'));
                         }
                     }
                 } catch (Exception $e) {
@@ -1261,17 +1264,20 @@ class UnicoController extends Controller
                     $regemail->delete();
                     $reguser->delete();
                     $regfone->delete();
-                    return Tools::setResponse('fail', null, 'Impossível Prosseguir, Informações Inconsistentes');
+                    return back()->withErrors(Tools::setResult('fail', null, 'Impossível Prosseguir, Informações Inconsistentes'));
                 }
             }else{
-                return Tools::setResponse('fail', null, 'Impossível Prosseguir, Informações Inconsistentes');
+                Tools::setAtividade(0, 8, 0, 'Tentativa de Registro de Novo Usuário', 'Nome: '.$request->unidentificacao.' CPF: '.$request->uncpf);
+                return back()->withErrors(Tools::setResult('fail', null, 'Impossível Prosseguir, Informações Inconsistentes'));
             }
         } else {
-            return Tools::setResponse('fail', null, 'Impossível Prosseguir, Informações Inconsistentes');
+            Tools::setAtividade(0, 8, 0, 'Falha no Registro de Novo Usuário', '');
+            return back()->withErrors(Tools::setResult('fail', null, 'Impossível Prosseguir, Informações Inconsistentes'));
         }
         } catch (Exception $e) {
             $except = $e->getMessage();
-            return Tools::setResponse('fail', null, 'Impossível Prosseguir, Informações Inconsistentes');
+            Tools::setAtividade(0, 8, 0, 'Falha no Registro de Novo Usuário', $except);
+            return back()->withErrors(Tools::setResult('fail', null, 'Impossível Prosseguir, Informações Inconsistentes'));
         }
     }
 
@@ -1279,7 +1285,7 @@ class UnicoController extends Controller
      * verifica se já existe o e-mail cadastrado para o mesmo gestor
      * 
      */
-    public function verificaUnicoEmail($email, $unico)
+    public function verificaUnicoEmail(mixed $email, mixed $unico)
     {
         $emails = DB::table('email')
             ->where('email.euemail', '=', trim($email))
