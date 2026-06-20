@@ -1,6 +1,6 @@
 <script setup>
 import Layout from '@/Layouts/LayoutAberto.vue'; 
-import { ref, onMounted, inject } from 'vue'; 
+import { ref, onMounted, inject, computed } from 'vue'; 
 import { useForm, Link, usePage } from '@inertiajs/vue3';
 import * as sistemajs from '@/sistema.js';
 
@@ -11,7 +11,8 @@ const page = usePage();
 
 // 🌟 Chave Pública injetada pelo Backend via Inertia Shared Props
 const siteKey = page.props.NOCAPTCHA_SITEKEY; 
-const limiteUpload = page.props.SISTEMA_LIMITE_UPLOAD; 
+//const limiteUpload = computed(() => page.props.SISTEMA_LIMITE_UPLOAD);
+const limiteUpload = import.meta.env.VITE_SISTEMA_LIMITE_UPLOAD || 5;
 
 const campoNome = ref(null);
 const campoSenha = ref(null);
@@ -62,7 +63,10 @@ onMounted(() => {
         campoNome.value.focus();
     }
 
+    setTimeout(() => {
+
     console.log(limiteUpload)
+    }, 3000);
     
     window.vRecaptchaLoaded = () => {
         inicializarRecaptcha();
@@ -241,7 +245,7 @@ const tratarUploadArquivos = (listaArquivos) => {
     }
 
     // 2. Validação de Tamanho Máximo (5 MB por arquivo = 5 * 1024 * 1024 bytes)
-    const limiteTamanho = page.props.SISTEMA_LIMITE_UPLOAD * 1024 * 1024; 
+    const limiteTamanho = limiteUpload * 1024 * 1024; 
     const arquivosArray = Array.from(listaArquivos);
 
     const temArquivoMuitoGrande = arquivosArray.some(arquivo => arquivo.size > limiteTamanho);

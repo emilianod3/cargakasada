@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'number' => '1.0.30',
-    'hash' => '92e951c',
-    'timestamp' => '2026-06-20 18:51:27',
+    'number' => '1.0.31',
+    'hash' => 'beea221',
+    'timestamp' => '2026-06-21 00:31:26',
 ];
