@@ -1,6 +1,6 @@
 <?php
 // atualizar-versao.php
-
+date_default_timezone_set('America/Sao_Paulo');
 // 1. Pega a contagem de commits do Git
 $commitCount = (int) shell_exec('git rev-list --count HEAD');
 $nextCommitCount = $commitCount + 1;
