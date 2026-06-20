@@ -1,8 +1,9 @@
 <script setup>
 import Layout from '@/Layouts/LayoutAberto.vue'; 
-import { ref, onMounted, inject, useTemplateRef } from 'vue'; // Removido 'reactive' sem uso
-import { useForm, Link, usePage } from '@inertiajs/vue3';
+import { ref, onMounted, inject, onUnmounted } from 'vue'; // Removido 'reactive' sem uso
+import { useForm, Link, usePage, router} from '@inertiajs/vue3';
 import * as sistemajs from '@/sistema.js';
+import { route } from 'ziggy-js';
 
 // Injeta o valor provido pelo Layout padrão para resolver as imagens
 const appUrl1 = inject('appUrl');
@@ -16,6 +17,9 @@ const campoNome = ref(null);
 const erroRecaptcha = ref(false);
 const recaptchaContainer = ref(null);
 let widgetId = null;
+let tokenTimer = null;
+// Tempo limite de inatividade (Ex: 5 minutos = 5 * 60 * 1000 ms)
+const TEMPO_LIMITE_INATIVIDADE = 5 * 60 * 1000;
 
 // Capturando logo do .env via Vite
 const logoEmpresa = import.meta.env.VITE_COMPANY_LOGO || 'logo_text';
@@ -37,6 +41,14 @@ onMounted(() => {
         campoNome.value.focus();
     }
     
+    // Inicializa o controle de inatividade
+    resetarTimerInatividade();
+    window.addEventListener('mousemove', resetarTimerInatividade);
+    window.addEventListener('keydown', resetarTimerInatividade);
+    window.addEventListener('click', resetarTimerInatividade);
+    window.addEventListener('scroll', resetarTimerInatividade);
+    window.addEventListener('touchstart', resetarTimerInatividade);    
+
     // 1. Criamos uma função na janela global (window) para o Google achar
     window.vRecaptchaLoaded = () => {
         inicializarRecaptcha();
@@ -56,6 +68,28 @@ onMounted(() => {
         document.head.appendChild(script);
     }    
 });
+
+// Limpeza estrita de memória ao destruir a tela
+onUnmounted(() => {
+    if (tokenTimer) clearTimeout(tokenTimer);
+    window.removeEventListener('mousemove', resetarTimerInatividade);
+    window.removeEventListener('keydown', resetarTimerInatividade);
+    window.removeEventListener('click', resetarTimerInatividade);
+    window.removeEventListener('scroll', resetarTimerInatividade);
+    window.removeEventListener('touchstart', resetarTimerInatividade);
+});
+
+// --- SISTEMA DE CONTROLE DE INATIVIDADE (REDIRECIONAMENTO) ---
+const redirecionarParaLogin = () => {
+    router.visit(route('login'), {
+        replace: true // Substitui o histórico para evitar que volte avançando a página
+    });
+};
+
+const resetarTimerInatividade = () => {
+    if (tokenTimer) clearTimeout(tokenTimer);
+    tokenTimer = setTimeout(redirecionarParaLogin, TEMPO_LIMITE_INATIVIDADE);
+};
 
 function inicializarRecaptcha() {
     // Adicionada uma proteção extra de segurança (timeout) caso o DOM ainda esteja renderizando a ref

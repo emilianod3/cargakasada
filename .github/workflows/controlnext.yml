@@ -14,7 +14,7 @@ on:
       - github/**  
       - .env
       - .env.*
-      - anotacao
+      - anotacao.md
       - 'vendor/'
       - 'vendor/**'
       - '**/vendor/**'
