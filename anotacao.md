@@ -4,13 +4,15 @@
 
 # 📝 Tarefas Pendentes
 > [!NOTE]
-> limiteUpload
-> No esqueci senha se demorar e tiver inatividade redirecionar para login
 > Analise que o Falcao Mandou
 > Fazer o controle de acesso, cal, menus, permissoes
 > Configuração de sistema e usuarios
 > Tipos de Escuro, tom azul escuro, preto e acinzentado
 > paginacao
+> Reportar problema
+> Contato 
+> Versões  que pode unificr em Sobre ou não
+
 
 
 > Criar componentes para usar em todo o sistema
@@ -66,6 +68,8 @@ usu;grupo;uni;emai;fon;reco
 > Limitar o acesso aos IPs - OK
 > Recaptcha - OK
 > E-mail - OK
+> No esqueci senha se demorar e tiver inatividade redirecionar para login
+> limiteUpload
 
 
 

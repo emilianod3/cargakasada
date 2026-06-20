@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted, onUnmounted, ref } from 'vue';
-import { jssistema, alterarModo, alterarCorBase } from '@/sistema';
+// 🌟 IMPORTANTE: Certifique-se de exportar 'modosDisponiveis' no seu @/sistema
+import { jssistema, alterarModo, alterarCorBase, modosDisponiveis } from '@/sistema';
 
 const { configAberta, modoAtual, corAtual } = jssistema();
 
@@ -9,29 +10,23 @@ const painelConfigRef = ref(null);
 
 // Função para fechar a aba ao clicar fora
 const verificarCliqueFora = (event) => {
-    // Se o menu já estiver fechado, não faz nada
     if (!configAberta.value) return;
-
-    // Se o clique foi no botão da engrenagem (ou elementos internos dele), ignora
     if (event.target.closest('.btn-engrenagem-trigger')) return;
 
-    // Se o clique NÃO foi dentro da tag <aside>, fecha o painel
     if (painelConfigRef.value && !painelConfigRef.value.contains(event.target)) {
         configAberta.value = false;
     }
 };
 
-// Escuta os cliques na janela ao montar o componente
 onMounted(() => {
     window.addEventListener('click', verificarCliqueFora);
 });
 
-// Remove o listener para evitar vazamento de memória ao destruir o componente
 onUnmounted(() => {
     window.removeEventListener('click', verificarCliqueFora);
 });
 
-// Mapeamento para renderizar o background correto dos botões na listagem
+// Mapeamento para renderizar o background correto dos botões na listagem de destaque
 const previewCores = {
     cinza: 'bg-[#64748b]',
     azul: 'bg-[#3b82f6]',
@@ -52,7 +47,7 @@ const previewCores = {
     </button>
 
     <aside ref="painelConfigRef"
-           class="fixed right-0 top-[72px] h-[calc(100vh-72px)] w-80 bg-layout-painel border-l border-comum shadow-2xl p-6 flex flex-col gap-6 transition-transform duration-300 ease-in-out z-40"
+           class="fixed right-0 top-[72px] h-[calc(100vh-72px)] w-80 bg-layout-painel border-l border-comum shadow-2xl p-6 flex flex-col gap-6 transition-transform duration-300 ease-in-out z-40 overflow-y-auto"
            :class="configAberta ? 'translate-x-0' : 'translate-x-full'">
         
         <div class="flex justify-between items-center border-b border-comum pb-3">
@@ -66,17 +61,26 @@ const previewCores = {
         
         <div class="flex flex-col gap-2">
             <label class="text-xs font-semibold text-texto-claro/40 uppercase tracking-wider">Modo de Visualização</label>
-            <div class="grid grid-cols-2 gap-2">
-                <button @click="alterarModo('escuro')" 
-                        class="p-2 rounded-lg border text-sm font-medium flex items-center justify-center gap-2 cursor-pointer transition-all"
-                        :class="modoAtual === 'escuro' ? 'border-primary bg-primary/10 text-primary' : 'border-comum text-texto-claro/65 hover:text-texto-claro'">
-                    <i class="fas fa-moon"></i> Escuro
-                </button>
-                <button @click="alterarModo('claro')" 
-                        class="p-2 rounded-lg border text-sm font-medium flex items-center justify-center gap-2 cursor-pointer transition-all"
-                        :class="modoAtual === 'claro' ? 'border-primary bg-primary/10 text-primary' : 'border-comum text-texto-claro/65 hover:text-texto-claro'">
-                    <i class="fas fa-sun"></i> Claro
-                </button>
+            <div class="flex flex-col gap-1.5">
+            
+                <div class="w-full border-t border-comum/50 my-1"></div>
+
+                    <button v-for="(config, chave) in modosDisponiveis" 
+                            :key="chave"
+                            @click="alterarModo(chave)" 
+                            class="w-full p-2.5 rounded-lg border text-sm font-medium flex items-center justify-between cursor-pointer transition-all px-4"
+                            :class="modoAtual === chave ? 'border-primary bg-primary/10 text-primary' : 'border-comum text-texto-claro/65 hover:bg-layout-fundo hover:text-texto-claro'">
+                        
+                        <span class="flex items-center gap-2">
+                            <i v-if="chave === 'claro'" class="fas fa-sun text-amber-500"></i>
+                            <i v-else class="fas fa-moon text-indigo-400"></i> 
+                            
+                            {{ config.nome }}
+                        </span>
+                        
+                        <i v-if="modoAtual === chave" class="fas fa-circle-check text-xs"></i>
+                    </button>
+
             </div>
         </div>
 
