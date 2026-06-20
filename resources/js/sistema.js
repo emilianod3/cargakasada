@@ -6,13 +6,115 @@ import { nextTick } from 'vue';
 const modoAtual = ref(localStorage.getItem('sistema-modo') || 'claro'); // 'escuro' ou 'claro'
 const corAtual = ref(localStorage.getItem('sistema-cor') || 'azul');   // cinza, azul, verde, etc.
 
+
+
+export const modosDisponiveis = {
+    claro: {
+        nome: 'Modo Claro Tradicional',
+        classes: {
+            '--cor-fundo-rgb': '255 255 255',
+            '--cor-painel-rgb': '241 245 249',
+            '--cor-texto-claro': '15 23 42',
+            '--cor-texto-escuro': '255 255 255',
+            '--cor-border-rgb': '226 232 240'
+        }
+    },
+    slate: {
+        nome: 'Slate Escuro',
+        classes: {
+            '--cor-fundo-rgb': '15 23 42',       /* Slate 900 */
+            '--cor-painel-rgb': '30 41 59',      /* Slate 800 */
+            '--cor-texto-claro': '248 250 252',  /* Slate 50 */
+            '--cor-texto-escuro': '15 23 42',    /* Slate 900 */
+            '--cor-border-rgb': '51 65 85'       /* Slate 700 */
+        }
+    },
+    zinc: {
+        nome: 'Zinc Escuro',
+        classes: {
+            '--cor-fundo-rgb': '24 24 27',       /* Zinc 900 */
+            '--cor-painel-rgb': '39 39 42',      /* Zinc 800 */
+            '--cor-texto-claro': '250 250 250',  /* Zinc 50 */
+            '--cor-texto-escuro': '24 24 27',    /* Zinc 900 */
+            '--cor-border-rgb': '63 63 70'       /* Zinc 700 */
+        }
+    },
+    gray: {
+        nome: 'Gray Escuro',
+        classes: {
+            '--cor-fundo-rgb': '17 24 39',       /* Gray 900 */
+            '--cor-painel-rgb': '31 41 55',      /* Gray 800 */
+            '--cor-texto-claro': '249 250 251',  /* Gray 50 */
+            '--cor-texto-escuro': '17 24 39',    /* Gray 900 */
+            '--cor-border-rgb': '55 65 81'       /* Gray 700 */
+        }
+    },
+    neutral: {
+        nome: 'Neutral Escuro',
+        classes: {
+            '--cor-fundo-rgb': '23 23 23',       /* Neutral 900 */
+            '--cor-painel-rgb': '38 38 38',      /* Neutral 800 */
+            '--cor-texto-claro': '250 250 250',  /* Neutral 50 */
+            '--cor-texto-escuro': '23 23 23',    /* Neutral 900 */
+            '--cor-border-rgb': '64 64 64'       /* Neutral 700 */
+        }
+    },
+    stone: {
+        nome: 'Stone (Quente)',
+        classes: {
+            '--cor-fundo-rgb': '28 25 23',       /* Stone 900 */
+            '--cor-painel-rgb': '44 42 41',      /* Stone 800 */
+            '--cor-texto-claro': '250 249 246',  /* Stone 50 */
+            '--cor-texto-escuro': '28 25 23',    /* Stone 900 */
+            '--cor-border-rgb': '68 64 60'       /* Stone 700 */
+        }
+    },
+    pureBlack: {
+        nome: 'Preto Absoluto (OLED)',
+        classes: {
+            '--cor-fundo-rgb': '0 0 0',          /* Preto Puro 100% */
+            '--cor-painel-rgb': '18 18 18',      /* Cinza Fundo Escuro */
+            '--cor-texto-claro': '255 255 255',  /* Branco Puro */
+            '--cor-texto-escuro': '0 0 0',        /* Preto Puro */
+            '--cor-border-rgb': '38 38 38'       /* Contraste suave no preto */
+        }
+    }
+};
+
 // 1. Definição dos Modos (Fundo e Texto)
 const modos = {
     escuro: {
-        '--cor-fundo-rgb': '15 23 42',       /* Slate 900 */
-        '--cor-painel-rgb': '30 41 59',      /* Slate 800 */
-        '--cor-texto-claro': '248 250 252',  /* Slate 50 */
-        '--cor-texto-escuro': '15 23 42',    /* Slate 900 (Para tooltips) */
+        //'--cor-fundo-rgb': '15 23 42',       /* Slate 900 */
+        //'--cor-painel-rgb': '30 41 59',      /* Slate 800 */
+        //'--cor-texto-claro': '248 250 252',  /* Slate 50 */
+        //'--cor-texto-escuro': '15 23 42',    /* Slate 900 (Para tooltips) */
+
+        //'--cor-fundo-rgb': '24 24 27',       /* Zinc 900 */
+        //'--cor-painel-rgb': '39 39 42',      /* Zinc 800 */
+        //'--cor-texto-claro': '250 250 250',  /* Zinc 50 */
+        //'--cor-texto-escuro': '24 24 27',    /* Zinc 900 */
+
+        '--cor-fundo-rgb': '17 24 39',       /* Gray 900 */
+        '--cor-painel-rgb': '31 41 55',      /* Gray 800 */
+        '--cor-texto-claro': '249 250 251',  /* Gray 50 */
+        '--cor-texto-escuro': '17 24 39',    /* Gray 900 */
+
+        //'--cor-fundo-rgb': '23 23 23',       /* Neutral 900 */
+        //'--cor-painel-rgb': '38 38 38',      /* Neutral 800 */
+        //'--cor-texto-claro': '250 250 250',  /* Neutral 50 */
+        //'--cor-texto-escuro': '23 23 23',    /* Neutral 900 */
+
+        //'--cor-fundo-rgb': '28 25 23',       /* Stone 900 */
+        //'--cor-painel-rgb': '44 42 41',      /* Stone 800 */
+        //'--cor-texto-claro': '250 249 246',  /* Stone 50 */
+        //'--cor-texto-escuro': '28 25 23',    /* Stone 900 */
+
+        //'--cor-fundo-rgb': '0 0 0',          /* Preto Puro 100% */
+        //'--cor-painel-rgb': '18 18 18',      /* Cinza Fundo Escuro */
+        //'--cor-texto-claro': '255 255 255',  /* Branco Puro */
+        //'--cor-texto-escuro': '0 0 0',        /* Preto Puro */        
+
+        
     },
     claro: {
         '--cor-fundo-rgb': '241 245 249',    /* Slate 100 */
@@ -63,22 +165,32 @@ let popupDecisaoTimeoutId = null;
 
 // Função unificada para aplicar as variáveis no HTML
 export function atualizarEstilosGlobais() {
-    const variaveisModo = modos[modoAtual.value];
+    // 🌟 CORREÇÃO: Acessa o modo atual e pega o objeto interno '.classes'
+    const temaSelecionado = modosDisponiveis[modoAtual.value];
+    if (!temaSelecionado) return; // Evita quebras se o valor for inválido
+
+    const variaveisModo = temaSelecionado.classes;
     const variaveisCor = coresBases[corAtual.value];
 
-    // Aplica variáveis do modo (claro/escuro)
+    const raiz = document.documentElement;
+
+    // Aplica variáveis do modo (Acessando o dicionário de chaves corretamente)
     Object.keys(variaveisModo).forEach(chave => {
-        document.documentElement.style.setProperty(chave, variaveisModo[chave]);
+        raiz.style.setProperty(chave, variaveisModo[chave]);
     });
 
-    // Aplica variáveis da cor base selecionada
-    Object.keys(variaveisCor).forEach(chave => {
-        document.documentElement.style.setProperty(chave, variaveisCor[chave]);
-    });
+    // Aplica variáveis da cor base selecionada (primary, primary-hover, etc)
+    if (variaveisCor) {
+        Object.keys(variaveisCor).forEach(chave => {
+            raiz.style.setProperty(chave, variaveisCor[chave]);
+        });
+    }
 }
 
-// Funções de disparo que serão chamadas nos cliques
+// Sua função de disparo continua linda e não precisa mudar nada:
 export function alterarModo(novoModo) {
+    if (!modosDisponiveis[novoModo]) return; // Proteção extra
+
     modoAtual.value = novoModo;
     localStorage.setItem('sistema-modo', novoModo);
     atualizarEstilosGlobais();
