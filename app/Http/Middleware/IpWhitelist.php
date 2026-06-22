@@ -15,7 +15,23 @@ class IpWhitelist
      */
     public function handle(Request $request, Closure $next): Response
     {
-            // 1. IP do cliente tentando o acesso
+
+        // Rotas que não exigem validação de IP (por URI ou padrão)
+        $exceptRoutes = [
+            'problema/reportarproblema',
+            'contato/formulariocontato',
+            /*'ouvidoria/registraouvidoria',
+            'servico/registraservico',*/
+        ];
+
+        //  Verificar se a rota atual está na lista de exceções
+        foreach ($exceptRoutes as $route) {
+            if ($request->is($route)) {
+                return $next($request);
+            }
+        }    
+
+        // 1. IP do cliente tentando o acesso
         $clientIp = trim($request->ip());
 
         // 2. Proteção Loopback Integrada: Libera localhost (IPv4 e IPv6) nativamente

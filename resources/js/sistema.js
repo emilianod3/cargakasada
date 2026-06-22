@@ -819,6 +819,10 @@ function isEmpty(texto){
 
 
 
+
+
+
+
 function temTexto(texto) {
     if (texto == '' || texto == null) {
         return false;
@@ -1499,6 +1503,38 @@ export function validacaoEmail(str) {
     } else {
         return false;
     }
+}
+
+
+export function validacaoNomeCompleto(str) {
+    if (!str || typeof str !== 'string') return false;
+    const nomeLimpo = str.trim();
+
+    // 🚀 TRAVA DE DIGITAÇÃO: Se digitou menos de 5 caracteres, considera válido por enquanto
+    if (nomeLimpo.length < 5) {
+        return true;
+    }
+
+    // Permite letras (com acentos), números (0-9) e espaços.
+    // Bloqueia apenas símbolos/caracteres especiais como @, !, #, $, %, etc.
+    const apenasLetrasNumerosEspacos = /^[A-Za-zÀ-ÖØ-öø-ÿ0-9\s]+$/;
+    if (!apenasLetrasNumerosEspacos.test(nomeLimpo)) {
+        return false;
+    }
+
+    // Verifica se existe pelo menos um espaço separando as palavras (forçando duas palavras)
+    const espacoIndex = nomeLimpo.indexOf(" ");
+    if (espacoIndex === -1) return false;
+
+    // Divide o nome pelas lacunas de espaço
+    const partes = nomeLimpo.split(/\s+/);
+
+    // Garante que existem pelo menos duas palavras e que ambas têm conteúdo mínimo
+    if (partes.length >= 2 && partes[0].length >= 2 && partes[1].length >= 2) {
+        return true;
+    }
+
+    return false;
 }
 
 

@@ -9,15 +9,18 @@ use App\Http\Controllers\Controller;
 use stdClass;
 use App\Http\Controllers\Core\Tools;
 use App\Mail\envioEmailContato;
+use Inertia\Inertia;
 
 class MailController extends Controller
 {
     public function view()
     {  
         if(Tools::getUser() > 0){
-            return view('ajuda.contato'); 
+            //return view('ajuda.contato'); 
+            return Inertia::render('Ajuda/Contato');
         }else{
-            return view('ajuda.contato'); 
+            //return view('ajuda.contato'); 
+            return Inertia::render('Ajuda/Contato');
         }    
     }
 
@@ -70,49 +73,5 @@ class MailController extends Controller
                 return Tools::setResponse('success', null, 'Formulário de Contato'); 
         }
     }
-
-/*
-    public function enviarParaEmail(Request $request)
-    {
-        $validator = Validator::make(
-        [
-            'envioemaildestino' => $request->envioemaildestino,
-            'envioemailnome' => $request->envioemailnome,
-            'envioemailorigem' => $request->envioemailorigem,
-        ],
-        [            
-            'envioemaildestino'=> 'required|email',
-            'envioemailnome' => 'required|string|min:5',
-            'envioemailorigem'=> 'required|email',
-        ],
-        [
-            'envioemaildestino.required' => 'Necessário Informar o E-mail',
-            'envioemaildestino.email' => 'Necessário Informar um e-mail válido',
-            'envioemailnome.required' => 'Necessário Informar Seu Nome',
-            'envioemailnome.string' => 'Necessário Informar um Nome Válido',
-            'envioemailnome.min' => 'Necessário Informar um Nome Válido',
-            'envioemailorigem.required' => 'Necessário Informar o E-mail',
-            'envioemailorigem.email' => 'Necessário Informar um e-mail válido',
-        ]);
-
-        if ($validator->fails()) {
-            return [
-                'status' => 'fail',
-                'element' => $validator->errors(),
-                'messagetop' => 'Falha na Validação dos dados',
-                'message' => $validator->errors()->first()
-            ];
-        }
-        
-        return [
-            'status' => 'success',
-            'element' => $validator->errors(),
-            'messagetop' => 'Formulário Enviado com Sucesso',
-            'message' => 'Agradecemos seu Contato'
-        ];
-       
-    }
-
-     */
 
 }

@@ -13,7 +13,7 @@ import PopupInformativo from '../Partials/popupinformativo.vue';
 import PopupDecisao from '../Partials/popupdecisao.vue';
 import CortinaLoading from '../Partials/cortinaloading.vue';
 
-import { modoAtual, modos } from '@/sistema.js';
+import { modoAtual, modosDisponiveis } from '@/sistema.js';
 
 const page = usePage();
 
@@ -48,8 +48,12 @@ const bloquearContextMenu = (e) => {
 
 // Seus computeds de estilo existentes (estiloFundo, estiloLuzEsquerda...)
 const estiloFundo = computed(() => {
-    const rgbFundo = modos[modoAtual.value]?.['--cor-fundo-rgb'] || '15 23 42';
-    const rgbTexto = modos[modoAtual.value]?.['--cor-texto-claro'] || '248 250 252';
+    const classesAtivas = modosDisponiveis[modoAtual.value]?.classes;
+    
+    // Mapeia exatamente as variáveis CSS que o seu sistema.js usa
+    const rgbFundo = classesAtivas?.['--cor-fundo-rgb'] || '15 23 42';
+    const rgbTexto = classesAtivas?.['--cor-texto-claro'] || '248 250 252';
+    
     return {
         color: `rgb(${rgbTexto})`,
         background: `linear-gradient(to bottom, rgb(${rgbFundo}), rgb(${rgbFundo})) fixed`
