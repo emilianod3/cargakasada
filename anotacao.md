@@ -7,11 +7,9 @@
 > Analise que o Falcao Mandou
 > Fazer o controle de acesso, cal, menus, permissoes
 > Configuração de sistema e usuarios
-> Tipos de Escuro, tom azul escuro, preto e acinzentado
 > paginacao
-> Reportar problema
-> Contato 
 > Versões  que pode unificr em Sobre ou não
+> quando em mobile ao clicar para abrir , esconder o menu novamente e automaticamente
 
 
 
@@ -27,13 +25,20 @@ composer dump-autoload -o --no-scripts
 composer config audit.block-insecure false
 composer config audit.block-insecure true
 php artisan --version
+php artisan route:list
+php artisan route:clear
+
+php artisan route:clear
+php artisan config:clear
+php artisan cache:clear
+
 
 npm run build 
 npm run dev
 npm run dev --watch
 
 **BANCO**
-cal;cfg;conf;grupo;usu;log;audi
+cal;cfg;conf;grupo;usu;log;audi;unic;emai;fone
 
 usu;grupo;uni;emai;fon;reco
 
@@ -70,7 +75,9 @@ usu;grupo;uni;emai;fon;reco
 > E-mail - OK
 > No esqueci senha se demorar e tiver inatividade redirecionar para login
 > limiteUpload
-
+> Tipos de Escuro, tom azul escuro, preto e acinzentado
+> Reportar problema
+> Contato 
 
 
 > **Seeders para Popular os dados iniciais no Banco de Dados**

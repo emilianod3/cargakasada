@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Core\CfgSistController;
+use App\Http\Controllers\Core\MailController;
+use App\Http\Controllers\Core\ReportarProblemaController;
 use App\Http\Controllers\Core\UnicoController;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
@@ -68,7 +70,25 @@ Route::middleware(['throttle:100,1'])->group(function () {
     })->middleware(['web','authcheck'])->name('termosuso');
     Route::get('/sobre', function () {
         return Inertia::render('Ajuda/Sobre');
-    })->middleware(['web','authcheck'])->name('sobre');       
+    })->middleware(['web','authcheck'])->name('sobre');
+    Route::get('/contato', function () {
+        return Inertia::render('Ajuda/Contato');
+    })->middleware(['web','authcheck'])->name('contato');
+
+    Route::post('/envio-para-email', [MailController::class, 'send'])->name('envio.para.email');
+});
+
+
+Route::group(['middleware' => 'throttle:300,1'], function () {
+    /*Reportar erro nao logado*/
+    /*
+    Route::get('/reportar', function () {
+        return view('ajuda.reportar');
+    })->name('reportar')->middleware('throttle:15,1');*/
+
+    //Route::get('/reportar-problema', 'ReportarProblemaController@view')->middleware('throttle:6,1')->name('reportar.problema');
+    Route::get('/reportar-problema', [ReportarProblemaController::class, 'view'])->middleware(['web','authcheck'])->name('reportar.problema');
+    Route::post('/envio-reportar-problema', [ReportarProblemaController::class, 'send'])->middleware('throttle:150,1')->name('envio.reportar.problema');
 });
 
 

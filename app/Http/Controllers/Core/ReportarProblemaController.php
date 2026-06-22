@@ -9,12 +9,13 @@ use App\Http\Controllers\Controller;
 use stdClass;
 use App\Mail\reportarProblema;
 use App\Http\Controllers\Core\Tools;
+use Inertia\Inertia;
 
 class ReportarProblemaController extends Controller
 {
     public function view()
-    {
-        return view('ajuda.reportarproblema');        
+    {  
+        return Inertia::render('Ajuda/ReportarProblema');   
     }
 
     public function send(Request $request)
