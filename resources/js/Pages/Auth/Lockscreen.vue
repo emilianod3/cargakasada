@@ -207,13 +207,15 @@ function shakeform(erro2) {
 
                     <button type="submit" ref="botaoSubmit"
                             :disabled="loginForm.processing"
-                            class="w-full bg-primary hover:bg-primary-hover disabled:opacity-50 text-texto-escuro font-bold py-2.5 rounded-lg text-sm transition-all cursor-pointer shadow-lg">
+                            class="w-full bg-primary hover:bg-primary-hover disabled:opacity-50 text-texto-escuro font-bold py-2.5 rounded-full text-sm transition-all cursor-pointer shadow-lg">
                         {{ loginForm.processing ? 'Aguarde...' : 'Autenticar' }} <i class="fas fa-lock text-xl"></i>
                     </button>
 
-                    <div class="text-center text-x text-texto-claro/60 mt-2">
-                        <Link :href="route('logout')" class="btn btn-gray font-bold ml-1 hover:underline"><i class="fas fa-power-off w-4 mr-2"></i>SAIR DEFINITIVAMENTE!</Link>
-                    </div>         
+                    <div class="w-full text-center text-x text-texto-claro/60 mt-2">
+                        <Link :href="route('logout')" class="w-full block text-center btn btn-red font-bold rounded-full!">
+                            <i class="fas fa-power-off w-4 mr-2"></i>SAIR
+                        </Link>
+                    </div>
                 </form>
 
             </div>
