@@ -8,10 +8,7 @@
 > Fazer o controle de acesso, cal, menus, permissoes
 > Configuração de sistema e usuarios
 > paginacao
-> Versões  que pode unificr em Sobre ou não
 > quando em mobile ao clicar para abrir , esconder o menu novamente e automaticamente
-
-
 
 > Criar componentes para usar em todo o sistema
 > Revisar temas em cada tipo de componente
@@ -78,6 +75,7 @@ usu;grupo;uni;emai;fon;reco
 > Tipos de Escuro, tom azul escuro, preto e acinzentado
 > Reportar problema
 > Contato 
+> Versões 
 
 
 > **Seeders para Popular os dados iniciais no Banco de Dados**

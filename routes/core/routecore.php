@@ -76,6 +76,11 @@ Route::middleware(['throttle:100,1'])->group(function () {
     })->middleware(['web','authcheck'])->name('contato');
 
     Route::post('/envio-para-email', [MailController::class, 'send'])->name('envio.para.email');
+
+    Route::get('/versoes', function () {
+        return Inertia::render('Ajuda/Versoes');
+    })->name('versoes')->middleware(['web','authcheck']);
+
 });
 
 
