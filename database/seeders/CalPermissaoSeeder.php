@@ -67,6 +67,7 @@ class CalPermissaoSeeder extends Seeder
         CalPermissao::create(["fkidcal" => 194, "cppermissao" => "11:11:11:11:00", "fkidgrupo" => 1, "flagcontrole" => 1]);
         CalPermissao::create(["fkidcal" => 196, "cppermissao" => "11:11:11:11:00", "fkidgrupo" => 1, "flagcontrole" => 1]);
         CalPermissao::create(["fkidcal" => 197, "cppermissao" => "11:11:11:11:00", "fkidgrupo" => 1, "flagcontrole" => 1]);
+        CalPermissao::create(["fkidcal" => 199, "cppermissao" => "11:11:11:11:00", "fkidgrupo" => 1, "flagcontrole" => 1]);
         CalPermissao::create(["fkidcal" => 201, "cppermissao" => "11:11:11:11:00", "fkidgrupo" => 1, "flagcontrole" => 1]);
         CalPermissao::create(["fkidcal" => 204, "cppermissao" => "11:11:11:11:00", "fkidgrupo" => 1, "flagcontrole" => 1]);
         

@@ -5,14 +5,23 @@
 # 📝 Tarefas Pendentes
 > [!NOTE]
 > Analise que o Falcao Mandou
+
 > Fazer o controle de acesso, cal, menus, permissoes
 > Configuração de sistema e usuarios
+> Cadastro Unificado
+> Funcionario, Divisões, unidades
 > paginacao
 > quando em mobile ao clicar para abrir , esconder o menu novamente e automaticamente
-
+> auditoria, logs
+> Cidades, endereços, 
 > Criar componentes para usar em todo o sistema
 > Revisar temas em cada tipo de componente
 > Google Analytics
+> Estoque
+> Assinatura Digital
+> Modelos de Arquivos
+Preciso migrar este modulo com os arquivos em anexo onde utilizava laravel e blade e mysql para o meu novo projeto com laravel 12 + vue + inertia + mysql = exemplo do codigo padrao que estou utilizando atualmente no novo projeto = 
+
 
 ## ⚡ Exemplos Práticos de Uso Diário
 
@@ -33,6 +42,11 @@ php artisan cache:clear
 npm run build 
 npm run dev
 npm run dev --watch
+
+https://tailwindcss.com/docs/colors
+https://fontawesome.com/v4/icons/
+
+
 
 **BANCO**
 cal;cfg;conf;grupo;usu;log;audi;unic;emai;fone
@@ -86,6 +100,7 @@ php artisan db:seed EnderecoSeeder
 php artisan db:seed ColumnCalSeeder
 php artisan db:seed CalPermissaoSeeder
 php artisan db:seed CalSeeder
+php artisan db:seed MenuSeeder
 php artisan db:seed CfgSistSeeder
 php artisan db:seed CfgUserCalSeeder
 php artisan db:seed ConfigForUserSeeder

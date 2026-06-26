@@ -10,8 +10,16 @@ const listaMenus = computed(() => page2.props.menus || [])
 
 const { sidebarAberta, submenusAbertos, alternarSubmenu, irParaLink } = jssistema();
 
+
+// Função para fechar o menu automaticamente no mobile após o clique
+const fecharAoClicar = () => {
+  // Verifica se a largura da tela é menor que 768px (padrão 'md' do Tailwind)
+  if (window.innerWidth < 768) {
+    sidebarAberta.value = false; // Fecha a sidebar
+  }
+};
+
 onMounted(() => {
-    
     page2.props.app_debug ? console.log('Iniciando Menu') : '';
 });
 </script>
@@ -31,14 +39,14 @@ onMounted(() => {
            overflow-y-auto overflow-x-hidden"
     :class="[
       sidebarAberta 
-        ? 'md:w-48 max-md:w-48 max-md:translate-x-0 p-4 max-md:p-5' 
+        ? 'md:w-64 max-md:w-64 max-md:translate-x-0 p-4 max-md:p-5'
         : 'md:w-16 max-md:-translate-x-full py-4 px-2'
     ]"
   >
     
     <div 
       v-show="sidebarAberta"
-      class="text-[10px] font-bold text-texto-claro/40 uppercase tracking-widest px-1 mb-2 whitespace-nowrap transition-opacity duration-200"
+      class="text-[10px] font-bold text-texto-claro/40 uppercase tracking-widest px-1 mb-2 pt-2 whitespace-nowrap transition-opacity duration-200"
     >
       Navegação
     </div>
@@ -52,7 +60,7 @@ onMounted(() => {
         class="w-full flex items-center justify-between px-2 py-2 rounded-lg hover:bg-texto-claro/10 text-texto-claro transition-all group text-sm cursor-pointer text-left"
       >
         <div class="flex items-center gap-2 min-w-0 flex-1">
-          <span class="w-6 text-center text-texto-claro/40 group-hover:text-primary text-base transition-colors flex-shrink-0">
+          <span class="w-6 text-center text-texto-claro/40 group-hover:text-primary text-base transition-colors shrink-0">
             <i :class="menu.icone"></i>
           </span>
           
@@ -65,19 +73,20 @@ onMounted(() => {
         </div>
 
         <i v-if="sidebarAberta && menu.submenus && menu.submenus.length" 
-          class="fas fa-chevron-right text-[10px] text-texto-claro/30 transition-transform duration-200 flex-shrink-0 ml-1" 
+          class="fas fa-chevron-right text-[10px] text-texto-claro/30 transition-transform duration-200 shrink-0 ml-1" 
           :class="submenusAbertos[menu.id] ? 'rotate-90 text-primary' : ''"></i>
       </component>
 
       <div 
         v-if="menu.submenus && menu.submenus.length && sidebarAberta"
         class="overflow-hidden transition-all duration-300 ease-in-out pl-6 flex flex-col gap-1" 
-        :class="submenusAbertos[menu.id] ? 'max-h-40 mt-1 pb-1' : 'max-h-0'">
+        :class="submenusAbertos[menu.id] ? 'max-h-96 mt-1 pb-1' : 'max-h-0'">
         
         <Link 
           v-for="sub in menu.submenus" 
           :key="sub.id || sub.rota || sub.url"
           :href="appUrl1+sub.rota || appUrl1+sub.url"
+          @click="fecharAoClicar"
           class="text-xs text-texto-claro/90 hover:text-primary py-1.5 transition-colors block whitespace-nowrap overflow-hidden text-ellipsis">
           <i class="fas fa-circle text-[6px] mr-2 opacity-40"></i> 
           {{ sub.nome }}
