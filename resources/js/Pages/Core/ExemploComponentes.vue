@@ -219,8 +219,47 @@ const formTeste = reactive({
                         <button class="flex items-center gap-2 px-6 py-2.5 bg-transparent border-2 border-slate-600 text-slate-600 font-medium rounded-full hover:bg-slate-600 hover:text-white transition-all duration-300 ease-in-out cursor-pointer">
                             <i class="fas fa-arrow-left"></i> <span>Voltar Tela</span>
                         </button>
+
+                        <button class="flex items-center gap-2 px-6 py-2.5 bg-transparent border-2 border-slate-600 text-slate-600 font-medium rounded-full hover:bg-slate-600 hover:text-white transition-all duration-300 ease-in-out cursor-pointer">
+                            <i class="fa fa-cog"></i> <span>ExemploIcone</span>
+                        </button>
                     </div>
                 </div>
+
+
+                <div class="bg-layout-painel p-6 rounded-xl border border-comum shadow-md">
+                    <h3 class="text-sm font-bold text-texto-claro/40 uppercase tracking-wider mb-4">Group Componentes</h3>
+                    <div class="flex items-center w-full box-border">
+                        <button type="button" class="bg-blue-600 hover:bg-blue-700 text-white h-10 px-3.5 rounded-l-lg border border-blue-600 border-r-blue-500/30 transition-all cursor-pointer flex items-center justify-center shrink-0 focus:outline-none">
+                            <i class="fas fa-edit text-sm"></i>
+                        </button>
+                        <button type="button" class="bg-blue-600 hover:bg-blue-700 text-white h-10 px-3.5 border border-blue-600 border-r-blue-500/30 transition-all cursor-pointer flex items-center justify-center shrink-0 focus:outline-none">
+                            <i class="fas fa-cog text-sm"></i>
+                        </button>
+
+                        <input 
+                            type="text" 
+                            placeholder="Pesquisar..." 
+                            class="flex-1 w-full h-10 px-3 border border-comum bg-layout-fundo text-texto-claro text-sm placeholder-texto-claro/40 focus:outline-none focus:border-primary transition-all rounded-none box-border"
+                        />
+
+                        <button type="button" class="bg-blue-600 hover:bg-blue-700 text-white h-10 px-3.5 border border-blue-600 border-r-blue-500/30 transition-all cursor-pointer flex items-center justify-center shrink-0 focus:outline-none">
+                            <i class="fas fa-trash-alt text-sm"></i> <label>Excluir - </label> Teste
+                        </button>
+
+                        <div class="relative inline-block h-10 shrink-0">
+                            <select class="appearance-none bg-blue-600 hover:bg-blue-700 text-white h-full pl-4 pr-9 rounded-r-lg font-medium text-sm border border-blue-600 transition-all cursor-pointer focus:outline-none focus:border-primary box-border">
+                                <option value="1" class="bg-layout-painel text-texto-claro">Opção 1</option>
+                                <option value="2" class="bg-layout-painel text-texto-claro">Opção 2</option>
+                                <option value="3" class="bg-layout-painel text-texto-claro">Opção 3</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-white/70">
+                                <i class="fas fa-chevron-down text-[10px]"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
             <div v-if="abaAtiva === 'inputs'" class="bg-layout-painel p-6 rounded-xl border border-comum shadow-xl space-y-6 animate-fadeIn">

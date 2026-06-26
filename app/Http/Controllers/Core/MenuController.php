@@ -11,14 +11,14 @@ use Illuminate\Http\Request;
 
 class MenuController extends Controller
 {
-    public function getMenus($idNivel = 0, $idGrupo)
+    public function getMenus(Int $idNivel = 0, Int $idGrupo)
     {
         return Menu::leftjoin('cal', 'menu.fkidcal', '=', 'cal.id')->leftjoin('calpermissao', 'menu.fkidcal', '=', 'calpermissao.fkidcal')->select([DB::raw('menu.mnidentificacao, menu.mnnumeracao, menu.id, menu.mnicone, menu.mndestaque, menu.mnskin, menu.fkidcal, cal.clrota, cal.clidentificacao, calpermissao.cppermissao')])->where('fkidmenunivelacima',$idNivel)->where('mnstatus', 1)->where('fkidgrupo', $idGrupo)->groupBy('menu.id')->orderBy('mnsequencia', 'asc')->get();
     }
 
 
 
-    public function montaMenu($idGrupo)
+    public function montaMenu(Int $idGrupo)
     {
         $url = url('');
         $html = '';
@@ -124,7 +124,7 @@ class MenuController extends Controller
     /**
      * Ponto de entrada que busca o primeiro nível e dispara a montagem do JSON
      */
-    public function montaMenu2($idGrupo)
+    public function montaMenu2(Int $idGrupo)
     {
         // 1. Busca os menus de nível zero (raiz)
         $menusRaiz = $this->getMenus(0, $idGrupo);
@@ -180,7 +180,7 @@ class MenuController extends Controller
             'id'           => $menu->id,
             'nome'         => $menu->mnidentificacao,
             'numeracao'    => $menu->mnnumeracao != '' ? $menu->mnnumeracao : $menu->id,
-            'icone'        => $menu->mnicone != '' ? $menu->mnicone : 'icon-speedometer',
+            'icone'        => $menu->mnicone != '' ? $menu->mnicone : 'fa fa-square',
             'rota'         => $menu->fkidcal > 0 ? $menu->clrota : '/dashboard',
             'submenus'     => [] // Começa vazio
         ];

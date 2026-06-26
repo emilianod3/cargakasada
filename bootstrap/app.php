@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 Route::group([], base_path('routes/auth/routeauth.php'));
                 Route::group([], base_path('routes/core/routecore.php'));
                 Route::group([], base_path('routes/rests/routerests.php'));
+                Route::group([], base_path('routes/controle/routecontrole.php'));
                 //Route::group([], base_path('routes/auxiliares/routeauxiliares.php'));
                 //Route::group([], base_path('routes/cadastro/routecadastro.php'));
                 //Route::group([], base_path('routes/controle/routecontrole.php'));
