@@ -404,3 +404,50 @@ input:-webkit-autofill:active {
 .dadoinvalido-texto {
     color: #f87171; /* Cor vermelha idêntica ao text-red-400 do Tailwind */
 }
+
+
+
+
+
+
+
+/* ==========================================================================
+   CUSTOM SELECT NATIVO (RESET E SOBREPOSIÇÃO DE CORES)
+   ========================================================================== */
+
+/* Aplica o cursor pointer no select principal */
+select.select-customizado {
+    cursor: pointer !important;
+}
+
+/* Força o cursor pointer em todas as opções internas */
+select.select-customizado option {
+    cursor: pointer !important;
+    background-color: rgb(var(--cor-fundo-rgb)) !important;
+    color: rgb(var(--cor-texto-claro)) !important;
+    padding: 10px 14px;
+}
+
+/* TRUQUE AVANÇADO CONTRA O AZUL DO SISTEMA OPERACIONAL:
+   Usamos uma sombra interna (box-shadow) gigante para preencher o fundo. 
+   O gradiente ou box-shadow consegue anular a injeção do azul nativo no hover e na seleção.
+*/
+select.select-customizado option:hover,
+select.select-customizado option:focus,
+select.select-customizado option:active,
+select.select-customizado option:checked {
+    background-color: rgb(var(--cor-marca-rgb)) !important; /* Cor Primária (Verde) */
+    color: rgb(var(--cor-texto-escuro)) !important; /* Texto adaptado para o fundo verde */
+    
+    /* Preenche o fundo forçadamente para anular o azul do Windows/Chrome */
+    box-shadow: inset 0 0 100px 100px rgb(var(--cor-marca-rgb)) !important;
+}
+
+/* Fallback específico para navegadores baseados em Chromium */
+@media (-webkit-min-device-pixel-ratio:0) {
+    select.select-customizado option:checked {
+        background-color: rgb(var(--cor-marca-rgb)) !important;
+        box-shadow: inset 0 0 100px 100px rgb(var(--cor-marca-rgb)) !important;
+        color: rgb(var(--cor-texto-escuro)) !important;
+    }
+}

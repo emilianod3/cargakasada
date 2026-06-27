@@ -162,47 +162,39 @@ const executarAcao = (acao) => {
             <div v-if="abaAtiva === 'inicio'" class="flex flex-col gap-4">
                 
                 <div class="bg-layout-painel border border-comum rounded-lg p-4 shadow-sm flex flex-col gap-4">
-                    <div class="flex gap-2">
-
                     <div class="flex items-center w-full box-border">
-
-
                         <div class="relative inline-block h-10 shrink-0">
                             <button 
-                                type="button" 
-                                @click="exibirOpcoesCal = !exibirOpcoesCal"
-                                class="bg-blue-600 hover:bg-blue-700 text-white h-10 w-10 rounded-l-lg border border-blue-600 transition-all cursor-pointer focus:outline-none flex items-center justify-center box-border select-none"
-                                title="Mais Opções"
-                            >
-                                <i class="fas fa-ellipsis-v text-sm transition-transform duration-200" :class="{ 'rotate-90 text-primary': exibirOpcoesCal }"></i>
+                                type="button" @click="exibirOpcoesCal = !exibirOpcoesCal" title="Relatórios"
+                                class="bg-primary hover:bg-primary-hover text-texto-escuro h-10 w-15 rounded-l-lg transition-all cursor-pointer focus:outline-none flex items-center justify-center box-border select-none pr-3 pl-3">
+                                <i class="fas fa-print text-sm transition-transform duration-200 cursor-pointer pl-2 pr-5" :class="{ 'rotate-90 cursor-pointer': exibirOpcoesCal }"></i>
+                                <i class="fas fa-chevron-down text-[10px] pr-3 cursor-pointer"></i>
                             </button>
 
-                            <div 
-                                v-if="exibirOpcoesCal" 
-                                class="absolute left-0 mt-1 w-48 bg-layout-painel border border-comum rounded-lg shadow-xl z-50 overflow-hidden py-1"
-                            >
+                            <div v-if="exibirOpcoesCal" class="absolute left-0 mt-1 w-48 bg-layout-painel border border-comum rounded-lg shadow-xl z-50 overflow-hidden py-1">
                                 <button 
-                                    type="button" 
+                                    type="button" title="Gerar Relatório - PDF"
                                     @click="executarAcao('acao1')"
                                     class="w-full text-left px-4 py-2.5 text-sm text-texto-claro/90 hover:bg-texto-claro/10 transition-colors flex items-center gap-2.5 cursor-pointer"
                                 >
-                                    <i class="fas fa-plus text-xs text-texto-claro/40"></i> Adicionar Novo
+                                    <i class="fas fa-plus text-xs text-texto-claro/40"></i> Relatório
                                 </button>
                                 
                                 <button 
-                                    type="button" 
+                                    type="button" title="Gerar Relatório - DOC"
                                     @click="executarAcao('acao2')"
                                     class="w-full text-left px-4 py-2.5 text-sm text-texto-claro/90 hover:bg-texto-claro/10 transition-colors flex items-center gap-2.5 cursor-pointer"
                                 >
-                                    <i class="fas fa-download text-xs text-texto-claro/40"></i> Exportar Dados
+                                    <i class="fas fa-download text-xs text-texto-claro/40"></i> Relatório
                                 </button>
+                                <hr class="border-comum">
                                 
                                 <button 
-                                    type="button" 
+                                    type="button" title="Gerar Relatório - CSV"
                                     @click="executarAcao('acao3')"
                                     class="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors flex items-center gap-2.5 cursor-pointer"
                                 >
-                                    <i class="fas fa-exclamation-triangle text-xs opacity-60"></i> Executar Alerta
+                                    <i class="fas fa-exclamation-triangle text-xs opacity-60"></i> Relatório
                                 </button>
                             </div>
 
@@ -210,54 +202,27 @@ const executarAcao = (acao) => {
                         </div>
                         
 
-                        <button type="button" class="bg-blue-600 hover:bg-blue-700 text-white h-10 px-3.5 border border-blue-600 border-r-blue-500/30 transition-all cursor-pointer flex items-center justify-center shrink-0 focus:outline-none">
-                            <i class="fas fa-cog text-sm"></i>
-                        </button>
-
-                        <input 
-                            type="text" 
-                            placeholder="Pesquisar..." 
-                            class="flex-1 w-full h-10 px-3 border border-comum bg-layout-fundo text-texto-claro text-sm placeholder-texto-claro/40 focus:outline-none focus:border-primary transition-all rounded-none box-border"
-                        />
-
-                        <button type="button" class="bg-blue-600 hover:bg-blue-700 text-white h-10 px-3.5 border border-blue-600 border-r-blue-500/30 transition-all cursor-pointer flex items-center justify-center shrink-0 focus:outline-none">
-                            <i class="fas fa-trash-alt text-sm"></i> <label>Excluir - </label> Teste
-                        </button>
-
-                        <div class="relative inline-block h-10 shrink-0">
-                            <select class="appearance-none bg-blue-600 hover:bg-blue-700 text-white h-full pl-4 pr-9 rounded-r-lg font-medium text-sm border border-blue-600 transition-all cursor-pointer focus:outline-none focus:border-primary box-border">
-                                <option value="1" class="bg-layout-painel text-texto-claro">Opção 1</option>
-                                <option value="2" class="bg-layout-painel text-texto-claro">Opção 2</option>
-                                <option value="3" class="bg-layout-painel text-texto-claro">Opção 3</option>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-white/70">
-                                <i class="fas fa-chevron-down text-[10px]"></i>
-                            </div>
-                        </div>
-                    </div>
-                                            
-                        <button @click="exibirFiltrosAvancados = !exibirFiltrosAvancados" class="bg-comum hover:bg-comum/80 text-texto-claro p-2.5 rounded-lg text-sm transition-all flex items-center gap-2">
+                        <button @click="exibirFiltrosAvancados = !exibirFiltrosAvancados" type="button" class="bg-primary hover:bg-primary-hover text-texto-escuro h-10 px-3.5 border-l border-primary/30 transition-all cursor-pointer flex items-center justify-center shrink-0 focus:outline-none" title="Mais Opções de Filtros">
                             <i :class="['fas', exibirFiltrosAvancados ? 'fa-angle-double-up' : 'fa-filter']"></i>
-                            Filtros
                         </button>
-                        
                         <div class="relative flex-1">
-                            <input v-model="campoPesquisa" @keyup.enter="pesquisar" type="text" placeholder="Dados para pesquisa..." class="w-full p-2.5 pl-10 rounded-lg border border-comum bg-layout-fundo text-texto-claro focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none text-sm transition-all" />
+                            <input v-model="campoPesquisa" @keyup.enter="pesquisar" type="text" placeholder="Dados para pesquisa..." class="w-full p-2.5 pl-10 border border-comum bg-layout-fundo text-texto-claro focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none text-sm transition-all" />
                             <i class="fas fa-search absolute left-3.5 top-3.5 text-texto-claro/40 text-sm"></i>
                         </div>
-
-                        <button @click="pesquisar" class="bg-primary hover:bg-primary-hover text-texto-escuro font-bold px-5 rounded-lg text-sm transition-all flex items-center gap-2">
-                            Filtrar
+                        
+                        <button type="button" @click="pesquisar" class="bg-primary hover:bg-primary-hover text-texto-escuro h-10 px-3.5 transition-all cursor-pointer flex items-center justify-center shrink-0 focus:outline-none" title="Pesquisar">
+                            <i class="fas fa-search text-sm"></i> <label class="pl-3 cursor-pointer">Filtrar</label>
                         </button>
-                        <button @click="limparFiltros" class="bg-red-600 hover:bg-red-700 text-white px-3 rounded-lg text-sm transition-all">
-                            <i class="mdi mdi-close"></i>
+                        <button type="button" class="btn-black h-10 px-3.5 transition-all cursor-pointer flex items-center justify-center shrink-0 focus:outline-none rounded-r-lg" title="Limpar Filtro">
+                            <i class="fas fa-times text-sm"></i>
                         </button>
                     </div>
+                    
 
-                    <div v-if="exibirFiltrosAvancados" class="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-comum/40 pt-4 transition-all">
+                    <div v-if="exibirFiltrosAvancados" class="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-comum pt-4 transition-all">
                         <div class="flex flex-col gap-1">
                             <label class="text-xs font-medium text-texto-claro/70">Status do Registro</label>
-                            <select v-model="filtroStatus" class="p-2 rounded-lg border border-comum bg-layout-fundo text-texto-claro text-sm focus:outline-none">
+                            <select v-model="filtroStatus" class="select-customizado w-full p-2.5 pr-10 rounded-lg border border-comum bg-layout-fundo text-texto-claro text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all ">
                                 <option value="0">Ambos</option>
                                 <option value="1">Ativo</option>
                                 <option value="2">Inativo</option>
@@ -266,31 +231,51 @@ const executarAcao = (acao) => {
 
                         <div class="flex flex-col gap-1">
                             <label class="text-xs font-medium text-texto-claro/70">Data Inicial</label>
-                            <input v-model="filtroDataInicio" type="date" class="p-2 rounded-lg border border-comum bg-layout-fundo text-texto-claro text-sm focus:outline-none" />
+                            <input v-model="filtroDataInicio" type="date" class="p-2 rounded-lg border border-comum bg-layout-fundo text-texto-claro text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
                         </div>
 
                         <div class="flex flex-col gap-1">
                             <label class="text-xs font-medium text-texto-claro/70">Data Final</label>
-                            <input v-model="filtroDataFim" type="date" class="p-2 rounded-lg border border-comum bg-layout-fundo text-texto-claro text-sm focus:outline-none" />
+                            <input v-model="filtroDataFim" type="date" class="p-2 rounded-lg border border-comum bg-layout-fundo text-texto-claro text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
                         </div>
+                    </div>
 
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div class="flex flex-col gap-1">
                             <label class="text-xs font-medium text-texto-claro/70">Ordenar Por</label>
-                            <select v-model="filtroCampoOrdem" class="p-2 rounded-lg border border-comum bg-layout-fundo text-texto-claro text-sm focus:outline-none">
+                            <select v-model="filtroCampoOrdem" class="select-customizado w-full p-2.5 pr-10 rounded-lg border border-comum bg-layout-fundo text-texto-claro text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all ">
                                 <option value="clidentificacao">Identificação</option>
                                 <option value="clobserve">Obs</option>
                                 <option value="id">Código</option>
                             </select>
                         </div>
+                        <div class="flex flex-col gap-1 md:col-span-2">
+                            <label class="text-xs font-medium text-texto-claro/70">Ordem</label>
+                            <div class="btn-group">
+                                <button class="bg-primary hover:bg-primary-hover text-texto-escuro cursor-pointer rounded-l-lg pr-3 pl-3"><i :class="['mr-2 fas', filtroOrdemDirecao === 'asc' ? 'fa-sort-alpha-down' : 'fa-sort-alpha-up']"></i>{{ filtroOrdemDirecao === 'asc' ? 'Crescente' : 'Decrescente' }}</button>
+                               <button 
+                                    type="button"
+                                    @click="tipoFiltro = 'exato'"
+                                    class="btn flex-1 transition-all"
+                                    :class="tipoFiltro === 'exato' 
+                                        ? 'bg-primary hover:bg-primary-hover text-texto-escuro' 
+                                        : 'opacity-60 hover:bg-layout-fundo/10 bg-layout-fundo/99 text-texto-claro/99 border-comum'"
+                                >
+                                    <i class="fa fa-crosshairs mr-2"></i>Filtro Exato
+                                </button>
 
-                        <div class="flex flex-col gap-1 justify-end">
-                            <div class="flex gap-2">
-                                <button @click="alternarOrdemDirecao" class="bg-comum hover:bg-comum/80 text-texto-claro p-2 rounded-lg text-xs font-bold transition-all flex-1">
-                                    <i :class="['fas', filtroOrdemDirecao === 'asc' ? 'fa-sort-alpha-down' : 'fa-sort-alpha-up']"></i>
-                                    {{ filtroOrdemDirecao === 'asc' ? 'Crescente' : 'Decrescente' }}
+                                <button 
+                                    type="button"
+                                    @click="tipoFiltro = 'amplo'"
+                                    class="btn flex-1 transition-all"
+                                    :class="tipoFiltro === 'amplo' 
+                                        ? 'bg-primary hover:bg-primary-hover text-texto-escuro font-semibold' 
+                                        : 'opacity-60 hover:bg-layout-fundo/10 bg-layout-fundo/99 text-texto-claro/99 border-comum'"
+                                >
+                                    <i class="fa fa-arrows-alt mr-2"></i>Filtro Amplo
                                 </button>
                             </div>
-                        </div>
+                        </div>                         
                     </div>
                 </div>
 
