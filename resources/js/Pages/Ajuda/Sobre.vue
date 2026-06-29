@@ -2,18 +2,13 @@
 import Layout from '@/Layouts/PainelInterno.vue';
 import { onMounted, inject, computed } from 'vue';
 import { usePage} from '@inertiajs/vue3';
-import { formataDataHora } from '@/sistema.js';
+import { formataDataHora, voltarhistory } from '@/sistema.js';
 
 const appUrl1 = inject('appUrl');
 const page = usePage();
 const logoEmpresa = import.meta.env.VITE_COMPANY_LOGO || 'logo_text';
 const usuarioLogado = computed(() => page.props.auth?.user || null);
 const grupoLogado = computed(() => page.props.auth?.grupo || null);
-
-
-const voltar = () => {
-    window.history.back();
-};
 
 onMounted(() => {
     if (usuarioLogado.value) {
@@ -105,7 +100,7 @@ onMounted(() => {
                                 <li><strong>Libre Office:</strong> {{ $page.props.sistema.libreOfficeVersion }}</li>
                             </ul>                            
 
-                            <button @click="voltar" class="flex items-center gap-2 bg-primary hover:bg-primary-hover text-texto-escuro font-bold px-6 py-2.5 rounded-full text-sm transition-all shadow-lg cursor-pointer opacity-60">
+                            <button @click="voltarhistory" class="flex items-center gap-2 bg-primary hover:bg-primary-hover text-texto-escuro font-bold px-6 py-2.5 rounded-full text-sm transition-all shadow-lg cursor-pointer opacity-60">
                                     <i class="fas fa-arrow-left"></i> Voltar
                             </button>
                         </template>

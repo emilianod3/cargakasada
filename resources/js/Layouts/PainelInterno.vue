@@ -137,11 +137,11 @@ onUnmounted(() => {
 
         <div class="flex flex-1 relative w-full items-stretch">
             
-            <Menu class="sticky top-16 h-[calc(100vh-4rem)] z-40 overflow-y-auto transition-all duration-300 flex-shrink-0" />
+            <Menu class="sticky top-16 h-[calc(100vh-4rem)] z-40 overflow-y-auto transition-all duration-300 shrink-0" />
 
             <div class="flex-1 flex flex-col justify-between overflow-x-hidden pt-6 min-w-0">
                 
-                <main class="p-6 w-full max-w-7xl mx-auto flex-1 relative">
+                <main class="p-6 w-full mx-auto flex-1 relative">
                     <slot />
                     
                     <button 

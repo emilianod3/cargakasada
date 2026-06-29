@@ -51,8 +51,9 @@ class HandleInertiaRequests extends Middleware
             ],
             'auth' => [
                 //'user' => $request->user(),
-                'user'   => $request->session()->get('user'), // null se deslogado
-                'grupo' => $request->session()->get('grupo'),  // null se deslogado
+                'user'   => $request->session()->get('user'),
+                'grupo' => $request->session()->get('grupo'),
+                'permissoes' => $request->session()->get('permissoes'),
             ],
             'sistema' => [
                 'versao'    => config('version.number', '1.0.0'), // Fallback caso não exista
