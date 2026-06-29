@@ -1,10 +1,10 @@
 <script setup>
 import Layout from '@/Layouts/PainelInterno.vue';
 import { ref, onMounted, computed } from 'vue';
-import { useForm, usePage, Head } from '@inertiajs/vue3';
+import { useForm, usePage, Head, router } from '@inertiajs/vue3';
 import * as sistemajs from '@/sistema.js';
 
-// --- PROPS RECEBIDAS DO BACKEND ---
+
 const props = defineProps({
     cal: Object,
     colunasCal: Array,
@@ -24,6 +24,18 @@ const filtroDataFim = ref('');
 const filtroCampoOrdem = ref('clidentificacao');
 const filtroOrdemDirecao = ref('asc');
 const tipoFiltro = ref('amplo'); // amplo ou exato
+const calid = props.cal?.cal?.[0];
+let permissao = null;
+let pageatual = 1;
+
+const btnnovoregistro = ref(false);
+
+const listagem = ref({
+    current_page: 1,
+    data: [],
+    links: [],
+    total: 0
+});
 
 // --- FORMULÁRIO PRINCIPAL (CRUD) ---
 const form = useForm({
@@ -38,21 +50,84 @@ const form = useForm({
 // --- CARREGAMENTO INICIAL ---
 onMounted(() => {
     // Inicializações se necessário
+    permissaoPrincipal();
+    filtrar(); // Carrega a listagem inicial
 });
 
+
+function permissaoPrincipal(){
+    permissao = sistemajs.getPermissaoCal(calid);
+    if (page.props.app_debug) {
+        console.log('Permissões do Cal:', permissao);
+    }
+    if(permissao.inserir != true){
+        btnnovoregistro.value = permissao.inserir;
+        if (page.props.app_debug) {
+            console.log('Sem Permissão Inserir:', permissao.inserir);
+        }
+    }else{
+        btnnovoregistro.value = permissao.inserir;
+        if (page.props.app_debug) {
+            console.log('Permissão Inserir:', permissao.inserir);
+        }
+        btnnovoregistro.value = permissao.inserir;
+    }
+
+    if(permissao.inserir != true && permissao.alterar != true){
+        //$(".btnSalvarPrincipal").hide();
+        //$(".btnsalvarestatistica4").hide();
+    }
+    else{
+        //$(".btnSalvarPrincipal").show();
+        //$(".btnsalvarestatistica4").show();
+    } 
+
+    if(permissao.apagar != true){
+        //$(".veiculolisttblcolunatd").addClass('hide');
+        //$(".btnremoverfoto").hide();
+    }
+    else{
+        //$(".veiculolisttblcolunatd").removeClass('hide');
+        //$(".btnremoverfoto").show();
+    }
+}
+
 // --- MÉTODOS DE NAVEGAÇÃO E AÇÃO ---
-const alternarAba = (aba) => {
+const alternarAba = (aba = 'inicio') => {
     if (aba !== 'inicio' && form.id === 0 && aba !== 'cadastro') {
         sistemajs.mostrarPopup({ titulo: 'Aviso', conteudo: 'Selecione ou salve um registro para continuar.', tipo: 'warning', tempo: 4000 });
         return;
     }
+
+    if(aba === 'inicio'){
+        if (page.props.app_debug) {
+            console.log('Limpar Campos do cadastro e listar registros');
+        }        
+    }
+
+
+    if(aba === 'cadastro'){
+        if (page.props.app_debug) {
+            console.log('Limpar Campos e Iniciar cadastro');
+        }        
+    }
+
+    if(aba === 'colunas'){
+        if (page.props.app_debug) {
+            console.log('Campos de colunas');
+        }        
+    }
+
     abaAtiva.value = aba;
 };
 
 const novoRegistro = () => {
     form.reset();
     form.id = 0;
-    abaAtiva.value = 'cadastro';
+    alternarAba('cadastro');
+    if (page.props.app_debug) {
+        console.log('Btn Novo Registro - Clicado');
+    }    
 };
 
 const editarRegistro = (registro) => {
@@ -66,21 +141,121 @@ const editarRegistro = (registro) => {
 };
 
 // --- SUBMISSÃO DO FILTRO / PESQUISA ---
-const pesquisar = () => {
-    // Envia os filtros de volta via Inertia recarregando os dados parciais
-    form.get(route('controle.cals.index'), {
+const filtrar = (pg = 1) => {
+    /*form.get(route('controle.cals.lista'), {
         data: {
-            pesquisa: campoPesquisa.value,
-            status: filtroStatus.value,
-            data_inicio: filtroDataInicio.value,
-            data_fim: filtroDataFim.value,
-            ordenar_por: filtroCampoOrdem.value,
+            campoPesquisa: campoPesquisa.value,
+            statusfiltro: filtroStatus.value,
+            datainiciofiltro: filtroDataInicio.value,
+            datafinalfiltro: filtroDataFim.value,
+            campoordem: filtroCampoOrdem.value,
             ordem: filtroOrdemDirecao.value,
-            tipo_filtro: tipoFiltro.value
+            tipofiltro: tipoFiltro.value,
+            regPg: 10
         },
         preserveState: true,
         replace: true
+    });*/
+    pageatual = pg;
+    let data = {
+        campoPesquisa: campoPesquisa.value,
+        statusfiltro: filtroStatus.value,
+        datainiciofiltro: filtroDataInicio.value,
+        datafinalfiltro: filtroDataFim.value,
+        campoordem: filtroCampoOrdem.value,
+        ordem: filtroOrdemDirecao.value,
+        tipofiltro: tipoFiltro.value,
+        regPg: 10,
+        page: pg,
+    };
+
+    /*router.post(route('controle.cals.lista'), {
+    campoPesquisa: campoPesquisa.value,
+    statusfiltro: filtroStatus.value,
+    datainiciofiltro: filtroDataInicio.value,
+    datafinalfiltro: filtroDataFim.value,
+    campoordem: filtroCampoOrdem.value,
+    ordem: filtroOrdemDirecao.value,
+    tipofiltro: tipoFiltro.value,
+    regPg: 10,
+    preserveState: true,
+    replace: true,
+    onError: (errors) => {*/
+
+    router.post(route('controle.cals.lista'), data, {
+        preserveState: true,
+        replace: true,
+        onError: (errors) => {   
+            /*const rerro = errors.resultado;
+            try {
+                const djson = JSON.parse(rerro);
+                sistemajs.mostrarPopup({ titulo: 'Falha no Cadastro', conteudo: djson.message, tipo: 'danger', tempo: 6000 });
+            } catch (e) {
+                sistemajs.mostrarPopup({ titulo: 'Falha no Cadastro', conteudo: 'Impossível Processar dados.', tipo: 'danger', tempo: 6000 });
+            }
+            
+            registerForm.reset('senha', 'unsenha_confirmation', 'grecaptcha');
+            mensagemErroSenha.value = '';
+            
+            if (window.grecaptcha && widgetId !== null) {
+                window.grecaptcha.reset(widgetId);
+                registerForm.grecaptcha = '';
+            }
+            registerForm.reset();
+            registerForm.aceitatermos = false;            
+            campoNome.value?.focus();*/
+            sistemajs.mostrarPopup({ 
+                titulo: 'Erro Listagem', 
+                conteudo: 'Falha na Listagem de CAlls...', 
+                tipo: 'danger', 
+                tempo: 4000 
+            });
+        },
+        onSuccess: () => {
+            /*sistemajs.mostrarPopup({ 
+                titulo: 'Listagem Realizada', 
+                conteudo: 'Sucesso na Listagem...', 
+                tipo: 'success', 
+                tempo: 4000 
+            });*/
+            /*
+            registerForm.reset();
+            setTimeout(() => {
+                window.location.href = route('login');
+            }, 4000);  */  
+            //const rsucesso = page.props.flash?.resultado;
+            //console.log('Saida:', rsucesso);
+            //const djson = JSON.parse(rsucesso);
+            if(page.props.flash?.resultado != null){
+                listagem.value = JSON.parse(page.props.flash?.resultado).data;
+            }else{
+              
+            }
+            //listagem.value = djson.data;
+            /*console.log(djson.message);
+            console.log(djson.status);
+            console.log(djson.data);*/
+        }
     });
+
+
+};
+
+
+// 2. Função inteligente para mudar de página sem perder os filtros existentes na URL
+const navegarParaPagina = (page = 1) => {
+
+    
+        console.log('filtrar - navegarParaPagina:', page);
+    
+    filtrar(page);
+    /*
+    if (!url) return;
+    
+    router.port(url, {}, {
+        preserveState: true, // Mantém o texto digitado nos filtros da tela
+        preserveScroll: true // Evita que a página pule para o topo ao mudar de página
+    });*/
 };
 
 const limparFiltros = () => {
@@ -88,12 +263,12 @@ const limparFiltros = () => {
     filtroStatus.value = '1';
     filtroDataInicio.value = '';
     filtroDataFim.value = '';
-    pesquisar();
+    filtrar();
 };
 
 const alternarOrdemDirecao = () => {
     filtroOrdemDirecao.value = filtroOrdemDirecao.value === 'asc' ? 'desc' : 'asc';
-    pesquisar();
+    filtrar();
 };
 
 // --- SUBMIT DO FORMULÁRIO (SALVAR) ---
@@ -135,7 +310,7 @@ const executarAcao = (acao) => {
     <Head title="Controle de Cals" />
 
     <Layout>
-        <div class="pb-2 max-w-7xl mx-auto flex flex-col gap-6">
+        <div class="pb-2 max-full flex flex-col gap-4">
             
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-comum pb-2 gap-2">
                 <div>
@@ -162,47 +337,39 @@ const executarAcao = (acao) => {
             <div v-if="abaAtiva === 'inicio'" class="flex flex-col gap-4">
                 
                 <div class="bg-layout-painel border border-comum rounded-lg p-4 shadow-sm flex flex-col gap-4">
-                    <div class="flex gap-2">
-
                     <div class="flex items-center w-full box-border">
-
-
                         <div class="relative inline-block h-10 shrink-0">
                             <button 
-                                type="button" 
-                                @click="exibirOpcoesCal = !exibirOpcoesCal"
-                                class="bg-blue-600 hover:bg-blue-700 text-white h-10 w-10 rounded-l-lg border border-blue-600 transition-all cursor-pointer focus:outline-none flex items-center justify-center box-border select-none"
-                                title="Mais Opções"
-                            >
-                                <i class="fas fa-ellipsis-v text-sm transition-transform duration-200" :class="{ 'rotate-90 text-primary': exibirOpcoesCal }"></i>
+                                type="button" @click="exibirOpcoesCal = !exibirOpcoesCal" title="Relatórios"
+                                class="bg-primary hover:bg-primary-hover text-texto-escuro h-10 w-15 rounded-l-lg transition-all cursor-pointer focus:outline-none flex items-center justify-center box-border select-none pr-3 pl-3">
+                                <i class="fas fa-print text-sm transition-transform duration-200 cursor-pointer pl-2 pr-5" :class="{ 'rotate-90 cursor-pointer': exibirOpcoesCal }"></i>
+                                <i class="fas fa-chevron-down text-[10px] pr-3 cursor-pointer"></i>
                             </button>
 
-                            <div 
-                                v-if="exibirOpcoesCal" 
-                                class="absolute left-0 mt-1 w-48 bg-layout-painel border border-comum rounded-lg shadow-xl z-50 overflow-hidden py-1"
-                            >
+                            <div v-if="exibirOpcoesCal" class="absolute left-0 mt-1 w-48 bg-layout-painel border border-comum rounded-lg shadow-xl z-50 overflow-hidden py-1">
                                 <button 
-                                    type="button" 
+                                    type="button" title="Gerar Relatório - PDF"
                                     @click="executarAcao('acao1')"
                                     class="w-full text-left px-4 py-2.5 text-sm text-texto-claro/90 hover:bg-texto-claro/10 transition-colors flex items-center gap-2.5 cursor-pointer"
                                 >
-                                    <i class="fas fa-plus text-xs text-texto-claro/40"></i> Adicionar Novo
+                                    <i class="fas fa-plus text-xs text-texto-claro/40"></i> Relatório
                                 </button>
                                 
                                 <button 
-                                    type="button" 
+                                    type="button" title="Gerar Relatório - DOC"
                                     @click="executarAcao('acao2')"
                                     class="w-full text-left px-4 py-2.5 text-sm text-texto-claro/90 hover:bg-texto-claro/10 transition-colors flex items-center gap-2.5 cursor-pointer"
                                 >
-                                    <i class="fas fa-download text-xs text-texto-claro/40"></i> Exportar Dados
+                                    <i class="fas fa-download text-xs text-texto-claro/40"></i> Relatório
                                 </button>
+                                <hr class="border-comum">
                                 
                                 <button 
-                                    type="button" 
+                                    type="button" title="Gerar Relatório - CSV"
                                     @click="executarAcao('acao3')"
                                     class="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors flex items-center gap-2.5 cursor-pointer"
                                 >
-                                    <i class="fas fa-exclamation-triangle text-xs opacity-60"></i> Executar Alerta
+                                    <i class="fas fa-exclamation-triangle text-xs opacity-60"></i> Relatório
                                 </button>
                             </div>
 
@@ -210,93 +377,87 @@ const executarAcao = (acao) => {
                         </div>
                         
 
-                        <button type="button" class="bg-blue-600 hover:bg-blue-700 text-white h-10 px-3.5 border border-blue-600 border-r-blue-500/30 transition-all cursor-pointer flex items-center justify-center shrink-0 focus:outline-none">
-                            <i class="fas fa-cog text-sm"></i>
-                        </button>
-
-                        <input 
-                            type="text" 
-                            placeholder="Pesquisar..." 
-                            class="flex-1 w-full h-10 px-3 border border-comum bg-layout-fundo text-texto-claro text-sm placeholder-texto-claro/40 focus:outline-none focus:border-primary transition-all rounded-none box-border"
-                        />
-
-                        <button type="button" class="bg-blue-600 hover:bg-blue-700 text-white h-10 px-3.5 border border-blue-600 border-r-blue-500/30 transition-all cursor-pointer flex items-center justify-center shrink-0 focus:outline-none">
-                            <i class="fas fa-trash-alt text-sm"></i> <label>Excluir - </label> Teste
-                        </button>
-
-                        <div class="relative inline-block h-10 shrink-0">
-                            <select class="appearance-none bg-blue-600 hover:bg-blue-700 text-white h-full pl-4 pr-9 rounded-r-lg font-medium text-sm border border-blue-600 transition-all cursor-pointer focus:outline-none focus:border-primary box-border">
-                                <option value="1" class="bg-layout-painel text-texto-claro">Opção 1</option>
-                                <option value="2" class="bg-layout-painel text-texto-claro">Opção 2</option>
-                                <option value="3" class="bg-layout-painel text-texto-claro">Opção 3</option>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-white/70">
-                                <i class="fas fa-chevron-down text-[10px]"></i>
-                            </div>
-                        </div>
-                    </div>
-                                            
-                        <button @click="exibirFiltrosAvancados = !exibirFiltrosAvancados" class="bg-comum hover:bg-comum/80 text-texto-claro p-2.5 rounded-lg text-sm transition-all flex items-center gap-2">
+                        <button @click="exibirFiltrosAvancados = !exibirFiltrosAvancados" type="button" class="bg-primary hover:bg-primary-hover text-texto-escuro h-10 px-3.5 border-l border-primary/30 transition-all cursor-pointer flex items-center justify-center shrink-0 focus:outline-none" title="Mais Opções de Filtros">
                             <i :class="['fas', exibirFiltrosAvancados ? 'fa-angle-double-up' : 'fa-filter']"></i>
-                            Filtros
                         </button>
-                        
                         <div class="relative flex-1">
-                            <input v-model="campoPesquisa" @keyup.enter="pesquisar" type="text" placeholder="Dados para pesquisa..." class="w-full p-2.5 pl-10 rounded-lg border border-comum bg-layout-fundo text-texto-claro focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none text-sm transition-all" />
+                            <input v-model="campoPesquisa" @keyup.enter="filtrar" type="text" placeholder="Dados para pesquisa..." class="w-full p-2.5 pl-10 border border-comum bg-layout-fundo text-texto-claro focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none text-sm transition-all" />
                             <i class="fas fa-search absolute left-3.5 top-3.5 text-texto-claro/40 text-sm"></i>
                         </div>
-
-                        <button @click="pesquisar" class="bg-primary hover:bg-primary-hover text-texto-escuro font-bold px-5 rounded-lg text-sm transition-all flex items-center gap-2">
-                            Filtrar
+                        
+                        <button type="button" @click="filtrar" class="bg-primary hover:bg-primary-hover text-texto-escuro h-10 px-3.5 transition-all cursor-pointer flex items-center justify-center shrink-0 focus:outline-none" title="Pesquisar">
+                            <i class="fas fa-search text-sm"></i> <label class="pl-3 cursor-pointer">Filtrar</label>
                         </button>
-                        <button @click="limparFiltros" class="bg-red-600 hover:bg-red-700 text-white px-3 rounded-lg text-sm transition-all">
-                            <i class="mdi mdi-close"></i>
+                        <button type="button" class="btn-black h-10 px-3.5 transition-all cursor-pointer flex items-center justify-center shrink-0 focus:outline-none rounded-r-lg" title="Limpar Filtro">
+                            <i class="fas fa-times text-sm"></i>
                         </button>
                     </div>
-
-                    <div v-if="exibirFiltrosAvancados" class="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-comum/40 pt-4 transition-all">
-                        <div class="flex flex-col gap-1">
-                            <label class="text-xs font-medium text-texto-claro/70">Status do Registro</label>
-                            <select v-model="filtroStatus" class="p-2 rounded-lg border border-comum bg-layout-fundo text-texto-claro text-sm focus:outline-none">
-                                <option value="0">Ambos</option>
-                                <option value="1">Ativo</option>
-                                <option value="2">Inativo</option>
-                            </select>
-                        </div>
-
-                        <div class="flex flex-col gap-1">
-                            <label class="text-xs font-medium text-texto-claro/70">Data Inicial</label>
-                            <input v-model="filtroDataInicio" type="date" class="p-2 rounded-lg border border-comum bg-layout-fundo text-texto-claro text-sm focus:outline-none" />
-                        </div>
-
-                        <div class="flex flex-col gap-1">
-                            <label class="text-xs font-medium text-texto-claro/70">Data Final</label>
-                            <input v-model="filtroDataFim" type="date" class="p-2 rounded-lg border border-comum bg-layout-fundo text-texto-claro text-sm focus:outline-none" />
-                        </div>
-
-                        <div class="flex flex-col gap-1">
-                            <label class="text-xs font-medium text-texto-claro/70">Ordenar Por</label>
-                            <select v-model="filtroCampoOrdem" class="p-2 rounded-lg border border-comum bg-layout-fundo text-texto-claro text-sm focus:outline-none">
-                                <option value="clidentificacao">Identificação</option>
-                                <option value="clobserve">Obs</option>
-                                <option value="id">Código</option>
-                            </select>
-                        </div>
-
-                        <div class="flex flex-col gap-1 justify-end">
-                            <div class="flex gap-2">
-                                <button @click="alternarOrdemDirecao" class="bg-comum hover:bg-comum/80 text-texto-claro p-2 rounded-lg text-xs font-bold transition-all flex-1">
-                                    <i :class="['fas', filtroOrdemDirecao === 'asc' ? 'fa-sort-alpha-down' : 'fa-sort-alpha-up']"></i>
-                                    {{ filtroOrdemDirecao === 'asc' ? 'Crescente' : 'Decrescente' }}
-                                </button>
+                    
+                    <div v-if="exibirFiltrosAvancados">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-comum pt-4 transition-all">
+                            <div class="flex flex-col gap-1">
+                                <label class="text-xs font-medium text-texto-claro/70">Status do Registro</label>
+                                <select v-model="filtroStatus" class="select-customizado w-full p-2.5 pr-10 rounded-lg border border-comum bg-layout-fundo text-texto-claro text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all ">
+                                    <option value="0">Ambos</option>
+                                    <option value="1">Ativo</option>
+                                    <option value="2">Inativo</option>
+                                </select>
                             </div>
+
+                            <div class="flex flex-col gap-1">
+                                <label class="text-xs font-medium text-texto-claro/70">Data Inicial</label>
+                                <input v-model="filtroDataInicio" type="date" class="p-2 rounded-lg border border-comum bg-layout-fundo text-texto-claro text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
+                            </div>
+
+                            <div class="flex flex-col gap-1">
+                                <label class="text-xs font-medium text-texto-claro/70">Data Final</label>
+                                <input v-model="filtroDataFim" type="date" class="p-2 rounded-lg border border-comum bg-layout-fundo text-texto-claro text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="flex flex-col gap-1">
+                                <label class="text-xs font-medium text-texto-claro/70">Ordenar Por</label>
+                                <select v-model="filtroCampoOrdem" class="select-customizado w-full p-2.5 pr-10 rounded-lg border border-comum bg-layout-fundo text-texto-claro text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all ">
+                                    <option value="clidentificacao">Identificação</option>
+                                    <option value="clobserve">Obs</option>
+                                    <option value="id">Código</option>
+                                </select>
+                            </div>
+                            <div class="flex flex-col gap-1 md:col-span-2">
+                                <label class="text-xs font-medium text-texto-claro/70">Ordem</label>
+                                <div class="btn-group">
+                                    <button class="bg-primary hover:bg-primary-hover text-texto-escuro cursor-pointer rounded-l-lg pr-3 pl-3"><i :class="['mr-2 fas', filtroOrdemDirecao === 'asc' ? 'fa-sort-alpha-down' : 'fa-sort-alpha-up']"></i>{{ filtroOrdemDirecao === 'asc' ? 'Crescente' : 'Decrescente' }}</button>
+                                <button 
+                                        type="button"
+                                        @click="tipoFiltro = 'exato'"
+                                        class="btn flex-1 transition-all"
+                                        :class="tipoFiltro === 'exato' 
+                                            ? 'bg-primary hover:bg-primary-hover text-texto-escuro' 
+                                            : 'opacity-60 hover:bg-layout-fundo/10 bg-layout-fundo/99 text-texto-claro/99 border-comum'"
+                                    >
+                                        <i class="fa fa-crosshairs mr-2"></i>Filtro Exato
+                                    </button>
+
+                                    <button 
+                                        type="button"
+                                        @click="tipoFiltro = 'amplo'"
+                                        class="btn flex-1 transition-all"
+                                        :class="tipoFiltro === 'amplo' 
+                                            ? 'bg-primary hover:bg-primary-hover text-texto-escuro font-semibold' 
+                                            : 'opacity-60 hover:bg-layout-fundo/10 bg-layout-fundo/99 text-texto-claro/99 border-comum'"
+                                    >
+                                        <i class="fa fa-arrows-alt mr-2"></i>Filtro Amplo
+                                    </button>
+                                </div>
+                            </div>                         
                         </div>
                     </div>
                 </div>
 
                 <div class="flex justify-between items-center">
                     <span class="text-xs text-texto-claro/50">Resultados encontrados: {{ props.registrosIniciais?.total || 0 }}</span>
-                    <button @click="novoRegistro" class="bg-primary hover:bg-primary-hover text-texto-escuro text-xs font-bold py-2 px-4 rounded-full transition-all flex items-center gap-1.5 shadow-sm">
+                    <button @click="novoRegistro" v-show="btnnovoregistro" class="bg-primary hover:bg-primary-hover text-texto-escuro text-xs font-bold py-2 px-4 rounded-full transition-all flex items-center gap-1.5 shadow-sm">
                         <i class="fas fa-plus"></i> Novo Registro
                     </button>
                 </div>
@@ -307,39 +468,175 @@ const executarAcao = (acao) => {
                             <tr class="bg-layout-fundo border-b border-comum text-texto-claro/70 text-xs font-semibold uppercase tracking-wider">
                                 <th class="p-4">Código</th>
                                 <th class="p-4">Identificação</th>
-                                <th class="p-4">Tipo</th>
-                                <th class="p-4 text-center">Status</th>
-                                <th class="p-4 text-right">Ações</th>
+                                <th class="p-4">Destino</th>
+                                <th class="p-4 text-center">Tipo</th>
+                                <th class="p-4 text-right"></th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-comum/40 text-sm text-texto-claro/90">
-                            <tr v-for="reg in props.registrosIniciais?.data" :key="reg.id" class="hover:bg-layout-fundo/40 transition-colors">
-                                <td class="p-4 font-mono text-xs">{{ reg.id }}</td>
-                                <td class="p-4 font-bold">{{ reg.clidentificacao }}</td>
+                        <template v-if="listagem.data && listagem.data.length > 0">
+                            <tr v-for="item in listagem.data" :key="item.id" class="hover:bg-layout-fundo/40 transition-colors">
+                                <td class="px-6 py-4 font-mono font-bold text-xs">{{ item.id }}</td>
+                                <td class="px-6 py-4 font-medium text-texto-claro">{{ item.clidentificacao }}</td>
+                                <td class="px-6 py-4 font-mono text-xs text-primary">{{ item.clrota }}</td>
                                 <td class="p-4">
-                                    <span v-if="reg.cltipo === 1" class="text-xs bg-comum px-2 py-0.5 rounded border border-comum">Módulo Nível 1</span>
-                                    <span v-else-if="reg.cltipo === 2" class="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded border border-primary/30">Perfil</span>
-                                    <span v-else class="text-xs bg-layout-fundo px-2 py-0.5 rounded border border-comum">Outro</span>
+                                    <span v-if="item.cltipo === 1" class="text-xs bg-comum px-2 py-0.5 rounded border border-comum cursor-pointer">Módulo Nível 1</span>
+                                    <span v-else-if="item.cltipo === 2" class="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded border border-primary/30 cursor-pointer">Perfil</span>
+                                    <span v-else class="text-xs bg-layout-fundo px-2 py-0.5 rounded border border-comum cursor-pointer">Outro</span>
                                 </td>
                                 <td class="p-4 text-center">
-                                    <span :class="[reg.status === 1 ? 'text-green-400 bg-green-500/10 border-green-500/20' : 'text-red-400 bg-red-500/10 border-red-500/20', 'text-xs font-bold px-2.5 py-0.5 rounded-full border']">
-                                        {{ reg.status === 1 ? 'Ativo' : 'Inativo' }}
-                                    </span>
-                                </td>
-                                <td class="p-4 text-right">
-                                    <button @click="editarRegistro(reg)" class="text-primary hover:text-primary-hover font-bold p-1 text-xs mr-2 transition-all" title="Editar">
-                                        <i class="fas fa-edit"></i> Editar
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr v-if="!props.registrosIniciais?.data || props.registrosIniciais?.data.length === 0">
-                                <td colspan="5" class="p-8 text-center text-texto-claro/40 font-medium">
-                                    Não foram encontrados registros para exibição.
+                                    <div class="flex flex-wrap gap-1 justify-center">
+                                        <button v-if="item.clstatus === 1" class="w-7 h-7 flex items-center justify-center rounded-full text-xs btn-green cursor-pointer" title="Registro Ativo"><i class="fas fa-check"></i></button>
+                                        <button v-else class="w-7 h-7 flex items-center justify-center rounded-full text-xs btn-red cursor-pointer" title="Registro Inativo"><i class="fas fa-exclamation-triangle"></i></button>
+
+                                        <button v-if="permissao?.alterar" @click="editarRegistro(item.id)" class="w-7 h-7 flex items-center justify-center rounded-full text-xs btn-blue cursor-pointer" title="Editar Registro"><i class="fas fa-edit"></i></button>
+                                        <button v-if="permissao?.apagar" @click="apagarRegistro(item.id)" class="w-7 h-7 flex items-center justify-center rounded-full text-xs btn-red cursor-pointer" title="Apagar Registro"><i class="fas fa-trash-alt"></i></button>
+                                    </div>
                                 </td>
                             </tr>
+                        </template>
+                        <tr v-else>
+                            <td colspan="7" class="p-8 text-center text-texto-claro/40 font-medium">
+                                Não foram encontrados registros para exibição.
+                            </td>
+                        </tr>
+
                         </tbody>
                     </table>
                 </div>
+
+                <div class="flex items-center justify-between border border-comum bg-layout-fundo-card rounded-lg px-6 py-4 shadow-sm">
+                    <div class="text-sm text-texto-comum">
+                        Exibindo de <span class="font-semibold text-texto-claro">{{ listagem.from }}</span> até 
+                        <span class="font-semibold text-texto-claro">{{ listagem.to }}</span> de um total de 
+                        <span class="font-semibold text-texto-claro">{{ listagem.total }}</span> registros.
+                    </div>
+
+                    <nav class="inline-flex -space-x-px rounded-md shadow-sm" aria-label="Paginação">
+            
+                        <button
+                            :disabled="listagem.current_page === 1"
+                            @click="navegarParaPagina(listagem.first_page)"
+                            class="inline-flex items-center px-3 py-2 text-sm transition-all border border-comum text-texto-comum hover:bg-layout-fundo-subtle rounded-l-md"
+                            :class="listagem.current_page === 1 ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'"
+                            title="Primeira Página"><i class="fa fa-step-backward"></i>
+                        </button>
+
+                        <button
+                            v-for="(link, index) in listagem.links"
+                            :key="index"
+                            :disabled="!link.url"
+                            @click="navegarParaPagina(sistemajs.extrairNumeroPaginaPaginacao(link.url))"
+                            v-html="sistemajs.traduzirLabelpaginacao(link.label)"
+                            class="inline-flex items-center px-3 py-2 text-sm transition-all focus:z-20 border"
+                            :class="[
+                                // Botão Ativo/Página Atual
+                                link.active 
+                                    ? 'z-10 bg-primary border-primary text-texto-escuro font-semibold' 
+                                    : 'border-comum text-texto-comum hover:bg-layout-fundo-subtle',
+                                // Botão Desabilitado (ex: anterior quando se está na página 1)
+                                !link.url ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'
+                            ]"/>
+
+                        <button
+                            :disabled="listagem.current_page === listagem.last_page"
+                            @click="navegarParaPagina(listagem.last_page)"
+                            class="inline-flex items-center px-3 py-2 text-sm transition-all border border-comum text-texto-comum hover:bg-layout-fundo-subtle rounded-r-md"
+                            :class="listagem.current_page === listagem.last_page ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'"
+                            title="Última Página"><i class="fa fa-step-forward"></i>
+                        </button>
+                    </nav>
+                </div>
+
+
+
+
+
+
+<div class="flex flex-col md:flex-row items-center justify-between gap-4 border border-comum bg-layout-fundo-card rounded-lg px-6 py-4 shadow-sm">
+    
+    <div class="flex flex-wrap items-center gap-4 text-sm text-texto-comum">
+        <div>
+            Exibindo de <span class="font-semibold text-texto-claro">{{ listagem.from }}</span> até 
+            <span class="font-semibold text-texto-claro">{{ listagem.to }}</span> de um total de 
+            <span class="font-semibold text-texto-claro">{{ listagem.total }}</span> registros.
+        </div>
+
+        <div class="flex items-center gap-2 border-l border-comum pl-4" title="Quantidade de registros exibir por página">
+            <span class="text-xs">Exibir:</span>
+            <select 
+                ref="regporpagina" 
+                @change="alterarQuantidadeRegistros"
+                class="bg-layout-fundo border border-comum rounded pl-2 pr-8 py-1 text-texto-claro text-xs focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none cursor-pointer w-auto min-w-18"
+            >
+                <option :value="10" selected>10</option>
+                <option :value="25">25</option>
+                <option :value="50">50</option>
+                <option :value="100">100</option>
+                <option :value="200">200</option>
+                <option :value="500">500</option>
+                <option :value="1000">1000</option>
+            </select>
+        </div>
+
+
+
+        <div class="flex items-center gap-2 border-l border-comum focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none pl-4" title="Ir para uma página específica">
+            <span class="text-xs">Ir para:</span>
+            <input 
+                    type="number"
+                    @keyup.enter="navegarParaPagina($event.target.value)"
+                    @input="
+                        $event.target.value = $event.target.value.replace(/\D/g, '');
+                        sistemajs.soNumeros($event.target);
+                    "
+                    min="1"
+                    :max="listagem.last_page"
+                    placeholder="Pág."
+                    class="w-14 bg-layout-fundo border border-comum rounded px-2 py-1 text-center text-texto-claro text-xs focus:outline-none focus:border-primary"
+                />
+        </div>
+    </div>
+
+    <nav class="inline-flex -space-x-px rounded-md shadow-sm" aria-label="Paginação">
+
+        <button
+            :disabled="listagem.current_page === 1"
+            @click="navegarParaPagina(listagem.first_page)"
+            class="inline-flex items-center px-3 py-2 text-sm transition-all border border-comum text-texto-comum hover:bg-layout-fundo-subtle rounded-l-md"
+            :class="listagem.current_page === 1 ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'"
+            title="Primeira Página"><i class="fa fa-step-backward"></i>
+        </button>
+
+        <button
+            v-for="(link, index) in listagem.links"
+            :key="index"
+            :disabled="!link.url"
+            @click="navegarParaPagina(sistemajs.extrairNumeroPaginaPaginacao(link.url))"
+            v-html="sistemajs.traduzirLabelpaginacao(link.label)"
+            class="inline-flex items-center px-3 py-2 text-sm transition-all focus:z-20 border"
+            :class="[
+                link.active 
+                    ? 'z-10 bg-primary border-primary text-texto-escuro font-semibold' 
+                    : 'border-comum text-texto-comum hover:bg-layout-fundo-subtle',
+                !link.url ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+            ]"
+        />
+
+        <button
+            :disabled="listagem.current_page === listagem.last_page"
+            @click="navegarParaPagina(listagem.last_page)"
+            class="inline-flex items-center px-3 py-2 text-sm transition-all border border-comum text-texto-comum hover:bg-layout-fundo-subtle rounded-r-md"
+            :class="listagem.current_page === listagem.last_page ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'"
+            title="Última Página"><i class="fa fa-step-forward"></i>
+        </button>
+    </nav>
+</div>
+
+
+
+
+
             </div>
 
             <div v-if="abaAtiva === 'cadastro'" class="bg-layout-painel border border-comum rounded-lg p-6 shadow-sm">
@@ -370,17 +667,17 @@ const executarAcao = (acao) => {
                         <div class="flex flex-col gap-1 justify-center pt-5">
                             <label class="relative inline-flex items-center cursor-pointer select-none">
                                 <input type="checkbox" v-model="form.status" class="sr-only peer" />
-                                <div class="w-11 h-6 bg-comum rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-texto-claro after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                <div class="w-11 h-6 bg-comum rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-texto-claro after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                                 <span class="ml-3 text-sm font-medium text-texto-claro/80">Registro Ativo</span>
                             </label>
                         </div>
                     </div>
 
                     <div class="flex justify-end gap-3 border-t border-comum pt-4 mt-4">
-                        <button type="button" @click="abaAtiva = 'inicio'" class="bg-comum hover:bg-comum/80 text-texto-claro font-bold py-2.5 px-6 rounded-lg text-sm transition-all">
-                            Cancelar
+                        <button type="button" @click="alternarAba('inicio')" class="opacity-60 hover:bg-layout-fundo/10 bg-layout-fundo/99 text-texto-claro/99 border border-comum font-bold py-2.5 px-6 rounded-lg text-sm transition-all cursor-pointer">
+                            <i class="fas fa-arrow-left pr-5"></i>Voltar
                         </button>
-                        <button type="submit" :disabled="form.processing" class="bg-primary hover:bg-primary-hover disabled:opacity-50 text-texto-escuro font-bold py-2.5 px-6 rounded-lg text-sm transition-all shadow-md flex items-center gap-2">
+                        <button type="submit" :disabled="form.processing" class="bg-primary hover:bg-primary-hover disabled:opacity-50 text-texto-escuro font-bold py-2.5 px-6 rounded-lg text-sm transition-all shadow-md flex items-center gap-2 cursor-pointer">
                             <i class="fas fa-save"></i> 
                             {{ form.processing ? 'Salvando...' : 'Salvar Registro' }}
                         </button>

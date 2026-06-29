@@ -2,7 +2,7 @@
 import Layout from '@/Layouts/PainelInterno.vue';
 import { ref, onMounted, inject, computed } from 'vue';
 import { usePage, router, Link } from '@inertiajs/vue3';
-import { mostrarPopup, formataDataHora } from '@/sistema.js';
+import { mostrarPopup, formataDataHora, voltarhistory } from '@/sistema.js';
 import TermosUsoConteudo from '@/Pages/Ajuda/TermosUsoConteudo.vue';
 
 const appUrl1 = inject('appUrl');
@@ -11,9 +11,6 @@ const logoEmpresa = import.meta.env.VITE_COMPANY_LOGO || 'logo_text';
 const textoStatusAceite = ref('Aceite dos Termos de Uso');
 const usuarioLogado = computed(() => page.props.auth?.user || null);
 
-const voltar = () => {
-    window.history.back();
-};
 
 onMounted(() => {
     if (usuarioLogado.value) {
@@ -103,14 +100,14 @@ const setTermosdeuso = (tipo) => {
                                     <i class="fas fa-thumbs-down"></i> Revogar Aceite
                                 </button>
                             </div>
-                            <button @click="voltar" class="flex items-center gap-2 bg-primary hover:bg-primary-hover text-texto-escuro font-bold px-6 py-2.5 rounded-full text-sm transition-all shadow-lg cursor-pointer opacity-60">
+                            <button @click="voltarhistory" class="flex items-center gap-2 bg-primary hover:bg-primary-hover text-texto-escuro font-bold px-6 py-2.5 rounded-full text-sm transition-all shadow-lg cursor-pointer opacity-60">
                                     <i class="fas fa-arrow-left"></i> Voltar
                             </button>
                         </template>
 
                         <template v-else>
                             <div class="w-full flex flex-col sm:flex-row items-center justify-between gap-4">
-                                <button @click="voltar" class="flex items-center gap-2 bg-primary hover:bg-primary-hover text-texto-escuro font-bold px-6 py-2.5 rounded-full text-sm transition-all shadow-lg cursor-pointer opacity-60">
+                                <button @click="voltarhistory" class="flex items-center gap-2 bg-primary hover:bg-primary-hover text-texto-escuro font-bold px-6 py-2.5 rounded-full text-sm transition-all shadow-lg cursor-pointer opacity-60">
                                         <i class="fas fa-arrow-left"></i> Voltar
                                 </button>
                                 <span class="text-sm font-semibold text-primary bg-primary/10 border border-primary/50 px-4 py-2 rounded-lg flex items-center gap-2 text-center sm:text-left">

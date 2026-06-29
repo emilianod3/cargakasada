@@ -11,6 +11,8 @@
 > Cadastro Unificado
 > Funcionario, Divisões, unidades
 > paginacao
+> Responsividade na tabela e na paginacao
+> btn novo registr em cima e em baixo
 > quando em mobile ao clicar para abrir , esconder o menu novamente e automaticamente
 > auditoria, logs
 > Cidades, endereços, 

@@ -137,10 +137,15 @@ class CalController extends Controller
 
         try {
             $registros = $query->paginate($request->regPg);
-            return Tools::setResponse('success', $registros, '');
+            Tools::setAtividade(0, 8, 0, 'Listagem de Cals', 'Listado com Sucesso');
+            //return Tools::setResponse('success', $registros, '');
+            return back()->with(Tools::setResult('success', $registros, 'Dados Enviados com Sucesso'));
+                
         } catch (Exception $e) {
             $except = $e->getMessage();
-            return Tools::setResponse('fail', null, 'Falha ao obter dados');
+            //return Tools::setResponse('fail', null, 'Falha ao obter dados');
+            Tools::setAtividade(0, 8, 0, 'Listagem de Cals', 'Falha na Listagem de Cals - '.$except);
+            return back()->withErrors(Tools::setResult('fail', null, 'Falha no Processamento'));        
         }
     }
 

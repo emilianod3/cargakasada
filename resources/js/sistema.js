@@ -1,5 +1,6 @@
 import { ref } from 'vue';
 import { nextTick } from 'vue';
+import { usePage } from '@inertiajs/vue3';
 
 
 // Estados Globais
@@ -2061,3 +2062,80 @@ export function sanitizeFilename(text) {
         .replace(/[\s-]+/g, '_')              // Consolida espaços e hífens em um único "_"
         .replace(/^_+|_+$/g, '');             // Remove underscores órfãos nas extremidades
 }
+
+
+
+
+
+
+
+    export function voltarhistory(){
+        window.history.back();
+    };
+
+    /*
+    'consultar' => $this->trataPermissao(substr($permissao->{$campo}, 0,2)),
+    'inserir' => $this->trataPermissao(substr($permissao->{$campo}, 3,2)),
+    'alterar' => $this->trataPermissao(substr($permissao->{$campo}, 6,2)),
+    'apagar' => $this->trataPermissao(substr($permissao->{$campo}, 9,2)),
+    'idcal' => $permissao->{'fkidcal'}*/
+    function getValuePermition(param, idCal = 0) {
+        if (!param) return null;          
+
+        const retorno = param.split(":");
+        return {
+            consultar: retorno[0] === '11',
+            inserir:   retorno[1] === '11',
+            alterar:   retorno[2] === '11',
+            apagar:    retorno[3] === '11',
+            idcal:     idCal
+        };
+    }
+
+    export function getPermissaoCal(idCal) { 
+        // 1. Instancia o hook do Inertia para ler as props da página
+        const page = usePage();
+        
+        // 2. Acessa exatamente o caminho mapeado no seu HandleInertiaRequests
+        // O uso do ?. (Optional Chaining) evita erros caso a sessão expire
+        const listaPermissoes = page.props.auth?.permissoes;    
+
+        // Se não houver permissões na sessão, aborta mais cedo
+        if (!listaPermissoes || !Array.isArray(listaPermissoes)) return null;
+
+        // 3. Localiza a permissão correspondente ao idCal fornecido
+        const permissaoEncontrada = listaPermissoes.find(elm => elm.fkidcal == idCal);
+
+        return permissaoEncontrada 
+            ? getValuePermition(permissaoEncontrada.cppermissao, idCal) 
+            : null;
+    }
+
+
+    export const traduzirLabelpaginacao = (label) => {
+        if (!label) return '';
+        
+        // Se contiver a palavra Previous, troca pelo texto/ícone em português
+        if (label.includes('Previous')) {
+            return '<i class="fas fa-angle-left mr-1"></i> Anterior';
+        }
+        
+        // Se contiver a palavra Next, troca pelo texto/ícone em português
+        if (label.includes('Next')) {
+            return 'Próximo <i class="fas fa-angle-right ml-1"></i>';
+        }
+        
+        return label; // Retorna o próprio número da página se não for texto
+    };
+
+    export const extrairNumeroPaginaPaginacao = (url) => {
+        if (!url) return 1;
+        try {
+            // Usa o URLSearchParams global com segurança
+            const queryParams = url.split('?')[1];
+            const params = new URLSearchParams(queryParams);
+            return parseInt(params.get('page')) || 1;
+        } catch (e) {
+            return 1;
+        }
+    };    

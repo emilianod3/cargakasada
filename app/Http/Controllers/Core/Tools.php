@@ -43,45 +43,50 @@ class Tools{
      */
     public static function setAtividade($idUsuario = 0, $tipoAcao = 7, $idRegistro = 0, $origemnosistema = '', $obs = '')
     {
-        if($idUsuario <= 0){
-            $idUsuario = self::getUser(0);
-        }
+        try{
+            if($idUsuario <= 0){
+                $idUsuario = self::getUser(0);
+            }
 
-        $config = self::getConfig(1, 'status');
-        $ip = '';
-        $userAgent = '';
-        if($config > 0 || $config == null) {
-            try{
-                $ip = request()->ip();
-                $userAgent = request()->userAgent();
-            } catch (Exception $e) {
-                $except = $e->getMessage();
-                if(!self::temTexto($ip)){
-                    $ip = '0.0.0.0';
+            $config = self::getConfig(1, 'status');
+            $ip = '';
+            $userAgent = '';
+            if($config > 0 || $config == null) {
+                try{
+                    $ip = request()->ip();
+                    $userAgent = request()->userAgent();
+                } catch (Exception $e) {
+                    $except = $e->getMessage();
+                    if(!self::temTexto($ip)){
+                        $ip = '0.0.0.0';
+                    }
+                    if(!self::temTexto($userAgent)){
+                        $userAgent = 'Falha na identificação '.$except;
+                    }
                 }
-                if(!self::temTexto($userAgent)){
-                    $userAgent = 'Falha na identificação '.$except;
+                $reg = new LogAtividade();
+                $reg->fkidusuario = self::getUser($idUsuario);
+                $reg->fktipoacao = $tipoAcao;
+                $reg->idregistro = $idRegistro;
+                $reg->lip = $ip;
+                $reg->lagent = $userAgent;
+                $reg->llocal = self::getDadosGeograficos($ip);
+                $reg->lgonde = self::temTexto($origemnosistema) ? $origemnosistema : 'Não Informado';
+                $reg->lgtexto = $obs;
+                self::temTexto($obs) ? $obs : 'Não Informado';
+                $reg->lgversao = Carbon::now()->toDateTimeString();
+                $reg->flagatualiza = 1;
+                $reg->flagdelete = 0;
+                $reg->flaguser = self::getUser(0);
+                if($reg->save()) {
+                    return true;
+                } else {
+                    return false;
                 }
             }
-            $reg = new LogAtividade();
-            $reg->fkidusuario = self::getUser($idUsuario);
-            $reg->fktipoacao = $tipoAcao;
-            $reg->idregistro = $idRegistro;
-            $reg->lip = $ip;
-            $reg->lagent = $userAgent;
-            $reg->llocal = self::getDadosGeograficos($ip);
-            $reg->lgonde = self::temTexto($origemnosistema) ? $origemnosistema : 'Não Informado';
-            $reg->lgtexto = $obs;
-            self::temTexto($obs) ? $obs : 'Não Informado';
-            $reg->lgversao = Carbon::now()->toDateTimeString();
-            $reg->flagatualiza = 1;
-            $reg->flagdelete = 0;
-            $reg->flaguser = self::getUser(0);
-            if($reg->save()) {
-                return true;
-            } else {
-                return false;
-            }
+        } catch (Exception $e) {
+            $except = $e->getMessage();
+            return false;
         }
     }
 
