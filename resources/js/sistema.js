@@ -2112,6 +2112,30 @@ export function sanitizeFilename(text) {
     }
 
 
+    export function getCfgUserCal(idUser, idCal, tipo = 1){ 
+        const page = usePage();
+        const data = page.props.auth?.cfgusercal;
+        
+        if (!data) return 10; // Retorna o padrão 10 se não houver dados
+
+        // Se por acaso os dados ainda vierem como string (raro no Inertia, mas por garantia):
+        const listaConfig = typeof data === 'string' ? JSON.parse(data) : data;
+
+        // Busca o elemento correspondente de forma direta e limpa
+        const achado = listaConfig.find(elm => {
+            if (tipo > 0) {
+                return elm.fkidusuario == idUser && elm.fkidcal == idCal && elm.uctipo == tipo;
+            } else {
+                return elm.fkidusuario == idUser && elm.fkidcal == idCal;
+            }
+        });
+
+        // Retorna a paginação salva ou o padrão 10
+        return achado ? achado.ucregporpagina : 10;
+    }
+
+
+
     export const traduzirLabelpaginacao = (label) => {
         if (!label) return '';
         
@@ -2138,4 +2162,4 @@ export function sanitizeFilename(text) {
         } catch (e) {
             return 1;
         }
-    };    
+    };

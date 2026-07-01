@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Core\CfgUserCalController;
 use App\Http\Controllers\Core\ConfigController;
 use App\Http\Controllers\Core\MenuController;
 use App\Http\Controllers\Core\Tools;
@@ -158,62 +159,7 @@ class AuthController extends Controller
             Session::put('regporpagina', $configUserCal->loadConfigNumRegPorPagina($user->id));
             */
 
-        $menunn = '<div>'.
-            '<button @click="alternarSubmenu(\'dashboard\')" v-tooltip.right="!sidebarAberta ? \'Dashboard\' : null" class="w-full flex items-center justify-between px-1 py-2 rounded-lg hover:bg-texto-claro/10 text-texto-claro transition-all group text-sm cursor-pointer">'.
-                '<div class="flex items-center gap-1">'.
-                    '<span class="w-6 text-center text-texto-claro/40 group-hover:text-primary text-base transition-colors">'.
-                        '<i class="fas fa-chart-pie"></i>'.
-                    '</span>'.
-                    '<span class="font-medium whitespace-nowrap transition-all" :class="sidebarAberta ? \'opacity-100 translate-x-0\' : \'opacity-0 -translate-x-4 pointer-events-none\'">Dashboard33</span>'.
-                '</div>'.
-                '<i v-if="sidebarAberta" class="fas fa-chevron-right text-[10px] text-texto-claro/30 transition-transform duration-200" :class="submenusAbertos.dashboard ? \'rotate-90 text-primary\' : \'\'"></i>'.
-            '</button>'.
-
-            '<div class="overflow-hidden transition-all duration-300 ease-in-out pl-5 flex flex-col gap-1" :class="submenusAbertos.dashboard && sidebarAberta ? \'max-h-40 mt-1 pb-1\' : \'max-h-0\'">'.
-                '<Link href="/teste-vue" class="text-xs text-texto-claro/90 hover:text-primary py-1.5 transition-colors block"><i class="fas fa-circle text-[6px] mr-2 opacity-40"></i> Visão Geral</Link>'.
-                '<Link href="/analytics" class="text-xs text-texto-claro/90 hover:text-primary py-1.5 transition-colors block"><i class="fas fa-circle text-[6px] mr-2 opacity-40"></i> Estatísticas</Link>'.
-            '</div>'.
-        '</div>'.
-
-        '<div>'.
-            '<button @click="alternarSubmenu(\'dashboard1\')" v-tooltip.right="!sidebarAberta ? \'Dashboard 1\' : null" class="w-full flex items-center justify-between px-1 py-2 rounded-lg hover:bg-texto-claro/10 text-texto-claro transition-all group text-sm cursor-pointer">'.
-                '<div class="flex items-center gap-1">'.
-                    '<span class="w-6 text-center text-texto-claro/40 group-hover:text-primary text-base transition-colors">'.
-                        '<i class="fas fa-chart-pie"></i>'.
-                    '</span>'.
-                    '<span class="font-medium whitespace-nowrap transition-all" :class="sidebarAberta ? \'opacity-100 translate-x-0\' : \'opacity-0 -translate-x-4 pointer-events-none\'">Dashboard 222</span>'.
-                '</div>'.
-                '<i v-if="sidebarAberta" class="fas fa-chevron-right text-[10px] text-texto-claro/30 transition-transform duration-200" :class="submenusAbertos.dashboard1 ? \'rotate-90 text-primary\' : \'\'"></i>'.
-            '</button>'.
-
-            '<div class="overflow-hidden transition-all duration-300 ease-in-out pl-5 flex flex-col gap-1" :class="submenusAbertos.dashboard1 && sidebarAberta ? \'max-h-40 mt-1 pb-1\' : \'max-h-0\'">'.
-                '<Link href="/teste-vue" class="text-xs text-texto-claro/90 hover:text-primary py-1.5 transition-colors block"><i class="fas fa-circle text-[6px] mr-2 opacity-40"></i> Visão Geral</Link>'.
-                '<Link href="/analytics" class="text-xs text-texto-claro/90 hover:text-primary py-1.5 transition-colors block"><i class="fas fa-circle text-[6px] mr-2 opacity-40"></i> Estatísticas</Link>'.
-            '</div>'.
-        '</div>';
-
-
-
-            $menusPermitidos = [
-                [
-                    'id' => 'dashboard',
-                    'nome' => 'Dashboard 33',
-                    'icone' => 'fas fa-chart-pie',
-                    'submenus' => [
-                        ['nome' => 'Visão Geral', 'url' => '/teste-vue'],
-                        ['nome' => 'Estatísticas', 'url' => '/analytics']
-                    ]
-                ],
-                [
-                    'id' => 'configuracoes',
-                    'nome' => 'Configurações',
-                    'icone' => 'fas fa-cog',
-                    'submenus' => [
-                        ['nome' => 'Geral', 'url' => '/config-geral']
-                    ]
-                ]
-            ];
-
+        
             //Session::put('menus1', $menusPermitidos);
 
             self::loadDadosSessao($user);
@@ -285,7 +231,7 @@ class AuthController extends Controller
     private function loadDadosSessao(Usuario $usuario)
     {
         try{
-            Session::put('tempmens', 7000);
+            //Session::put('tempmens', 7000);
             //Session::put('user', $user);
             //Session::put('grupo', $grupo);                    
             //Session::put('permissoes', $permissoes);
@@ -304,7 +250,7 @@ class AuthController extends Controller
             //$configUser = new ConfigUserController();
             $config = new ConfigController();
             //$cfgsist = new CfgSistController();
-            //$cfgUserCal = new CfgUserCalController();
+            $cfgUserCal = new CfgUserCalController();
             //$estado = new EstadoController();
             //$cidade = new CidadeController();
             //$tiposacao = new TipoAcaoController();
@@ -325,7 +271,7 @@ class AuthController extends Controller
             //Session::put('config', $config->getAllSession());
             //Session::put('cfgsist', $cfgsist->getAllSession());
             //Session::put('configuser', $configUser->getAllSession());
-            //Session::put('cfgusercal', $cfgUserCal->getAllSession($usuario->id));
+            Session::put('cfgusercal', $cfgUserCal->getAllSession($usuario->id));
             //Session::put('cals', $cal->getAll());
 
             // 🚀 Criamos uma chave única: 'configuracoes_sistema_usuario_12'

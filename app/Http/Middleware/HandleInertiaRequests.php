@@ -54,6 +54,7 @@ class HandleInertiaRequests extends Middleware
                 'user'   => $request->session()->get('user'),
                 'grupo' => $request->session()->get('grupo'),
                 'permissoes' => $request->session()->get('permissoes'),
+                'cfgusercal' => $request->session()->get('cfgusercal'),
             ],
             'sistema' => [
                 'versao'    => config('version.number', '1.0.0'), // Fallback caso não exista

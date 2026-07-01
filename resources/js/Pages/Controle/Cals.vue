@@ -27,6 +27,7 @@ const tipoFiltro = ref('amplo'); // amplo ou exato
 const calid = props.cal?.cal?.[0];
 let permissao = null;
 let pageatual = 1;
+let qtdporpg = 10;
 
 const btnnovoregistro = ref(false);
 
@@ -51,7 +52,9 @@ const form = useForm({
 onMounted(() => {
     // Inicializações se necessário
     permissaoPrincipal();
+    qtdporpg = sistemajs.getCfgUserCal(page.props.auth?.user?.id, calid);
     filtrar(); // Carrega a listagem inicial
+    
 });
 
 
@@ -165,7 +168,7 @@ const filtrar = (pg = 1) => {
         campoordem: filtroCampoOrdem.value,
         ordem: filtroOrdemDirecao.value,
         tipofiltro: tipoFiltro.value,
-        regPg: 10,
+        regPg: 2,
         page: pg,
     };
 
@@ -303,6 +306,35 @@ const executarAcao = (acao) => {
     
     exibirOpcoesCal.value = false; // Fecha o menu automaticamente
 };
+
+
+
+const linksPaginacaoFiltrados = computed(() => {
+    if (!listagem.value.links || listagem.value.links.length === 0) return [];
+
+    const totalLinks = listagem.value.links.length;
+    const paginaAtual = listagem.value.current_page;
+    const maxVisiveis = 2; // Quantidade de números ao redor da página atual
+
+    return listagem.value.links.filter((link, index) => {
+        // 1. Sempre mantém o primeiro botão (Anterior) e o último botão (Próximo)
+        if (index === 0 || index === totalLinks - 1) return true;
+
+        const numPagina = parseInt(link.label);
+        
+        // 2. Se não for um número (ex: reticências "..."), mantém na tela
+        if (isNaN(numPagina)) return true;
+
+        // 3. Mantém os números próximos à página atual (miolo)
+        const noMiolo = numPagina >= paginaAtual - maxVisiveis && numPagina <= paginaAtual + maxVisiveis;
+
+        // 4. Nova Regra: Sempre mantém as duas últimas páginas numéricas da lista
+        // Como o último link (index totalLinks - 1) é o botão "Próximo", as páginas finais estão logo antes dele
+        const ehPaginaFinal = index === totalLinks - 2 || index === totalLinks - 3;
+
+        return noMiolo || ehPaginaFinal;
+    });
+});
 
 </script>
 
@@ -505,6 +537,7 @@ const executarAcao = (acao) => {
                     </table>
                 </div>
 
+                <!--
                 <div class="flex items-center justify-between border border-comum bg-layout-fundo-card rounded-lg px-6 py-4 shadow-sm">
                     <div class="text-sm text-texto-comum">
                         Exibindo de <span class="font-semibold text-texto-claro">{{ listagem.from }}</span> até 
@@ -547,96 +580,91 @@ const executarAcao = (acao) => {
                         </button>
                     </nav>
                 </div>
+-->
 
 
 
 
 
-
-<div class="flex flex-col md:flex-row items-center justify-between gap-4 border border-comum bg-layout-fundo-card rounded-lg px-6 py-4 shadow-sm">
-    
-    <div class="flex flex-wrap items-center gap-4 text-sm text-texto-comum">
-        <div>
-            Exibindo de <span class="font-semibold text-texto-claro">{{ listagem.from }}</span> até 
-            <span class="font-semibold text-texto-claro">{{ listagem.to }}</span> de um total de 
-            <span class="font-semibold text-texto-claro">{{ listagem.total }}</span> registros.
-        </div>
-
-        <div class="flex items-center gap-2 border-l border-comum pl-4" title="Quantidade de registros exibir por página">
-            <span class="text-xs">Exibir:</span>
-            <select 
-                ref="regporpagina" 
-                @change="alterarQuantidadeRegistros"
-                class="bg-layout-fundo border border-comum rounded pl-2 pr-8 py-1 text-texto-claro text-xs focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none cursor-pointer w-auto min-w-18"
-            >
-                <option :value="10" selected>10</option>
-                <option :value="25">25</option>
-                <option :value="50">50</option>
-                <option :value="100">100</option>
-                <option :value="200">200</option>
-                <option :value="500">500</option>
-                <option :value="1000">1000</option>
-            </select>
-        </div>
-
-
-
-        <div class="flex items-center gap-2 border-l border-comum focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none pl-4" title="Ir para uma página específica">
-            <span class="text-xs">Ir para:</span>
-            <input 
-                    type="number"
-                    @keyup.enter="navegarParaPagina($event.target.value)"
-                    @input="
-                        $event.target.value = $event.target.value.replace(/\D/g, '');
-                        sistemajs.soNumeros($event.target);
-                    "
-                    min="1"
-                    :max="listagem.last_page"
-                    placeholder="Pág."
-                    class="w-14 bg-layout-fundo border border-comum rounded px-2 py-1 text-center text-texto-claro text-xs focus:outline-none focus:border-primary"
-                />
-        </div>
-    </div>
-
-    <nav class="inline-flex -space-x-px rounded-md shadow-sm" aria-label="Paginação">
-
-        <button
-            :disabled="listagem.current_page === 1"
-            @click="navegarParaPagina(listagem.first_page)"
-            class="inline-flex items-center px-3 py-2 text-sm transition-all border border-comum text-texto-comum hover:bg-layout-fundo-subtle rounded-l-md"
-            :class="listagem.current_page === 1 ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'"
-            title="Primeira Página"><i class="fa fa-step-backward"></i>
-        </button>
-
-        <button
-            v-for="(link, index) in listagem.links"
-            :key="index"
-            :disabled="!link.url"
-            @click="navegarParaPagina(sistemajs.extrairNumeroPaginaPaginacao(link.url))"
-            v-html="sistemajs.traduzirLabelpaginacao(link.label)"
-            class="inline-flex items-center px-3 py-2 text-sm transition-all focus:z-20 border"
-            :class="[
-                link.active 
-                    ? 'z-10 bg-primary border-primary text-texto-escuro font-semibold' 
-                    : 'border-comum text-texto-comum hover:bg-layout-fundo-subtle',
-                !link.url ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
-            ]"
-        />
-
-        <button
-            :disabled="listagem.current_page === listagem.last_page"
-            @click="navegarParaPagina(listagem.last_page)"
-            class="inline-flex items-center px-3 py-2 text-sm transition-all border border-comum text-texto-comum hover:bg-layout-fundo-subtle rounded-r-md"
-            :class="listagem.current_page === listagem.last_page ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'"
-            title="Última Página"><i class="fa fa-step-forward"></i>
-        </button>
-    </nav>
-</div>
+                <div class="flex flex-col md:flex-row items-center justify-between gap-4 border border-comum bg-layout-fundo-card rounded-lg px-6 py-4 shadow-sm">
+                    
+                    <div class="flex flex-wrap items-center gap-4 text-sm text-texto-comum">
+                        <div>
+                            Exibindo de <span class="font-semibold text-texto-claro">{{ listagem.from }}</span> até 
+                            <span class="font-semibold text-texto-claro">{{ listagem.to }}</span> de um total de 
+                            <span class="font-semibold text-texto-claro">{{ listagem.total }}</span> registros.
+                        </div>
+                        <div class="flex items-center border-l border-comum pl-4">
+                            <div class="flex items-center gap-2 shrink-0">
+                                <span class="text-xs">Exibir:</span>
+                                <select 
+                                    ref="regporpagina" @change="alterarQuantidadeRegistros"
+                                    :class="['bg-layout-fundo border border-comum pl-2 pr-8 py-1 text-texto-claro text-xs focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none cursor-pointer w-auto min-w-18 h-full', permissao?.alterar || permissao?.inserir ? 'rounded-l' : 'rounded']">
+                                    <option :value="10" selected>10</option>
+                                    <option :value="25">25</option>
+                                    <option :value="50">50</option>
+                                    <option :value="100">100</option>
+                                    <option :value="200">200</option>
+                                    <option :value="500">500</option>
+                                    <option :value="1000">1000</option>
+                                </select>
+                            </div>
+                            <button v-if="permissao?.alterar || permissao?.inserir" @click="salvarregporpagina(regporpagina.value)" type="button" title="Aplicar quantidade como Padrão" class="bg-primary hover:bg-primary-hover text-texto-escuro px-2 py-1.5 border border-primary transition-all cursor-pointer flex items-center justify-center shrink-0 focus:outline-none rounded-r text-xs"><i class="fa fa-check"></i></button>
+                        </div>
 
 
 
 
 
+                        <div class="flex items-center gap-2 border-l border-comum focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none pl-4" title="Ir para uma página específica">
+                            <span class="text-xs">Ir para:</span>
+                            <input 
+                                    type="number"
+                                    @keyup.enter="navegarParaPagina($event.target.value)"
+                                    @input="$event.target.value = $event.target.value.replace(/\D/g, ''); 
+                                    sistemajs.soNumeros($event.target);"
+                                    min="1"
+                                    :max="listagem.last_page"
+                                    placeholder="Pág."
+                                    class="w-14 bg-layout-fundo border border-comum rounded px-2 py-1 text-center text-texto-claro text-xs focus:outline-none focus:border-primary"
+                                />
+                        </div>
+                    </div>
+
+                    <nav class="inline-flex flex-wrap -space-x-px rounded-md shadow-sm" aria-label="Paginação">
+
+                        <button
+                            :disabled="listagem.current_page === 1"
+                            @click="navegarParaPagina(listagem.first_page)"
+                            class="inline-flex items-center px-3 py-2 text-sm transition-all border border-comum text-texto-comum hover:bg-layout-fundo-subtle rounded-l-md"
+                            :class="listagem.current_page === 1 ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'"
+                            title="Primeira Página"><i class="fa fa-step-backward"></i>
+                        </button>
+
+                        <button
+                            v-for="(link, index) in linksPaginacaoFiltrados"
+                            :key="index"
+                            :disabled="!link.url"
+                            @click="navegarParaPagina(sistemajs.extrairNumeroPaginaPaginacao(link.url))"
+                            v-html="sistemajs.traduzirLabelpaginacao(link.label)"
+                            class="inline-flex items-center px-3 py-2 text-sm transition-all focus:z-20 border"
+                            :class="[
+                                link.active 
+                                    ? 'z-10 bg-primary border-primary text-texto-escuro font-semibold' 
+                                    : 'border-comum text-texto-comum hover:bg-layout-fundo-subtle',
+                                !link.url ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+                            ]"
+                        />
+
+                        <button
+                            :disabled="listagem.current_page === listagem.last_page"
+                            @click="navegarParaPagina(listagem.last_page)"
+                            class="inline-flex items-center px-3 py-2 text-sm transition-all border border-comum text-texto-comum hover:bg-layout-fundo-subtle rounded-r-md"
+                            :class="listagem.current_page === listagem.last_page ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'"
+                            title="Última Página"><i class="fa fa-step-forward"></i>
+                        </button>
+                    </nav>
+                </div>
             </div>
 
             <div v-if="abaAtiva === 'cadastro'" class="bg-layout-painel border border-comum rounded-lg p-6 shadow-sm">

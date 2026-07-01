@@ -303,7 +303,7 @@ class Tools{
             //Session::forget('config');
             //Session::forget('configuser');
             //Session::forget('cfgsist');
-            //Session::forget('cfgusercal');
+            Session::forget('cfgusercal');
             //Session::forget('categoria');
             //Session::forget('siteconteudocategoria');
             //Session::forget('noticiacategoria');
