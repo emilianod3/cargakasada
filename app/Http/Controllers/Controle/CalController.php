@@ -47,13 +47,13 @@ class CalController extends Controller
         return $qry;
     }
 
-    public function get($id)
+    public function get(mixed $id)
     {
         $reg = Cal::find($id);
         return $reg;
     }
 
-    public function removerId($id)
+    public function removerId(mixed $id)
     {
         $sistemadesativar = env('SISTEMA_DESATIVAR'); /*Desativa ou remove do banco */
         if($sistemadesativar > 0){
@@ -118,6 +118,7 @@ class CalController extends Controller
         $campoordenar = 'id';
         $campoordenar = $request->campoordem != 'undefined' ? $request->campoordem : 'id';
 
+        /*
         if(strlen($request->campoPesquisa) > 0) {  //$request->tipofiltro == 'amplo'
             $query->where('cal.clidentificacao', 'like', '%' . $request->campoPesquisa . '%');
             $query->orwhere('cal.clobserve', 'like', '%' . $request->campoPesquisa . '%');
@@ -130,7 +131,30 @@ class CalController extends Controller
             $query->where('cal.clbase', 'like', '%' . $request->campoPesquisa . '%');
             $query->where('cal.clrota', 'like', '%' . $request->campoPesquisa . '%');
             $query->where('cal.id', 'like', '%' . $request->campoPesquisa . '%');
-        }
+        }*/
+
+        if(strlen($request->campoPesquisa) > 0) {  //$request->tipofiltro == 'amplo'
+            $termos = array_filter(explode(' ', trim($request->campoPesquisa)));
+            $query->where(function ($queryGeral) use ($termos) {
+                foreach ($termos as $termo) {
+                    // Para cada palavra, cria um subgrupo AND que busca em qualquer uma das colunas (OR)
+                    $queryGeral->where(function ($qSub) use ($termo) {
+                        $qSub->where('cal.clidentificacao', 'like', '%' . $termo . '%');
+                        $qSub->orwhere('cal.clobserve', 'like', '%' . $termo . '%');
+                        $qSub->orwhere('cal.clbase', 'like', '%' . $termo . '%');
+                        $qSub->orwhere('cal.clrota', 'like', '%' . $termo . '%');
+                        $qSub->orwhere('cal.id', 'like', '%' . $termo . '%');
+                    });
+                }
+            });
+        }else if(strlen($request->campoPesquisa) > 0 && $request->tipofiltro == 'exato') {  
+            $query->where('cal.clidentificacao', 'like', '%' . $request->campoPesquisa . '%');
+            $query->where('cal.clobserve', 'like', '%' . $request->campoPesquisa . '%');
+            $query->where('cal.clbase', 'like', '%' . $request->campoPesquisa . '%');
+            $query->where('cal.clrota', 'like', '%' . $request->campoPesquisa . '%');
+            $query->where('cal.id', 'like', '%' . $request->campoPesquisa . '%');
+        } 
+
 
         //$query->with('cal','menuacima');
         $query->orderBy($campoordenar, strlen($request->ordem) > 0 ? $request->ordem : 'desc')->groupBy('cal.id');
@@ -145,7 +169,9 @@ class CalController extends Controller
             $except = $e->getMessage();
             //return Tools::setResponse('fail', null, 'Falha ao obter dados');
             Tools::setAtividade(0, 8, 0, 'Listagem de Cals', 'Falha na Listagem de Cals - '.$except);
-            return back()->withErrors(Tools::setResult('fail', null, 'Falha no Processamento'));        
+            $resp = Tools::setResult('fail', null, 'Falha no Processamento - '.$except);
+            return back()->withErrors($resp); 
+            //return back()->withErrors(Tools::setResult('fail', null, 'Falha no Processamento - '.$except));        
         }
     }
 

@@ -14,7 +14,7 @@ export const modosDisponiveis = {
         nome: 'Modo Claro Tradicional',
         classes: {
             '--cor-fundo-rgb': '255 255 255',
-            '--cor-painel-rgb': '241 245 249',
+            '--cor-painel-rgb': '248 249 250',
             '--cor-texto-claro': '15 23 42',
             '--cor-texto-escuro': '255 255 255',
             '--cor-border-rgb': '226 232 240'
@@ -2163,3 +2163,83 @@ export function sanitizeFilename(text) {
             return 1;
         }
     };
+
+
+
+
+    export function limparCampos(classe){
+        var inputs = document.getElementsByClassName(classe);     
+        //console.log(inputs.length);
+        for (var i = 0; i < inputs.length; ++i) {
+            input = inputs[i];
+            if(input.type == 'hidden')
+            {
+                input.value = 0;
+            }else if(input.type == 'text'){
+                input.value = '';
+            }else if(input.type == 'password'){
+                input.value = '';
+            }else if(input.type == 'tel'){
+                input.value = '';
+            }else if(input.type == 'email'){
+                input.value = '';
+            }else if(input.type == 'date'){
+                var functionexecut = $('#'+input.id).attr('data-default');
+                var parametro = $('#'+input.id).attr('data-parametro');
+                var parametro2 = $('#'+input.id).attr('data-tipo');
+                if(!parametro){
+                    parametro = 0;
+                }
+                if(strlen(parametro2) < 1 && parametro2 == 'undefined'){  //soma subtrair
+                    parametro2 = 'soma';
+                }
+                if(functionexecut == 'getDataAtualBanco'){
+                    var result = getDataAtualBanco();
+                    input.value = result;
+                }else if(functionexecut == 'getDataAtualBancoAddDays'){
+                    var result = getDataAtualBancoAddDays(parametro, parametro2);
+                    input.value = result;
+                }else{
+                    input.value = '';
+                }
+            }else if(input.type == 'datetime-local'){
+                var functionexecut = $('#'+input.id).attr('data-default');
+                if(functionexecut == 'getDataAtualBanco'){
+                    input.value = getDataHoraAtualBanco();
+                }
+            }else if(input.type == 'textarea'){
+                input.value = '';
+            }else if(input.type == 'select-one'){
+                var result = $('#'+input.id).attr('data-default');
+                if(result){
+                    $('#'+input.id).val(result).change();
+                }else{
+                    $('#'+input.id).val(0).change();
+                }
+            }else if(input.type == 'checkbox'){
+                try{
+                    var result = $('#'+input.id).attr('data-checkdefault')
+                    setStatusCheck(input.id, (result == 'true' ? 1 : 0));
+                }catch (e) {
+                    setStatusCheck(input.id, 1);
+                }
+            }else if(input.classList.contains('summernote')){
+                inputsummer = input;
+                setTimeout(function() {
+                    $('#'+inputsummer.id).summernote('code', '');
+                }, 200);
+            }else if(input.classList.contains('table002')){
+                var functionexecut = $('#'+input.id).attr('data-defaultloadlist');
+                if(functionexecut != null){
+                    functionexecut += '(100)';
+                    setTimeout( functionexecut, 700);
+                }
+            }
+
+
+            //console.log(input.classList);
+            //console.log(input.classList.contains('summernote'));
+            //console.log(input.name);
+            //console.log(input.type);
+        }
+    }

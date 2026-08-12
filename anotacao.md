@@ -24,6 +24,17 @@
 > Modelos de Arquivos
 Preciso migrar este modulo com os arquivos em anexo onde utilizava laravel e blade e mysql para o meu novo projeto com laravel 12 + vue + inertia + mysql = exemplo do codigo padrao que estou utilizando atualmente no novo projeto = 
 
+> ao mudar a qtd de paginas fazer a busca
+salvar a qtd por pagina
+ordenação pela coluna clicada
+
+no lugar ta table colocar div ou container
+como criar componentes do cadastro para diminuir a quantidade de codigo e reutilizar codigo
+impressao dos relatórios
+
+textarea de summernote ou texto rico
+testando as permissoes 
+
 
 ## ⚡ Exemplos Práticos de Uso Diário
 
@@ -47,8 +58,8 @@ npm run dev --watch
 
 https://tailwindcss.com/docs/colors
 https://fontawesome.com/v4/icons/
-
-
+https://colorkit.co/color/
+file:///D:/webserverx/htdocs/templates/eliteadmin/eliteadmin/index.html
 
 **BANCO**
 cal;cfg;conf;grupo;usu;log;audi;unic;emai;fone

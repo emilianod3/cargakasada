@@ -34,6 +34,10 @@
   --v-popper-theme-tooltip-color: rgb(var(--cor-texto-escuro));
 }
 
+.clicavel {
+    cursor: pointer;
+}
+
 /* Bordas dinâmicas inteligentes que funcionam tanto no branco quanto no preto */
 .border-comum {
   border-color: rgba(var(--cor-texto-claro) / 0.12) !important;
@@ -213,6 +217,44 @@ input:-webkit-autofill:active {
     color: inherit;
 }
 
+
+
+
+/* ==========================================================================
+   ESTRUTURA DOS BOTÕES ESTILO PILL (OUTLINE E PREENCHIDOS)
+   ========================================================================== */
+
+/* Base da variante Pill */
+.btn-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;                   /* gap-2 */
+    padding: 0.5rem 1.25rem;       /* px-5 py-2 */
+    font-size: 0.75rem;            /* text-xs */
+    font-weight: 700;              /* font-bold */
+    border-radius: 9999px;         /* rounded-full */
+    border: 1px solid transparent;
+    cursor: pointer !important;
+    user-select: none;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
+}
+
+.btn-pill:active {
+    transform: scale(0.96);
+}
+
+.btn-pill i {
+    font-size: 0.75rem; /* text-xs */
+    line-height: 1;
+    flex-shrink: 0;
+    color: inherit;
+}
+
+
+
+
 /* ==========================================================================
    PALETA DE CORES DOS BOTÕES (Fundo + Texto + Hovers)
    ========================================================================== */
@@ -235,11 +277,11 @@ input:-webkit-autofill:active {
 
 /* VERDE */
 .btn-green {
-    background-color: #16a34a;
+    background-color: #10b981;
     color: #ffffff;
 }
-.btn-green:hover { background-color: #15803d; }
-.btn-green:active { background-color: #166534; }
+.btn-green:hover { background-color: #09895E; }
+.btn-green:active { background-color: #06714E; }
 
 /* AMARELO */
 .btn-yellow {
@@ -251,11 +293,11 @@ input:-webkit-autofill:active {
 
 /* AZUL */
 .btn-blue {
-    background-color: #2563eb;
+    background-color: #3b82f6;
     color: #ffffff;
 }
-.btn-blue:hover { background-color: #1d4ed8; }
-.btn-blue:active { background-color: #1e40af; }
+.btn-blue:hover { background-color: #295FB7; }
+.btn-blue:active { background-color: #193E7B; }
 
 /* CIANO */
 .btn-cyan {
@@ -289,6 +331,16 @@ input:-webkit-autofill:active {
 }
 .btn-white:hover { background-color: #f8fafc; }
 .btn-white:active { background-color: #f1f5f9; }
+
+
+
+
+
+
+
+
+
+
 
 /* ==========================================================================
    ESTILOS ESPECIAIS (Neon Button)
@@ -406,6 +458,100 @@ input:-webkit-autofill:active {
 }
 
 
+.text-red {
+    color: #ef4444; /* Cor vermelha idêntica ao text-red-500 do Tailwind */
+}
+
+/* VERDE / SUCCESS */
+.text-green {
+    color: #22c55e; /* text-green-500 */
+}
+
+/* ESMERALDA */
+.text-emerald {
+    color: #10b981; /* text-emerald-500 */
+}
+
+/* AZUL / INFO */
+.text-blue {
+    color: #3b82f6; /* text-blue-500 */
+}
+
+/* CIANO */
+.text-cyan {
+    color: #06b6d4; /* text-cyan-500 */
+}
+
+/* TEAL / VERDE-ÁGUA */
+.text-teal {
+    color: #14b8a6; /* text-teal-500 */
+}
+
+/* AMARELO / WARNING */
+.text-yellow {
+    color: #eab308; /* text-yellow-500 */
+}
+
+/* AMBER / LARANJA-AMARELADO */
+.text-amber {
+    color: #f59e0b; /* text-amber-500 */
+}
+
+/* LARANJA */
+.text-orange {
+    color: #f97316; /* text-orange-500 */
+}
+
+/* ROXO / PURPLE */
+.text-purple {
+    color: #a855f7; /* text-purple-500 */
+}
+
+/* VIOLETA */
+.text-violet {
+    color: #8b5cf6; /* text-violet-500 */
+}
+
+/* INDIGO */
+.text-indigo {
+    color: #6366f1; /* text-indigo-500 */
+}
+
+/* FUCHSIA */
+.text-fuchsia {
+    color: #d946ef; /* text-fuchsia-500 */
+}
+
+/* ROSE / ROSA */
+.text-rose {
+    color: #f43f5e; /* text-rose-500 */
+}
+
+/* PINK */
+.text-pink {
+    color: #ec4899; /* text-pink-500 */
+}
+
+/* VERDE-LIMA */
+.text-lime {
+    color: #84cc16; /* text-lime-500 */
+}
+
+/* CINZA / SLATE */
+.text-slate {
+    color: #64748b; /* text-slate-500 */
+}
+
+/* ESCURO / DARK */
+.text-dark {
+    color: #1e293b; /* text-slate-800 */
+}
+
+/* CLARO / WHITE */
+.text-white {
+    color: #ffffff;
+}
+
 
 
 
@@ -450,4 +596,85 @@ select.select-customizado option:checked {
         box-shadow: inset 0 0 100px 100px rgb(var(--cor-marca-rgb)) !important;
         color: rgb(var(--cor-texto-escuro)) !important;
     }
+}
+
+
+
+
+
+
+/* ==========================================================================
+   SWITCHERS (TOGGLE SWITCHES REATIVOS - ESTILO IOS / SWITCHERY)
+   ========================================================================== */
+
+/* Estreita e esconde o checkbox real do HTML */
+.switcher-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Base do Track (Trilho do Switcher) */
+.switcher-track {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  border: 1px solid rgba(var(--cor-texto-claro) / 0.18);
+  background-color: rgb(var(--cor-fundo-rgb));
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.25s ease-in-out, border-color 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+/* A Bolinha (Thumb Flutuante) */
+.switcher-thumb {
+  display: block;
+  border-radius: 50%;
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* --- TAMANHOS (SIZES) --- */
+
+/* Padrão (Normal) */
+.switcher-size-md { width: 3.25rem; height: 1.75rem; padding: 0.125rem; }
+.switcher-size-md .switcher-thumb { width: 1.4rem; height: 1.4rem; }
+.switcher-input:checked + .switcher-size-md .switcher-thumb { transform: translateX(1.5rem); }
+
+/* Small (Pequeno) */
+.switcher-size-sm { width: 2.5rem; height: 1.35rem; padding: 0.1rem; }
+.switcher-size-sm .switcher-thumb { width: 1.1rem; height: 1.1rem; }
+.switcher-input:checked + .switcher-size-sm .switcher-thumb { transform: translateX(1.15rem); }
+
+/* Large (Grande) */
+.switcher-size-lg { width: 4.25rem; height: 2.25rem; padding: 0.15rem; }
+.switcher-size-lg .switcher-thumb { width: 1.85rem; height: 1.85rem; }
+.switcher-input:checked + .switcher-size-lg .switcher-thumb { transform: translateX(2rem); }
+
+/* --- CORES QUANDO ATIVADO (CHECKED STATES) --- */
+.switcher-blue:checked + .switcher-track { background-color: #009efb; border-color: #009efb; }
+.switcher-red:checked + .switcher-track { background-color: #f62d51; border-color: #f62d51; }
+.switcher-cyan:checked + .switcher-track { background-color: #00c292; border-color: #00c292; }
+.switcher-amber:checked + .switcher-track { background-color: #fec107; border-color: #fec107; }
+.switcher-purple:checked + .switcher-track { background-color: #7460ee; border-color: #7460ee; }
+.switcher-dark:checked + .switcher-track { background-color: #343a40; border-color: #343a40; }
+.switcher-primary:checked + .switcher-track { background-color: rgb(var(--cor-marca-rgb)); border-color: rgb(var(--cor-marca-rgb)); }
+
+/* --- VARIANTES DE COR SECUNDÁRIA (INATIVO PREENCHIDO) --- */
+.switcher-sec-red .switcher-track { background-color: #f62d51; border-color: #f62d51; }
+.switcher-sec-purple .switcher-track { background-color: #7460ee; border-color: #7460ee; }
+
+/* Estado Desabilitado */
+.switcher-input:disabled + .switcher-track {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
