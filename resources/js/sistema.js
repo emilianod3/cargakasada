@@ -1,6 +1,7 @@
 import { ref } from 'vue';
 import { nextTick } from 'vue';
-import { usePage } from '@inertiajs/vue3';
+import { usePage, router } from '@inertiajs/vue3';
+import { route } from 'ziggy-js';
 
 
 // Estados Globais
@@ -2133,6 +2134,113 @@ export function sanitizeFilename(text) {
         // Retorna a paginação salva ou o padrão 10
         return achado ? achado.ucregporpagina : 10;
     }
+
+
+
+    // 1. Lista de opções que preencherá o <select> dinamicamente
+    export const opcoesQtdPagina1 = [5, 10, 15, 25, 50, 100, 200, 500, 1000];
+
+    /**
+     * Valida e ajusta a quantidade de registros por página.
+     * Se o número informado não existir na lista, retorna o próximo valor superior disponível.
+     * 
+     * @param {Number|String} qtd Valor numérico informado (ex: 12, 18, 30)
+     * @returns {Number} Valor exato ou o próximo maior da lista
+     */
+    export function setoptionregporpagina(qtd = 10) {
+        const numero = Number(qtd);
+        if (isNaN(numero) || numero <= 0) {
+            return opcoesQtdPagina1[0]; // Retorna 10
+        }
+        if (opcoesQtdPagina1.includes(numero)) {
+            return numero;
+        }
+        // Encontra o primeiro número na lista que seja estritamente MAIOR que o valor informado
+        const proximoMaior = opcoesQtdPagina1.find(opcao => opcao > numero);
+        // Se encontrar o próximo maior (ex: para 18, retorna 25), retorna ele.
+        // Caso o número informado seja maior que o último item (ex: 1500), retorna o limite máximo (1000).
+        return proximoMaior !== undefined ? proximoMaior : opcoesQtdPagina1[opcoesQtdPagina1.length - 1];
+    }
+    
+    
+
+    /**
+     * Salva em  cfgusercal a coluna ucregporpagina a quantidade de página do usuario no modulo cal
+     * Altera registro de Configuração de quantidade de Registros Exibidos por Página na Listagem
+     * chamda exemplo sistemajs.setregporpagina(calid, qtdporpg, () => sistemajs.functionteste1())
+     * @param {*} idcal 
+     * @param {*} qtd 
+     * @param {*} callback 
+     */
+    export function setregporpagina(idcal, qtd, iduser, callback){
+        let qtdNumerica = Number(qtd);
+        if (qtdNumerica > 0 && idcal > 0 && iduser > 0) {
+            router.post(route('sistema.setnumregporpagina'), {
+                idcal: idcal,
+                numReg: qtdNumerica,
+                iduser: iduser,
+            }, {
+                preserveScroll: true,
+                preserveState: true,
+                onError: (errors) => {
+                    mostrarPopup({
+                        titulo: 'Falha', 
+                        conteudo: JSON.parse(errors.resultado).message ?? 'Indeterminado', 
+                        tipo: 'danger', 
+                        tempo: 4000 
+                    });
+                },
+                onSuccess: () => {
+                    if (typeof callback === 'function') {
+                        callback();
+                    }
+                    mostrarPopup({
+                        titulo: 'Sucesso',
+                        conteudo: 'Preferências Aplicadas com Sucesso',
+                        tipo: 'info',
+                        tempo: 3000
+                    });
+                }
+            });
+        } else {
+            mostrarPopup({
+                titulo: 'Impossível Prosseguir',
+                conteudo: 'Informe Dados Válidos',
+                tipo: 'danger',
+                tempo: 3000
+            });
+        }
+    };
+
+    /**
+     * Altera a coluna e direção de ordenação da tabela.
+     * Se clicar na mesma coluna, inverte entre 'asc' e 'desc'.
+     * Se clicar em uma nova coluna, define 'asc' por padrão.
+     */
+    export function setordenarpor(formvar, campoordenar, callback){
+        if (formvar.filtroCampoOrdem === campoordenar) {
+            formvar.filtroOrdemDirecao = formvar.filtroOrdemDirecao === 'asc' ? 'desc' : 'asc';
+        } else {
+            formvar.filtroCampoOrdem = campoordenar;
+            formvar.filtroOrdemDirecao = 'asc';
+        }
+        if (typeof callback === 'function') {
+            callback();
+        }
+    }
+
+    /**
+     * Retorna a classe do ícone FontAwesome correspondente ao estado atual de ordenação.
+     */
+    export function setordenarporicone(formvar, campoordenar){
+        if (formvar.filtroCampoOrdem !== campoordenar) {
+            return 'fas fa-sort text-texto-claro/30 group-hover:text-texto-claro/70';
+        }
+        return formvar.filtroOrdemDirecao === 'asc' 
+            ? 'fas fa-sort-down text-primary' 
+            : 'fas fa-sort-up text-primary';
+    };
+
 
 
 

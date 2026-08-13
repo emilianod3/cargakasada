@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Core\CfgSistController;
+use App\Http\Controllers\Core\CfgUserCalController;
 use App\Http\Controllers\Core\MailController;
 use App\Http\Controllers\Core\ReportarProblemaController;
 use App\Http\Controllers\Core\UnicoController;
@@ -99,4 +100,8 @@ Route::group(['middleware' => 'throttle:300,1'], function () {
 
 Route::group(['namespace' => 'Cadastro', 'middleware' => 'throttle:100,1', 'prefix' => 'cadastro', 'as' => 'cadastro.'], function () {
     Route::get('/updatetermouso/{iduser}/{tipo}', [UnicoController::class, 'updatetermouso'])->where('iduser', '[0-9]+')->where('tipo', '[0-9]+')->name('updatetermouso')->middleware(['web','authcheck']);    
+});
+
+Route::group(['namespace' => 'Sistema', 'middleware' => 'throttle:100,1', 'prefix' => 'sistema', 'as' => 'sistema.'], function () {
+    Route::post('/setNumRegPorPagina', [CfgUserCalController::class, 'setNumRegPorPagina'])->name('setnumregporpagina')->middleware('authcheck');
 });

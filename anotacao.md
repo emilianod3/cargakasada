@@ -24,13 +24,12 @@
 > Modelos de Arquivos
 Preciso migrar este modulo com os arquivos em anexo onde utilizava laravel e blade e mysql para o meu novo projeto com laravel 12 + vue + inertia + mysql = exemplo do codigo padrao que estou utilizando atualmente no novo projeto = 
 
-> ao mudar a qtd de paginas fazer a busca
-salvar a qtd por pagina
-ordenação pela coluna clicada
+CAdastro falta
 
 no lugar ta table colocar div ou container
 como criar componentes do cadastro para diminuir a quantidade de codigo e reutilizar codigo
 impressao dos relatórios
+upload de arquivos
 
 textarea de summernote ou texto rico
 testando as permissoes 

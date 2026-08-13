@@ -104,18 +104,11 @@ class CfgUserCalController extends Controller
                     Session::forget('cfgusercal');
                     Session::put('cfgusercal', self::getAllSession($request->iduser));
                     Tools::setAtividade(0, 1, $config->id,  'Altera registro de Configuração de quantidade de Registros Exibidos por Página na Listagem', '');                
-                    return response()->json( [
-                        'status' => 'success',
-                        'data' => [],
-                        'message' => 'Registro Salvo com Sucesso'
-                    ]);
+                    return back()->with(Tools::setResult('success', null, 'Preferências Aplicadas com Sucesso'));
                 }else{
-                    Tools::setAtividade(0, 9, 0,  'Tentativa Registro de Configuração de quantidade de Registros Exibidos por Página na Listagem', '');               
-                    return response()->json( [
-                        'status' => 'fail',
-                        'data' => [],
-                        'message' => 'Falha no Salvamento do Registro'
-                    ]);
+                    Tools::setAtividade(0, 9, 0,  'Tentativa Registro de Configuração de quantidade de Registros Exibidos por Página na Listagem', '');  
+                    $resperr = Tools::setResult('fail', null, 'Falha no Processamento');
+                    return back()->withErrors($resperr);              
                 }  
             } else {
                 $config = new CfgUserCal();
@@ -133,18 +126,11 @@ class CfgUserCalController extends Controller
                     Session::forget('cfgusercal');
                     Session::put('cfgusercal', self::getAllSession($request->iduser));                    
                     Tools::setAtividade(0, 1, $config->id,  'Novo registro de Configuração de quantidade de Registros Exibidos por Página na Listagem', '');                
-                    return response()->json( [
-                        'status' => 'success',
-                        'data' => [],
-                        'message' => 'Registro Salvo com Sucesso'
-                    ]);
+                    return back()->with(Tools::setResult('success', null, 'Preferências Aplicadas com Sucesso'));
                 }else{
                     Tools::setAtividade(0, 9, 0,  'Tentativa Configuração de quantidade de Registros Exibidos por Página na Listagem', '');
-                    return response()->json( [
-                        'status' => 'fail',
-                        'data' => [],
-                        'message' => 'Falha no Salvamento do Registro'
-                    ]);
+                    $resperr = Tools::setResult('fail', null, 'Falha no Processamento');
+                    return back()->withErrors($resperr);  
                 }  
             }
         }

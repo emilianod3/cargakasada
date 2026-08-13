@@ -17,19 +17,12 @@ const page = usePage();
 // --- ESTADOS REATIVOS (TABS E FILTROS) ---
 const abaAtiva = ref('inicio'); // inicio, cadastro, colunas
 const exibirFiltrosAvancados = ref(false);
-/*
-const campoPesquisa = ref('');
-const filtroStatus = ref('0'); // 0=Ambos, 1=Ativo, 2=Inativo
-const filtroDataInicio = ref('');
-const filtroDataFim = ref('');
-const filtroCampoOrdem = ref('clidentificacao');
-const filtroOrdemDirecao = ref('asc');
-const tipoFiltro = ref('amplo'); // amplo ou exato*/
 const calid = props.cal?.cal?.[0];
+const relatorios1 = ref(false);
 
 let permissao = null;
 let pageatual = 1;
-let qtdporpg = 10;
+let qtdporpg1 = 10;
 
 const btnnovoregistro = ref(false);
 const clidentificacaoref = ref(null);
@@ -66,7 +59,8 @@ const formcad1 = useForm({
 onMounted(() => {
     // Inicializações se necessário
     permissaoPrincipal1();
-    qtdporpg = sistemajs.getCfgUserCal(page.props.auth?.user?.id, calid) ?? 10;
+    //qtdporpg = sistemajs.getCfgUserCal(page.props.auth?.user?.id, calid) ?? 10;
+    qtdporpg1 = sistemajs.setoptionregporpagina(sistemajs.getCfgUserCal(page.props.auth?.user?.id, calid));
     filtrar1(); // Carrega a listagem inicial
     
 });
@@ -169,10 +163,36 @@ const alternarOrdemDirecao1 = () => {
     filtrar1();
 };
 
+const alterarqtdporpagina1 = () => {
+    filtrar1();
+};
 
+const linksPaginacaoFiltrados1 = computed(() => {
+    if (!listagem1?.value?.links || listagem1?.value?.links.length === 0) return [];
 
+    const totalLinks = listagem1?.value?.links.length;
+    const paginaAtual = listagem1?.value?.current_page;
+    const maxVisiveis = 2; // Quantidade de números ao redor da página atual
 
+    return listagem1?.value?.links.filter((link, index) => {
+        // 1. Sempre mantém o primeiro botão (Anterior) e o último botão (Próximo)
+        if (index === 0 || index === totalLinks - 1) return true;
 
+        const numPagina = parseInt(link.label);
+        
+        // 2. Se não for um número (ex: reticências "..."), mantém na tela
+        if (isNaN(numPagina)) return true;
+
+        // 3. Mantém os números próximos à página atual (miolo)
+        const noMiolo = numPagina >= paginaAtual - maxVisiveis && numPagina <= paginaAtual + maxVisiveis;
+
+        // 4. Nova Regra: Sempre mantém as duas últimas páginas numéricas da lista
+        // Como o último link (index totalLinks - 1) é o botão "Próximo", as páginas finais estão logo antes dele
+        const ehPaginaFinal = index === totalLinks - 2 || index === totalLinks - 3;
+
+        return noMiolo || ehPaginaFinal;
+    });
+});
 
 
 
@@ -181,6 +201,7 @@ const alternarOrdemDirecao1 = () => {
 const novoRegistro1 = () => {
     formcad1.reset();
     formcad1.id = 0;
+    formcad1.clstatus = 1;
     alternarAba1('cadastro');
 
     if (page.props.app_debug) {
@@ -217,17 +238,17 @@ const filtrar1 = (pg = 1) => {
             campoordem: formFiltro1.filtroCampoOrdem,
             ordem: formFiltro1.filtroOrdemDirecao,
             tipofiltro: formFiltro1.tipoFiltro,
-            regPg: qtdporpg,
+            regPg: qtdporpg1,
             page: pg,
         };
 
         router.post(route('controle.cals.lista'), data, {
             preserveState: true,
             replace: true,
-            onError: (errors) => {   
+            onError: (errors) => { 
                 sistemajs.mostrarPopup({ 
                     titulo: 'Erro Listagem', 
-                    conteudo: JSON.parse(errors.resultado).message ?? 'Outro', 
+                    conteudo: JSON.parse(errors.resultado).message ?? 'Indeterminado', 
                     tipo: 'danger', 
                     tempo: 4000 
                 });
@@ -255,11 +276,126 @@ const filtrar1 = (pg = 1) => {
 
 
 
+function geraRelatorio(extensao = 'pdf', tipo = 0){
 
+    try {
+        const urlEndpoint = route('controle.cals.relatorio');
+        
+        // Constrói o payload extraindo os dados do formulário reativo
+        const payload = {
+        extensao: extensao,
+        tipo: tipo,
+        campoPesquisa: formFiltro1.campoPesquisa || '',
+        statusfiltro: formFiltro1.filtroStatus || '',
+        datainiciofiltro: formFiltro1.filtroDataInicio || '',
+        datafinalfiltro: formFiltro1.filtroDataFim || '',
+        campoordem: formFiltro1.filtroCampoOrdem || 'id',
+        ordem: formFiltro1.filtroOrdemDirecao || 'asc',
+        tipofiltro: formFiltro1.tipoFiltro || ''
+        };
 
+        // 1. EXECUÇÃO ASSÍNCRONA COM AWAIT (Resolve a Promise da resposta)
+        const response = axios.post(urlEndpoint, payload, {
+        responseType: 'arraybuffer',
+        headers: {
+            'Accept': 'application/octet-stream, application/pdf, application/msword, text/csv'
+        }
+        });
 
+        // 2. Extração segura do Content-Type dos headers resolvidos
+        const contentTypeHeader = response.headers?.get ? response.headers.get('content-type') : response.headers?.['content-type'];
+        const contentType = contentTypeHeader || (
+        extensao === 'doc' ? 'application/msword' :
+        extensao === 'csv' ? 'text/csv' : 'application/pdf'
+        );
 
+        const blob = new Blob([response.data], { type: contentType });
 
+        // 3. ABERTURA INLINE PARA PDF
+        if (extensao === 'pdf') {
+        const pdfUrl = URL.createObjectURL(blob);
+        const newWin = window.open(pdfUrl, '_blank');
+
+        if (!newWin || newWin.closed || typeof newWin.closed === 'undefined') {
+            sistemajs.mostrarPopup({
+            titulo: 'Aviso de Pop-up',
+            conteudo: 'Pop-up bloqueado pelo navegador. Permita pop-ups para visualizar o relatório.',
+            tipo: 'warning',
+            tempo: 5000
+            });
+        } else {
+            sistemajs.mostrarPopup({
+            titulo: 'Relatório Gerado',
+            conteudo: 'Visualização do relatório iniciada em nova aba.',
+            tipo: 'info',
+            tempo: 3000
+            });
+        }
+
+        setTimeout(() => URL.revokeObjectURL(pdfUrl), 10000);
+        } 
+        // 4. DOWNLOAD DIRETO PARA DOC E CSV
+        else {
+        let filename = `relatorio_cals_${new Date().getTime()}.${extensao}`;
+
+        // Tenta extrair o nome do arquivo enviado pelo Laravel via Content-Disposition
+        const disposition = response.headers?.get ? response.headers.get('content-disposition') : response.headers?.['content-disposition'];
+        if (disposition && disposition.includes('attachment')) {
+            const matches = /filename\*?=['"]?([^'"]+)?['"]?(;|$)/i.exec(disposition);
+            if (matches && matches[1]) {
+            filename = matches[1].replace(/['"]/g, '').trim();
+            }
+        }
+
+        const downloadUrl = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.style.display = 'none';
+        link.href = downloadUrl;
+        link.download = filename;
+
+        document.body.appendChild(link);
+        link.click();
+
+        setTimeout(() => {
+            document.body.removeChild(link);
+            URL.revokeObjectURL(downloadUrl);
+        }, 200);
+
+        sistemajs.mostrarPopup({
+            titulo: 'Processamento Finalizado',
+            conteudo: 'Download do relatório iniciado com sucesso.',
+            tipo: 'info',
+            tempo: 4000
+        });
+        }
+
+    } catch (error) {
+        console.error('[geraRelatorio] Erro na geração do relatório:', error);
+
+        let mensagemErro = 'Não foi possível gerar o relatório.';
+
+        // Deserializa mensagens de erro vindas em ArrayBuffer caso o Laravel retorne falha (422/500)
+        if (error.response?.data) {
+        try {
+            const decoder = new TextDecoder('utf-8');
+            const jsonText = decoder.decode(error.response.data);
+            const parsed = JSON.parse(jsonText);
+            mensagemErro = parsed.message || mensagemErro;
+        } catch (e) {
+            mensagemErro = `Falha no processamento (Erro HTTP ${error.response.status || 500}).`;
+        }
+        }
+
+        sistemajs.mostrarPopup({
+        titulo: 'Falha na Emissão',
+        conteudo: mensagemErro,
+        tipo: 'danger',
+        tempo: 5000
+        });
+    } finally {
+        //if (loadingState) loadingState.value = false;
+    }
+}
 
 
 
@@ -287,46 +423,11 @@ const submeterFormulario = () => {
 
 
 
-const exibirOpcoesCal = ref(false);
-
-// Função que será chamada ao clicar em cada opção
-const executarAcao = (acao) => {
-    console.log('Ação disparada:', acao);
-    
-    // Aqui você coloca a sua lógica (ex: abrir um modal, deletar, etc.)
-    if (acao === 'editar') { /* ... */ }
-    
-    exibirOpcoesCal.value = false; // Fecha o menu automaticamente
-};
 
 
 
-const linksPaginacaoFiltrados1 = computed(() => {
-    if (!listagem1?.value?.links || listagem1?.value?.links.length === 0) return [];
 
-    const totalLinks = listagem1?.value?.links.length;
-    const paginaAtual = listagem1?.value?.current_page;
-    const maxVisiveis = 2; // Quantidade de números ao redor da página atual
 
-    return listagem1?.value?.links.filter((link, index) => {
-        // 1. Sempre mantém o primeiro botão (Anterior) e o último botão (Próximo)
-        if (index === 0 || index === totalLinks - 1) return true;
-
-        const numPagina = parseInt(link.label);
-        
-        // 2. Se não for um número (ex: reticências "..."), mantém na tela
-        if (isNaN(numPagina)) return true;
-
-        // 3. Mantém os números próximos à página atual (miolo)
-        const noMiolo = numPagina >= paginaAtual - maxVisiveis && numPagina <= paginaAtual + maxVisiveis;
-
-        // 4. Nova Regra: Sempre mantém as duas últimas páginas numéricas da lista
-        // Como o último link (index totalLinks - 1) é o botão "Próximo", as páginas finais estão logo antes dele
-        const ehPaginaFinal = index === totalLinks - 2 || index === totalLinks - 3;
-
-        return noMiolo || ehPaginaFinal;
-    });
-});
 
 </script>
 
@@ -364,37 +465,37 @@ const linksPaginacaoFiltrados1 = computed(() => {
                         <!-- INICIO - Botoes de Impressao -->
                         <div class="relative inline-block h-10 shrink-0">
                             <button 
-                                type="button" @click="exibirOpcoesCal = !exibirOpcoesCal" title="Relatórios"
+                                type="button" @click="relatorios1 = !relatorios1" title="Relatórios"
                                 class="bg-primary hover:bg-primary-hover text-texto-escuro h-10 w-15 rounded-l-lg transition-all cursor-pointer focus:outline-none flex items-center justify-center box-border select-none pr-3 pl-3">
-                                <i class="fas fa-print text-sm transition-transform duration-200 cursor-pointer pl-2 pr-5" :class="{ 'rotate-90 cursor-pointer': exibirOpcoesCal }"></i>
+                                <i class="fas fa-print text-sm transition-transform duration-200 cursor-pointer pl-2 pr-5" :class="{ 'rotate-90 cursor-pointer': relatorios1 }"></i>
                                 <i class="fas fa-chevron-down text-[10px] pr-3 cursor-pointer"></i>
                             </button>
 
-                            <div v-if="exibirOpcoesCal" class="absolute left-0 mt-1 w-48 bg-layout-painel border border-comum rounded-lg shadow-xl z-50 overflow-hidden py-1">
+                            <div v-if="relatorios1" class="absolute left-0 mt-1 w-48 bg-layout-painel border border-comum rounded-lg shadow-xl z-50 overflow-hidden py-1">
                                 <button 
                                     type="button" title="Gerar Relatório - PDF"
-                                    @click="executarAcao('acao1')"
+                                    @click="geraRelatorio('pdf')"
                                     class="w-full text-left px-4 py-2.5 text-sm text-texto-claro/90 hover:bg-texto-claro/10 transition-colors flex items-center gap-2.5 cursor-pointer">
-                                    <i class="fas fa-plus text-xs text-texto-claro/40"></i> Relatório
+                                    <i class="fas fa-file-pdf text-xs text-red"></i> Relatório - PDF
                                 </button>
                                 
                                 <button 
                                     type="button" title="Gerar Relatório - DOC"
-                                    @click="executarAcao('acao2')"
+                                    @click="geraRelatorio('doc')"
                                     class="w-full text-left px-4 py-2.5 text-sm text-texto-claro/90 hover:bg-texto-claro/10 transition-colors flex items-center gap-2.5 cursor-pointer">
-                                    <i class="fas fa-download text-xs text-texto-claro/40"></i> Relatório
+                                    <i class="fas fa-file-word text-blue text-xs"></i> Relatório - DOC
                                 </button>
                                 <hr class="border-comum">
                                 
                                 <button 
                                     type="button" title="Gerar Relatório - CSV"
-                                    @click="executarAcao('acao3')"
-                                    class="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors flex items-center gap-2.5 cursor-pointer">
-                                    <i class="fas fa-exclamation-triangle text-xs opacity-60"></i> Relatório
+                                    @click="geraRelatorio('csv')"
+                                    class="w-full text-left px-4 py-2.5 text-sm text-texto-claro/90 hover:bg-texto-claro/10 transition-colors flex items-center gap-2.5 cursor-pointer">
+                                    <i class="fas fa-file-csv text-green text-xs opacity-60"></i> Relatório - CSV
                                 </button>
                             </div>
 
-                            <div v-if="exibirOpcoesCal" @click="exibirOpcoesCal = false" class="fixed inset-0 z-40"></div>
+                            <div v-if="relatorios1" @click="relatorios1 = false" class="fixed inset-0 z-40"></div>
                         </div>
                         <!-- FIM - Botoes de Impressao -->
                         
@@ -493,11 +594,11 @@ const linksPaginacaoFiltrados1 = computed(() => {
                     <table v-if="(permissao?.consultar)" class="w-full text-left border-collapse min-w-160">
                         <thead>
                             <tr class="bg-layout-fundo border-b border-comum text-texto-claro/70 text-xs font-semibold uppercase tracking-wider">
-                            <th class="p-3">Código</th>
-                            <th class="p-3">Identificação</th>
-                            <th class="p-3">Destino</th>
-                            <th class="p-3 text-center">Tipo</th>
-                            <th class="p-3 text-right"></th>
+                            <th class="p-3 clicavel" @click="sistemajs.setordenarpor(formFiltro1, 'id', () => filtrar1(pageatual))" title="Clique para ordenar por este campo">Código <i :class="[sistemajs.setordenarporicone(formFiltro1, 'id'), 'text-xs transition-colors']"></i></th>
+                            <th class="p-3 clicavel" @click="sistemajs.setordenarpor(formFiltro1, 'clidentificacao', () => filtrar1(pageatual))" title="Clique para ordenar por este campo">Identificação <i :class="[sistemajs.setordenarporicone(formFiltro1, 'clidentificacao'), 'text-xs transition-colors']"></i></th>
+                            <th class="p-3 clicavel" @click="sistemajs.setordenarpor(formFiltro1, 'clrota', () => filtrar1(pageatual))" title="Clique para ordenar por este campo">Destino <i :class="[sistemajs.setordenarporicone(formFiltro1, 'clrota'), 'text-xs transition-colors']"></i></th>
+                            <th class="p-3 text-center" @click="sistemajs.setordenarpor(formFiltro1, 'cltipo', () => filtrar1(pageatual))" title="Clique para ordenar por este campo">Tipo <i :class="[sistemajs.setordenarporicone(formFiltro1, 'cltipo'), 'text-xs transition-colors']"></i></th>
+                            <th class="p-3 text-right" @click="sistemajs.setordenarpor(formFiltro1, 'clversao', () => filtrar1(pageatual))" title="Clique para ordenar por este campo"> <i :class="[sistemajs.setordenarporicone(formFiltro1, 'clversao'), 'text-xs transition-colors']"></i></th>
                             </tr>
                         </thead>
                         <tbody class="text-xs text-texto-claro/90">
@@ -599,19 +700,18 @@ const linksPaginacaoFiltrados1 = computed(() => {
                         <div class="flex items-center border-l border-comum pl-4">
                             <div class="flex items-center gap-2 shrink-0">
                                 <span class="text-xs">Exibir:</span>
-                                <select 
-                                    ref="regporpagina" @change="alterarQuantidadeRegistros"
+                                <select ref="regporpagina1" @change="alterarqtdporpagina1"
+                                    v-model="qtdporpg1"
                                     :class="['bg-layout-fundo border border-comum pl-2 pr-8 py-1 text-texto-claro text-xs focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none cursor-pointer w-auto min-w-18 h-full', permissao?.alterar || permissao?.inserir ? 'rounded-l' : 'rounded']">
-                                    <option :value="10" selected>10</option>
-                                    <option :value="25">25</option>
-                                    <option :value="50">50</option>
-                                    <option :value="100">100</option>
-                                    <option :value="200">200</option>
-                                    <option :value="500">500</option>
-                                    <option :value="1000">1000</option>
+                                    <option 
+                                        v-for="opcao in sistemajs.opcoesQtdPagina1" 
+                                        :key="opcao" 
+                                        :value="opcao">
+                                        {{ opcao }}
+                                    </option>
                                 </select>
                             </div>
-                            <button v-if="permissao?.alterar || permissao?.inserir" @click="salvarregporpagina(regporpagina.value)" type="button" title="Aplicar quantidade como Padrão" class="bg-primary hover:bg-primary-hover text-texto-escuro px-2 py-1.5 border border-primary transition-all cursor-pointer flex items-center justify-center shrink-0 focus:outline-none rounded-r text-xs"><i class="fa fa-check"></i></button>
+                            <button v-if="permissao?.alterar || permissao?.inserir" @click="sistemajs.setregporpagina(calid, qtdporpg1, page.props.auth?.user?.id, null)" type="button" title="Aplicar quantidade como Padrão" class="bg-primary hover:bg-primary-hover text-texto-escuro px-2 py-1.5 border border-primary transition-all cursor-pointer flex items-center justify-center shrink-0 focus:outline-none rounded-r text-xs"><i class="fa fa-check"></i></button>
                         </div>
 
 
