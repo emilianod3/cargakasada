@@ -301,9 +301,9 @@ class Tools{
             //Session::forget('cidadesqtd');
             //Session::forget('estados');
             //Session::forget('config');
-            //Session::forget('configuser');
+            Session::forget('configuser');
             //Session::forget('cfgsist');
-            //Session::forget('cfgusercal');
+            Session::forget('cfgusercal');
             //Session::forget('categoria');
             //Session::forget('siteconteudocategoria');
             //Session::forget('noticiacategoria');
@@ -318,9 +318,15 @@ class Tools{
             //Session::forget('tiporaca');
             //Session::forget('unidades');
             //Session::forget('divisoes');
+            /*
             $cacheKeyconfig = 'config_' . $iduser;
             if ($cacheKeyconfig) {
                 Cache::forget($cacheKeyconfig);
+            }*/
+
+            $cacheKeycfgsist = 'cfgsist_' . $iduser;
+            if ($cacheKeycfgsist) {
+                Cache::forget($cacheKeycfgsist);
             }
 
             // 3. Limpa o resto da sessão com os comandos nativos

@@ -223,8 +223,45 @@ const formTeste = reactive({
                         <button class="flex items-center gap-2 px-6 py-2.5 bg-transparent border-2 border-slate-600 text-slate-600 font-medium rounded-full hover:bg-slate-600 hover:text-white transition-all duration-300 ease-in-out cursor-pointer">
                             <i class="fa fa-cog"></i> <span>ExemploIcone</span>
                         </button>
+                        
                     </div>
                 </div>
+
+                <div class="bg-layout-painel p-6 rounded-xl border border-comum shadow-md">
+                    <h3 class="text-xs font-bold text-texto-claro/40 uppercase tracking-wider mb-4">Botões Estilo Pill (Preenchidos)</h3>
+                    
+                    <div class="flex flex-wrap gap-3 justify-center items-center">
+                        <!-- Novo Cadastro (Azul) -->
+                        <button type="button" class="flex items-center gap-2 px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-full shadow-sm hover:shadow transition-all duration-200 cursor-pointer select-none">
+                            <i class="fas fa-plus text-xs"></i> <span>Novo Cadastro</span>
+                        </button>
+
+                        <!-- Aprovar Item / Novo Registro (Verde) -->
+                        <button type="button" class="flex items-center gap-2 px-5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-full shadow-sm hover:shadow transition-all duration-200 cursor-pointer select-none">
+                            <i class="fas fa-plus text-xs"></i> <span>Novo Registro</span>
+                        </button> 
+
+                        <!-- Excluir Registro (Vermelho) -->
+                        <button type="button" class="flex items-center gap-2 px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-full shadow-sm hover:shadow transition-all duration-200 cursor-pointer select-none">
+                            <i class="fas fa-trash-alt text-xs"></i> <span>Excluir Registro</span>
+                        </button>
+
+                        <!-- Editar Dados (Amber/Laranja) -->
+                        <button type="button" class="flex items-center gap-2 px-5 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-full shadow-sm hover:shadow transition-all duration-200 cursor-pointer select-none">
+                            <i class="fas fa-edit text-xs"></i> <span>Editar Dados</span>
+                        </button>
+
+                        <!-- Voltar Tela (Grafite/Cinza) -->
+                        <button type="button" class="flex items-center gap-2 px-5 py-2 bg-slate-600 hover:bg-slate-700 text-white text-xs font-bold rounded-full shadow-sm hover:shadow transition-all duration-200 cursor-pointer select-none">
+                            <i class="fas fa-arrow-left text-xs"></i> <span>Voltar Tela</span>
+                        </button>
+
+                        <!-- Exemplo Ícone (Cinza Escuro) -->
+                        <button type="button" class="flex items-center gap-2 px-5 py-2 bg-gray-700 hover:bg-gray-800 text-white text-xs font-bold rounded-full shadow-sm hover:shadow transition-all duration-200 cursor-pointer select-none">
+                            <i class="fa fa-cog text-xs"></i> <span>Exemplo Icone</span>
+                        </button>
+                    </div>
+                </div>        
 
 
                 <div class="bg-layout-painel p-6 rounded-xl border border-comum shadow-md">
@@ -465,6 +502,155 @@ const formTeste = reactive({
                     </label>
                 </div>
                 <p class="text-xs font-mono text-texto-claro/60">Estado do Checkbox: <span class="text-primary">{{ termosAceitos }}</span></p>
+
+                <div class="bg-layout-painel p-6 rounded-xl border border-comum shadow-md">
+                    <h3 class="text-xs font-bold text-texto-claro/40 uppercase tracking-wider mb-4">SWITCHERS (TOGGLE SWITCHES REATIVOS - ESTILO IOS / SWITCHERY)</h3>
+                    
+                    <div class="flex flex-wrap gap-3 justify-center items-center">
+                        <!-- 1. BÁSICOS (PALETA DE CORES PRINCIPAL) -->
+                        <div class="flex flex-col gap-2 border-t border-comum pt-4">
+                        <span class="text-xs font-semibold text-texto-claro/80">Cores Básicas (Ativos):</span>
+                        
+                            <div class="flex flex-wrap items-center gap-4">
+                                <!-- Azul (#009efb) -->
+                                <label class="inline-flex items-center cursor-pointer select-none">
+                                <input type="checkbox" v-model="statusAtivo" class="switcher-input switcher-blue" />
+                                <span class="switcher-track switcher-size-md">
+                                    <span class="switcher-thumb"></span>
+                                </span>
+                                </label>
+
+                                <!-- Vermelho (#f62d51) -->
+                                <label class="inline-flex items-center cursor-pointer select-none">
+                                <input type="checkbox" :checked="true" class="switcher-input switcher-red" />
+                                <span class="switcher-track switcher-size-md">
+                                    <span class="switcher-thumb"></span>
+                                </span>
+                                </label>
+
+                                <!-- Ciano (#00c292) -->
+                                <label class="inline-flex items-center cursor-pointer select-none">
+                                <input type="checkbox" :checked="true" class="switcher-input switcher-cyan" />
+                                <span class="switcher-track switcher-size-md">
+                                    <span class="switcher-thumb"></span>
+                                </span>
+                                </label>
+
+                                <!-- Amarelo (#fec107) -->
+                                <label class="inline-flex items-center cursor-pointer select-none">
+                                <input type="checkbox" :checked="true" class="switcher-input switcher-amber" />
+                                <span class="switcher-track switcher-size-md">
+                                    <span class="switcher-thumb"></span>
+                                </span>
+                                </label>
+
+                                <!-- Roxo (#7460ee) -->
+                                <label class="inline-flex items-center cursor-pointer select-none">
+                                <input type="checkbox" :checked="true" class="switcher-input switcher-purple" />
+                                <span class="switcher-track switcher-size-md">
+                                    <span class="switcher-thumb"></span>
+                                </span>
+                                </label>
+
+                                <!-- Dark (#343a40) -->
+                                <label class="inline-flex items-center cursor-pointer select-none">
+                                <input type="checkbox" :checked="true" class="switcher-input switcher-dark" />
+                                <span class="switcher-track switcher-size-md">
+                                    <span class="switcher-thumb"></span>
+                                </span>
+                                </label>
+
+                                <!-- Cor da Marca (Variável Dinâmica do Sistema) -->
+                                <label class="inline-flex items-center cursor-pointer select-none">
+                                <input type="checkbox" :checked="true" class="switcher-input switcher-primary" />
+                                <span class="switcher-track switcher-size-md">
+                                    <span class="switcher-thumb"></span>
+                                </span>
+                                </label>
+                            </div>
+
+                            <!-- 2. TAMANHOS (SIZES) -->
+                            <div class="flex flex-col gap-2 border-t border-comum pt-4">
+                            <span class="text-xs font-semibold text-texto-claro/80">Tamanhos (Small, Default, Large):</span>
+                            
+                            <div class="flex flex-wrap items-center gap-4">
+                                <!-- Small -->
+                                <label class="inline-flex items-center cursor-pointer select-none">
+                                <input type="checkbox" v-model="statusTamanhoSm" class="switcher-input switcher-red" />
+                                <span class="switcher-track switcher-size-sm">
+                                    <span class="switcher-thumb"></span>
+                                </span>
+                                </label>
+
+                                <!-- Medium (Default) -->
+                                <label class="inline-flex items-center cursor-pointer select-none">
+                                <input type="checkbox" v-model="statusAtivo" class="switcher-input switcher-cyan" />
+                                <span class="switcher-track switcher-size-md">
+                                    <span class="switcher-thumb"></span>
+                                </span>
+                                </label>
+
+                                <!-- Large -->
+                                <label class="inline-flex items-center cursor-pointer select-none">
+                                <input type="checkbox" v-model="statusTamanhoLg" class="switcher-input switcher-amber" />
+                                <span class="switcher-track switcher-size-lg">
+                                    <span class="switcher-thumb"></span>
+                                </span>
+                                </label>
+                            </div>
+                            </div>  
+                            
+                            
+
+
+
+
+
+                            <!-- 3. CORES SECUNDÁRIAS (FUNDO QUANDO DESATIVADO) -->
+                            <div class="flex flex-col gap-2 border-t border-comum pt-4">
+                            <span class="text-xs font-semibold text-texto-claro/80">Cores Secundárias (Desativados Preenchidos):</span>
+                            
+                            <div class="flex flex-wrap items-center gap-4">
+                                <!-- Secundário Vermelho -->
+                                <label class="inline-flex items-center cursor-pointer select-none switcher-sec-red">
+                                <input type="checkbox" v-model="statusSecundarioRed" class="switcher-input switcher-blue" />
+                                <span class="switcher-track switcher-size-md">
+                                    <span class="switcher-thumb"></span>
+                                </span>
+                                </label>
+
+                                <!-- Secundário Roxo -->
+                                <label class="inline-flex items-center cursor-pointer select-none switcher-sec-purple">
+                                <input type="checkbox" v-model="statusNotificacao" class="switcher-input switcher-cyan" />
+                                <span class="switcher-track switcher-size-md">
+                                    <span class="switcher-thumb"></span>
+                                </span>
+                                </label>
+                            </div>
+                            </div>
+
+                            <!-- 4. EXEMPLO PRÁTICO EM FORMULÁRIO COM TEXTO LADO A LADO -->
+                            <div class="flex flex-col gap-3 border-t border-comum pt-4">
+                            <span class="text-xs font-semibold text-texto-claro/80">Exemplo de Uso em Formulário:</span>
+
+                            <div class="flex items-center justify-between p-3 bg-layout-fundo rounded-lg border border-comum">
+                                <div class="flex flex-col">
+                                <span class="text-xs font-bold text-texto-claro">Ativar Notificações via E-mail</span>
+                                <span class="text-[11px] text-texto-claro/50">Receber alertas de sistema diretamente no e-mail cadastrado.</span>
+                                </div>
+
+                                <label class="inline-flex items-center cursor-pointer select-none">
+                                <input type="checkbox" v-model="statusNotificacao" class="switcher-input switcher-primary" />
+                                <span class="switcher-track switcher-size-md">
+                                    <span class="switcher-thumb"></span>
+                                </span>
+                                </label>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
         </div>

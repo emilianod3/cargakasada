@@ -123,14 +123,18 @@ class ConfigUserController extends Controller
         return $registro;
     }
 
-    public function getAllSession(){
-
-        $query = ConfigUser::leftjoin('configforuser', 'configuser.fkidconfigforuser', '=', 'configforuser.id')
-        ->select([DB::raw('configforuser.id, configforuser.identificacao, configforuser.tipodado, configforuser.status,
-        configforuser.classificacao, configforuser.valor1, configforuser.valor2, configuser.fkidcal,
-        configuser.fkidusuario, configuser.fkidconfigforuser, configuser.id as configuserid')]);
-        $registros = $query->groupBy('configuser.fkidusuario', 'configforuser.id')->get();     
-        return json_encode($registros);
+    public function getAllSession($idUser = 0){
+        if($idUser > 0){
+            $query = ConfigUser::leftjoin('configforuser', 'configuser.fkidconfigforuser', '=', 'configforuser.id')
+            ->select([DB::raw('configforuser.id, configforuser.identificacao, configforuser.tipodado, configforuser.status,
+            configforuser.classificacao, configforuser.valor1, configforuser.valor2, configuser.fkidcal,
+            configuser.fkidusuario, configuser.fkidconfigforuser, configuser.id as configuserid')]);
+            $query->where('configuser.fkidusuario', $idUser)->where('configforuser.status', '>', 0);
+            $registros = $query->groupBy('configuser.fkidusuario', 'configforuser.id')->get();
+            return json_encode($registros);
+        }else{
+            return null;
+        }
     }     
 
     public function getConfigsUser($idUser, $idCfgForUser){

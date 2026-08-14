@@ -44,4 +44,10 @@ return new class () extends Migration {
         Schema::dropIfExists('cal');
         DB::statement('SET FOREIGN_KEY_CHECKS = 1');
     }
+
+
+    /** 
+     * cltipo: 1 = Módulo Nível 1, 2 = Perfil, 3 = SubCadastro
+     * 
+    */
 };

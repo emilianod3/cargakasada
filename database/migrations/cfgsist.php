@@ -61,3 +61,8 @@ return new class () extends Migration {
         DB::statement('SET FOREIGN_KEY_CHECKS = 1');
     }
 };
+/*
+tabela = config
+tipodado = 1=Opcional 2=Texto 3=Numero 4=URL
+classificacao = 1=Parametro  2=Comportamento
+*/

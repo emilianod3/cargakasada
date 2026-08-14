@@ -1,6 +1,7 @@
 import { ref } from 'vue';
 import { nextTick } from 'vue';
-import { usePage } from '@inertiajs/vue3';
+import { usePage, router } from '@inertiajs/vue3';
+import { route } from 'ziggy-js';
 
 
 // Estados Globais
@@ -14,7 +15,7 @@ export const modosDisponiveis = {
         nome: 'Modo Claro Tradicional',
         classes: {
             '--cor-fundo-rgb': '255 255 255',
-            '--cor-painel-rgb': '241 245 249',
+            '--cor-painel-rgb': '248 249 250',
             '--cor-texto-claro': '15 23 42',
             '--cor-texto-escuro': '255 255 255',
             '--cor-border-rgb': '226 232 240'
@@ -2112,6 +2113,289 @@ export function sanitizeFilename(text) {
     }
 
 
+    export function getCfgUserCal(idUser, idCal, tipo = 1){ 
+        const page = usePage();
+        const data = page.props.auth?.cfgusercal;
+        
+        if (!data) return 10; // Retorna o padrão 10 se não houver dados
+
+        // Se por acaso os dados ainda vierem como string (raro no Inertia, mas por garantia):
+        const listaConfig = typeof data === 'string' ? JSON.parse(data) : data;
+
+        // Busca o elemento correspondente de forma direta e limpa
+        const achado = listaConfig.find(elm => {
+            if (tipo > 0) {
+                return elm.fkidusuario == idUser && elm.fkidcal == idCal && elm.uctipo == tipo;
+            } else {
+                return elm.fkidusuario == idUser && elm.fkidcal == idCal;
+            }
+        });
+
+        // Retorna a paginação salva ou o padrão 10
+        return achado ? achado.ucregporpagina : 10;
+    }
+
+  
+
+    /**
+     * 
+     * @param {*} idUser 
+     * @param {*} idconfiguser 
+     * @returns 
+     *  configUserDataHoraTramiteManual = getConfigForUser_({{Session::has('user')}} ? {{Session::get('user')->id}} : 9);        
+        configUserPermissaoParaTramitar = getConfigForUser_({{Session::get('user')->id ?? 0}}, 10);        
+        configUserPermissaoAlterarOrigemNaTramitacao = getConfigForUser_({{Session::get('user')->id ?? 0}}, 11);
+        configUserRemoverTramite = getConfigForUser_({{Session::get('user')->id ?? 0}}, 12); 
+        configUserAlteraSituacaoTramitar = getConfigForUser_({{Session::get('user')->id ?? 0}}, 13); 
+        configUserDefiniPrioridadeTramite = getConfigForUser_({{Session::get('user')->id ?? 0}}, 14); 
+        configUserDefiniPublicidadeTramite = getConfigForUser_({{Session::get('user')->id ?? 0}}, 15); 
+        configUserDefiniPrazoTramite = getConfigForUser_({{Session::get('user')->id ?? 0}}, 16);      
+        configUserCarregaListaSalvar = getConfigForUser_({{Session::get('user')->id ?? 0}}, 17);
+        let tempomessage1 = sistemajs.getCfgSist(13, 'valor1') ?? 5000
+        let exibirmessage1 = sistemajs.getCfgSist(29, 'valor1') ?? 'nao';
+     */
+    /*export function getConfigUser(idUser, idconfiguser){ 
+        const page = usePage();
+        const data = page.props.auth?.configuser;
+        if (!data) return null;
+        const listaConfigUser = typeof data === 'string' ? JSON.parse(data) : data;
+        // Busca o elemento correspondente de forma direta e limpa
+        const achado = listaConfigUser.find(elm => {
+            return elm.fkidusuario == idUser && elm.fkidconfigforuser == idconfiguser;
+        });
+        return achado ? achado : null;
+    }   */
+
+    export function getConfigUser(idUser, idconfiguser, coluna = null) {
+        const page = usePage();
+        const data = page?.props?.auth?.configuser;
+
+        if (!data) return null;
+
+        let lista = [];
+        if (typeof data === 'string') {
+            try {
+                lista = JSON.parse(data);
+            } catch (e) {
+                return null;
+            }
+        } else if (Array.isArray(data)) {
+            lista = data;
+        } else {
+            return null;
+        }
+
+        const achado = lista.find(elm => 
+            Number(elm.fkidusuario || elm.iduser) === Number(idUser) &&
+            Number(elm.fkidconfigforuser || elm.idconfiguser) === Number(idconfiguser)
+        );
+
+        if (!achado) return null;
+
+        if (coluna) {
+            return (achado[coluna] !== undefined && achado[coluna] !== null) 
+            ? achado[coluna] 
+            : null;
+        }
+
+        return achado;
+    }
+
+    /**
+     * obtem Configurações do sistema
+     * @param {*} idconfig 
+     * @param {*} coluna
+     * @returns 
+     * config.id, config.identificacao, config.status,
+        config.classificacao, config.valor1, config.valor2, config.flagexibe, config.exemplo
+     */
+    export function getConfig(idconfig, coluna = null) {
+        const page = usePage();
+        const data = page?.props?.auth?.config;
+
+        if (!data) return null;
+
+        let lista = [];
+        if (typeof data === 'string') {
+            try {
+                lista = JSON.parse(data);
+            } catch (e) {
+                return null;
+            }
+        } else if (Array.isArray(data)) {
+            lista = data;
+        } else {
+            return null;
+        }
+
+        const achado = lista.find(elm => 
+            elm.id === idconfig
+        );
+
+        if (!achado) return null;
+
+        if (coluna) {
+            return (achado[coluna] !== undefined && achado[coluna] !== null) 
+            ? achado[coluna] 
+            : null;
+        }
+
+        return achado;
+    }
+
+    
+    /**
+     * obtem Configurações do sistema para o gestor específico
+     * @param {*} idconfig 
+     * @param {*} coluna 
+     * @returns 
+     * config.id, config.identificacao, config.status, cfgsist.transtatus, config.tipodado, config.classificacao,
+        config.classificacao, cfgsist.valor1, cfgsist.valor2, config.flagexibe, config.exemplo, cfgsist.fkidconfig
+     */
+    export function getCfgSist(idconfig, coluna = null) {
+        const page = usePage();
+        const data = page?.props?.auth?.cfgsist;
+
+        if (!data) return null;
+
+        let lista = [];
+        if (typeof data === 'string') {
+            try {
+                lista = JSON.parse(data);
+            } catch (e) {
+                return null;
+            }
+        } else if (Array.isArray(data)) {
+            lista = data;
+        } else {
+            return null;
+        }
+
+        const achado = lista.find(elm => 
+            elm.fkidconfig === idconfig
+        );
+
+        if (!achado) return null;
+
+        if (coluna) {
+            return (achado[coluna] !== undefined && achado[coluna] !== null) 
+            ? achado[coluna] 
+            : null;
+        }
+
+        return achado;
+    }
+
+
+
+
+    // 1. Lista de opções que preencherá o <select> dinamicamente
+    export const opcoesQtdPagina1 = [5, 10, 15, 25, 50, 100, 200, 500, 1000];
+
+    /**
+     * Valida e ajusta a quantidade de registros por página.
+     * Se o número informado não existir na lista, retorna o próximo valor superior disponível.
+     * 
+     * @param {Number|String} qtd Valor numérico informado (ex: 12, 18, 30)
+     * @returns {Number} Valor exato ou o próximo maior da lista
+     */
+    export function setoptionregporpagina(qtd = 10) {
+        const numero = Number(qtd);
+        if (isNaN(numero) || numero <= 0) {
+            return opcoesQtdPagina1[0]; // Retorna 10
+        }
+        if (opcoesQtdPagina1.includes(numero)) {
+            return numero;
+        }
+        // Encontra o primeiro número na lista que seja estritamente MAIOR que o valor informado
+        const proximoMaior = opcoesQtdPagina1.find(opcao => opcao > numero);
+        // Se encontrar o próximo maior (ex: para 18, retorna 25), retorna ele.
+        // Caso o número informado seja maior que o último item (ex: 1500), retorna o limite máximo (1000).
+        return proximoMaior !== undefined ? proximoMaior : opcoesQtdPagina1[opcoesQtdPagina1.length - 1];
+    }
+    
+    
+
+    /**
+     * Salva em  cfgusercal a coluna ucregporpagina a quantidade de página do usuario no modulo cal
+     * Altera registro de Configuração de quantidade de Registros Exibidos por Página na Listagem
+     * chamda exemplo sistemajs.setregporpagina(calid, qtdporpg, () => sistemajs.functionteste1())
+     * @param {*} idcal 
+     * @param {*} qtd 
+     * @param {*} callback 
+     */
+    export function setregporpagina(idcal, qtd, iduser, callback){
+        let qtdNumerica = Number(qtd);
+        if (qtdNumerica > 0 && idcal > 0 && iduser > 0) {
+            router.post(route('sistema.setnumregporpagina'), {
+                idcal: idcal,
+                numReg: qtdNumerica,
+                iduser: iduser,
+            }, {
+                preserveScroll: true,
+                preserveState: true,
+                onError: (errors) => {
+                    mostrarPopup({
+                        titulo: 'Falha', 
+                        conteudo: JSON.parse(errors.resultado).message ?? 'Indeterminado', 
+                        tipo: 'danger', 
+                        tempo: 4000 
+                    });
+                },
+                onSuccess: () => {
+                    if (typeof callback === 'function') {
+                        callback();
+                    }
+                    mostrarPopup({
+                        titulo: 'Sucesso',
+                        conteudo: 'Preferências Aplicadas com Sucesso',
+                        tipo: 'info',
+                        tempo: 3000
+                    });
+                }
+            });
+        } else {
+            mostrarPopup({
+                titulo: 'Impossível Prosseguir',
+                conteudo: 'Informe Dados Válidos',
+                tipo: 'danger',
+                tempo: 3000
+            });
+        }
+    };
+
+    /**
+     * Altera a coluna e direção de ordenação da tabela.
+     * Se clicar na mesma coluna, inverte entre 'asc' e 'desc'.
+     * Se clicar em uma nova coluna, define 'asc' por padrão.
+     */
+    export function setordenarpor(formvar, campoordenar, callback){
+        if (formvar.filtroCampoOrdem === campoordenar) {
+            formvar.filtroOrdemDirecao = formvar.filtroOrdemDirecao === 'asc' ? 'desc' : 'asc';
+        } else {
+            formvar.filtroCampoOrdem = campoordenar;
+            formvar.filtroOrdemDirecao = 'asc';
+        }
+        if (typeof callback === 'function') {
+            callback();
+        }
+    }
+
+    /**
+     * Retorna a classe do ícone FontAwesome correspondente ao estado atual de ordenação.
+     */
+    export function setordenarporicone(formvar, campoordenar){
+        if (formvar.filtroCampoOrdem !== campoordenar) {
+            return 'fas fa-sort text-texto-claro/30 group-hover:text-texto-claro/70';
+        }
+        return formvar.filtroOrdemDirecao === 'asc' 
+            ? 'fas fa-sort-down text-primary' 
+            : 'fas fa-sort-up text-primary';
+    };
+
+
+
+
     export const traduzirLabelpaginacao = (label) => {
         if (!label) return '';
         
@@ -2138,4 +2422,84 @@ export function sanitizeFilename(text) {
         } catch (e) {
             return 1;
         }
-    };    
+    };
+
+
+
+
+    export function limparCampos(classe){
+        var inputs = document.getElementsByClassName(classe);     
+        //console.log(inputs.length);
+        for (var i = 0; i < inputs.length; ++i) {
+            input = inputs[i];
+            if(input.type == 'hidden')
+            {
+                input.value = 0;
+            }else if(input.type == 'text'){
+                input.value = '';
+            }else if(input.type == 'password'){
+                input.value = '';
+            }else if(input.type == 'tel'){
+                input.value = '';
+            }else if(input.type == 'email'){
+                input.value = '';
+            }else if(input.type == 'date'){
+                var functionexecut = $('#'+input.id).attr('data-default');
+                var parametro = $('#'+input.id).attr('data-parametro');
+                var parametro2 = $('#'+input.id).attr('data-tipo');
+                if(!parametro){
+                    parametro = 0;
+                }
+                if(strlen(parametro2) < 1 && parametro2 == 'undefined'){  //soma subtrair
+                    parametro2 = 'soma';
+                }
+                if(functionexecut == 'getDataAtualBanco'){
+                    var result = getDataAtualBanco();
+                    input.value = result;
+                }else if(functionexecut == 'getDataAtualBancoAddDays'){
+                    var result = getDataAtualBancoAddDays(parametro, parametro2);
+                    input.value = result;
+                }else{
+                    input.value = '';
+                }
+            }else if(input.type == 'datetime-local'){
+                var functionexecut = $('#'+input.id).attr('data-default');
+                if(functionexecut == 'getDataAtualBanco'){
+                    input.value = getDataHoraAtualBanco();
+                }
+            }else if(input.type == 'textarea'){
+                input.value = '';
+            }else if(input.type == 'select-one'){
+                var result = $('#'+input.id).attr('data-default');
+                if(result){
+                    $('#'+input.id).val(result).change();
+                }else{
+                    $('#'+input.id).val(0).change();
+                }
+            }else if(input.type == 'checkbox'){
+                try{
+                    var result = $('#'+input.id).attr('data-checkdefault')
+                    setStatusCheck(input.id, (result == 'true' ? 1 : 0));
+                }catch (e) {
+                    setStatusCheck(input.id, 1);
+                }
+            }else if(input.classList.contains('summernote')){
+                inputsummer = input;
+                setTimeout(function() {
+                    $('#'+inputsummer.id).summernote('code', '');
+                }, 200);
+            }else if(input.classList.contains('table002')){
+                var functionexecut = $('#'+input.id).attr('data-defaultloadlist');
+                if(functionexecut != null){
+                    functionexecut += '(100)';
+                    setTimeout( functionexecut, 700);
+                }
+            }
+
+
+            //console.log(input.classList);
+            //console.log(input.classList.contains('summernote'));
+            //console.log(input.name);
+            //console.log(input.type);
+        }
+    }
