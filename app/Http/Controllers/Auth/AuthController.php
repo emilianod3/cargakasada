@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controle\ConfigUserController;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Core\CfgSistController;
 use App\Http\Controllers\Core\CfgUserCalController;
 use App\Http\Controllers\Core\ConfigController;
 use App\Http\Controllers\Core\MenuController;
@@ -249,8 +250,8 @@ class AuthController extends Controller
             //$unidade = new UnidadeController();
             //$unico = new UnicoController();
             $configUser = new ConfigUserController();
-            $config = new ConfigController();
-            //$cfgsist = new CfgSistController();
+            //$config = new ConfigController();
+            $cfgsist = new CfgSistController();
             $cfgUserCal = new CfgUserCalController();
             //$estado = new EstadoController();
             //$cidade = new CidadeController();
@@ -274,13 +275,18 @@ class AuthController extends Controller
             Session::put('configuser', $configUser->getAllSession($usuario->id));
             Session::put('cfgusercal', $cfgUserCal->getAllSession($usuario->id));
             //Session::put('cals', $cal->getAll());
-
             // 🚀 Criamos uma chave única: 'configuracoes_sistema_usuario_12'
-            $cacheKeyconfig = 'config_' . $usuario->id;
+            $cacheKeycfgsist = 'cfgsist_' . $usuario->id;
+            // O Laravel guarda isso. Colocamos um tempo longo (ex: 1 dia), 
+            Cache::remember($cacheKeycfgsist, 86400, function () use ($cfgsist) {
+                return $cfgsist->getAllSession(); 
+            });
+            // 🚀 Criamos uma chave única: 'configuracoes_sistema_usuario_12'
+            /*$cacheKeyconfig = 'config_' . $usuario->id;
             // O Laravel guarda isso. Colocamos um tempo longo (ex: 1 dia), 
             Cache::remember($cacheKeyconfig, 86400, function () use ($config) {
                 return $config->getAllSession(); 
-            });
+            });*/
             // Guardamos o nome da chave na sessão para o logout saber quem apagar
             //Session::put('config_', $cacheKey);
             //Log::channel('slack')->info('Carregando dados e colocando na sessão');

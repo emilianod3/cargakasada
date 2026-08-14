@@ -20,7 +20,7 @@ const fecharAoClicar = () => {
 };
 
 onMounted(() => {
-    page2.props.app_debug ? console.log('Iniciando Menu') : '';
+    //page2.props.app_debug ? console.log('Iniciando Menu') : '';
 });
 </script>
 

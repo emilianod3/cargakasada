@@ -45,7 +45,8 @@ class HandleInertiaRequests extends Middleware
         //$serverIp = $_SERVER['SERVER_ADDR'] ?? request()->server('SERVER_ADDR') ?? '127.0.0.1';
         $serverIp = $request->server('SERVER_ADDR', '127.0.0.1');
 
-        $config = $request->session()->get('user') ? Cache::get('config_' . $request->session()->get('user')->id, []) : [];
+        //$config = $request->session()->get('user') ? Cache::get('config_' . $request->session()->get('user')->id, []) : [];
+        $cfgsist = $request->session()->get('user') ? Cache::get('cfgsist_' . $request->session()->get('user')->id, []) : [];
         
         return array_merge(parent::share($request), [
             'versions' => [
@@ -59,7 +60,8 @@ class HandleInertiaRequests extends Middleware
                 'permissoes' => $request->session()->get('permissoes'),
                 'cfgusercal' => $request->session()->get('cfgusercal'),
                 'configuser' => $request->session()->get('configuser'),
-                'config' => $config,
+                'cfgsist' => $cfgsist,
+                //'config' => $config,
             ],
             'sistema' => [
                 'versao'    => config('version.number', '1.0.0'), // Fallback caso não exista

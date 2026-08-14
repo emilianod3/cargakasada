@@ -23,9 +23,9 @@ return new class extends Migration
             $table->bigIncrements('id');
             $table->string('identificacao', 250)->nullable()->default(null);
             $table->text('exemplo')->nullable()->default(null);
-            $table->integer('tipodado')->default(0);
+            $table->integer('tipodado')->default(0)->comment('1=Opcional 2=Texto 3=Numero 4=URL');
             $table->integer('status')->default(1);
-            $table->integer('classificacao')->default(0);
+            $table->integer('classificacao')->default(0)->comment('1=Parametro  2=Comportamento');
             $table->string('valor1', 250)->default('');
             $table->string('valor2', 250)->default('');
             $table->integer('flagdelete')->default(0);
@@ -50,3 +50,9 @@ return new class extends Migration
         DB::statement('SET FOREIGN_KEY_CHECKS = 1'); 
     }
 };
+/*
+tipodado = 1=Opcional 2=Texto 3=Numero 4=URL
+classificacao = 1=Parametro  2=Comportamento
+
+
+*/

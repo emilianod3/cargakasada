@@ -13,6 +13,7 @@ class CfgSistSeeder extends Seeder
     /**
      * Run the database seeds.
      * php artisan db:seed --class=CfgSistSeeder
+	 * 
      * @return void
      */
 	 
@@ -51,6 +52,13 @@ class CfgSistSeeder extends Seeder
 		CfgSist::create(['fkidconfig' => 26, 'transtatus' => 1, 'valor1' => 'Segunda à sexta-feira', 'valor2' => 'das 08:00h às 11:00h e das 13:00h às 17:00h', 'tranversao' => Carbon::now()->toDateTimeString(), 'fkidgestor' => $fkidgestorparam, 'flagdelete' => 0, 'flagatualiza' => 1, 'flagcontrole' => 1, 'flaguser' => 0]);
 		CfgSist::create(['fkidconfig' => 27, 'transtatus' => 1, 'valor1' => 'nao', 'valor2' => '', 'tranversao' => Carbon::now()->toDateTimeString(), 'fkidgestor' => $fkidgestorparam, 'flagdelete' => 0, 'flagatualiza' => 1, 'flagcontrole' => 1, 'flaguser' => 0]);
 		CfgSist::create(['fkidconfig' => 28, 'transtatus' => 1, 'valor1' => '3', 'valor2' => '8', 'tranversao' => Carbon::now()->toDateTimeString(), 'fkidgestor' => $fkidgestorparam, 'flagdelete' => 0, 'flagatualiza' => 1, 'flagcontrole' => 1, 'flaguser' => 0]);	
+		CfgSist::create(['fkidconfig' => 29, 'transtatus' => 1, 'valor1' => 'nao', 'valor2' => '', 'tranversao' => Carbon::now()->toDateTimeString(), 'fkidgestor' => $fkidgestorparam, 'flagdelete' => 0, 'flagatualiza' => 1, 'flagcontrole' => 1, 'flaguser' => 0]);
         DB::statement('SET FOREIGN_KEY_CHECKS = 1');
     }
 }
+
+/*
+tabela = config
+tipodado = 1=Opcional 2=Texto 3=Numero 4=URL
+classificacao = 1=Parametro  2=Comportamento
+*/

@@ -2151,6 +2151,8 @@ export function sanitizeFilename(text) {
         configUserDefiniPublicidadeTramite = getConfigForUser_({{Session::get('user')->id ?? 0}}, 15); 
         configUserDefiniPrazoTramite = getConfigForUser_({{Session::get('user')->id ?? 0}}, 16);      
         configUserCarregaListaSalvar = getConfigForUser_({{Session::get('user')->id ?? 0}}, 17);
+        let tempomessage1 = sistemajs.getCfgSist(13, 'valor1') ?? 5000
+        let exibirmessage1 = sistemajs.getCfgSist(29, 'valor1') ?? 'nao';
      */
     /*export function getConfigUser(idUser, idconfiguser){ 
         const page = usePage();
@@ -2201,10 +2203,11 @@ export function sanitizeFilename(text) {
 
     /**
      * obtem Configurações do sistema
-     * @param {*} idUser 
-     * @param {*} idconfiguser 
-     * @param {*} coluna 
+     * @param {*} idconfig 
+     * @param {*} coluna
      * @returns 
+     * config.id, config.identificacao, config.status,
+        config.classificacao, config.valor1, config.valor2, config.flagexibe, config.exemplo
      */
     export function getConfig(idconfig, coluna = null) {
         const page = usePage();
@@ -2240,32 +2243,48 @@ export function sanitizeFilename(text) {
         return achado;
     }
 
-    /*
-    export function getCfgSist($id, $campo)
-    {
-        if (Session::has('cfgsist')) {
-            //$configs = Session::get('config');
-            $cfgsist = json_decode(Session::get('cfgsist')); 
-            if(isset($cfgsist)) {
-                try {
-                    foreach($cfgsist as $cfg) {
-                        if($cfg->fkidconfig == $id) {
-                            return $cfg->{$campo};
-                        }
-                    }
-                } catch (Exception $e) {
-                    $except = $e->getMessage();
-                    return null;
-                }
-            } else {
+    
+    /**
+     * obtem Configurações do sistema para o gestor específico
+     * @param {*} idconfig 
+     * @param {*} coluna 
+     * @returns 
+     * config.id, config.identificacao, config.status, cfgsist.transtatus, config.tipodado, config.classificacao,
+        config.classificacao, cfgsist.valor1, cfgsist.valor2, config.flagexibe, config.exemplo, cfgsist.fkidconfig
+     */
+    export function getCfgSist(idconfig, coluna = null) {
+        const page = usePage();
+        const data = page?.props?.auth?.cfgsist;
+
+        if (!data) return null;
+
+        let lista = [];
+        if (typeof data === 'string') {
+            try {
+                lista = JSON.parse(data);
+            } catch (e) {
                 return null;
             }
+        } else if (Array.isArray(data)) {
+            lista = data;
         } else {
             return null;
         }
-    }*/
 
+        const achado = lista.find(elm => 
+            elm.fkidconfig === idconfig
+        );
 
+        if (!achado) return null;
+
+        if (coluna) {
+            return (achado[coluna] !== undefined && achado[coluna] !== null) 
+            ? achado[coluna] 
+            : null;
+        }
+
+        return achado;
+    }
 
 
 

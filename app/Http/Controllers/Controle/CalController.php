@@ -59,47 +59,28 @@ class CalController extends Controller
     public function removerId(mixed $id)
     {
         $sistemadesativar = env('SISTEMA_DESATIVAR'); /*Desativa ou remove do banco */
-        //if($sistemadesativar >= 0){
+        if($sistemadesativar > 0){
             $reg = Cal::find($id);
             if ($reg->exists && $reg->flagcontrole == 1 && Session::get('user')->grupo->id != 1) {
-                //return Tools::setResponse('fail', null, 'Registro Bloqueado pelo Sistema, para continuar entre em contato com o Suporte');
-                //return back()->withErrors(Tools::setResult('fail', null, 'Registro Bloqueado pelo Sistema, para continuar entre em contato com o Suporte')); 
-                return back()->with(Tools::setResult('fail', null, 'Registro Bloqueado pelo Sistema, para continuar entre em contato com o Suporte')); 
+                return response()->json(Tools::setResult('fail', null, 'Registro Bloqueado pelo Sistema, para continuar entre em contato com o Suporte'));
             }            
             $reg->clstatus = 0;
-            //return Tools::msgpadrao($reg->save(), 'desativar');
-            //return back()->with(Tools::msgpadrao($reg->save(), 'desativar'));
             if($reg->save()){
-                //return back()->with(Tools::setResult('success', null, 'Registro Update com Sucesso1'));
-                return response()->json(['result' => true, 'message' => 'Registro removido com Sucesso1']);
-                //return response()->json(Tools::setResult('success', null, 'Registro removido com Sucesso1'))
-   
-
-
+                return response()->json(Tools::setResult('success', $reg, 'Registro Desativado com Sucesso'));
             }else{
-                $resperr = Tools::setResult('fail', null, 'Falha no Processamento 123');
-               //return back()->withErrors($resperr); 
+                return response()->json(Tools::setResult('fail', null, 'Falha no Processamento'));
             }
-
-    /*
         }else{
             $reg = Cal::find($id);
             if ($reg->exists && $reg->flagcontrole == 1 && Session::get('user')->grupo->id != 1) {
-                //return Tools::setResponse('fail', null, 'Registro Bloqueado pelo Sistema, para continuar entre em contato com o Suporte');
-                //return back()->withErrors(Tools::setResult('fail', null, 'Registro Bloqueado pelo Sistema, para continuar entre em contato com o Suporte')); 
-                return back()->with(Tools::setResult('fail', null, 'Registro Bloqueado pelo Sistema, para continuar entre em contato com o Suporte')); 
+                return response()->json(Tools::setResult('fail', null, 'Registro Bloqueado pelo Sistema, para continuar entre em contato com o Suporte'));
             }         
             if($reg->delete()){
-                return back()->with(Tools::setResult('success', null, 'Registro removido com Sucesso1'));
+                return response()->json(Tools::setResult('success', $reg, 'Registro removido com Sucesso'));
             }else{
-                $resperr = Tools::setResult('fail', null, 'Falha no Processamento');
-                return back()->withErrors($resperr); 
+                return response()->json(Tools::setResult('fail', null, 'Falha no Processamento'));
             }
-            //return Tools::msgpadrao($reg->delete(), 'delete');
-            //return back()->with(Tools::msgpadrao($reg->delete(), 'delete'));
-
-            
-        }*/
+        }
     }
 
     public function removerLote(Request $request)
@@ -107,19 +88,23 @@ class CalController extends Controller
         $sistemadesativar = env('SISTEMA_DESATIVAR');
         if($sistemadesativar > 0){
             $ids = explode(',', $request->ids);
-            //$update = DB::table('findespesa')->whereIn('id', $valores)->update(array('fddatapagamento' => Carbon::now()->toDateTimeString()));
             $regs = Cal::whereIn('id', $ids);
             $qtd = $regs->count();
             $regs->clstatus = 0;
-            //return Tools::msgpadrao($regs->save(), 'desativar', $qtd);
-            return back()->with(Tools::msgpadrao($regs->save(), 'desativar', $qtd));
+            if($regs->save()){
+                return response()->json(Tools::setResult('success', $regs, ($qtd > 1 ? 'Registros Desativados com Sucesso' : 'Registro Desativado com Sucesso')));
+            }else{
+                return response()->json(Tools::setResult('fail', null, ($qtd > 1 ? 'Impossível executar nos Registros Selecionados' : 'Impossível executar no Registro Selecionado')));
+            }
         }else{
             $ids = explode(',', $request->ids);
-            //$update = DB::table('findespesa')->whereIn('id', $valores)->update(array('fddatapagamento' => Carbon::now()->toDateTimeString()));
             $regs = Cal::whereIn('id', $ids);
             $qtd = $regs->count();
-            //return Tools::msgpadrao($regs->delete(), 'delete', $qtd);
-            return back()->with(Tools::msgpadrao($regs->delete(), 'delete', $qtd));
+            if($regs->delete()){
+                return response()->json(Tools::setResult('success', $regs, ($qtd > 1 ? 'Registros Deletados com Sucesso' : 'Registro Deletado com Sucesso')));
+            }else{
+                return response()->json(Tools::setResult('fail', null, ($qtd > 1 ? 'Impossível executar nos Registros Selecionados' : 'Impossível executar no Registro Selecionado')));
+            }
         }
     }
 
@@ -284,16 +269,62 @@ class CalController extends Controller
         return $registro;
     }
 
+
+    public function update(Request $request)
+    {
+        $gestor = Tools::getGestor();
+        if($gestor > 0 || Tools::getGrupoGeral()){
+            $validator = Validator::make(
+            [
+                'idregistro' => $request->idregistro,
+            ]
+            , [
+                'idregistro' => 'required|integer|min:1',
+            ],
+            [
+                'idregistro.required' => 'Dados Inválidos',
+                'idregistro.integer' => 'Dados Inválidos',
+                'idregistro.min' => 'Dados Inválidos',
+            ]);
+    
+            if($validator->fails()){
+                return back()->withErrors($validator->errors()->first());
+            }
+
+            $reg = null;
+            $reg = Cal::find($request->idregistro);
+            if($request->campo == 'status'){
+                $reg->clstatus = ($reg->clstatus > 0 ? 0 : 1);
+            }
+            /*
+            if($request->campo == 'flagexibe'){
+                $reg->flagexibe = ($reg->flagexibe > 0 ? 0 : 1);
+            }*/
+
+            $reg->clversao = Carbon::now()->toDateTimeString();
+            $reg->flaguser = Session::get('user')->id;
+            $reg->flagatualiza = 1;
+            $reg->flagdelete = 0;
+
+            if($reg->save()){
+                return back()->with(Tools::setResult('success', $reg, 'Processamento Realizado com Sucesso'));
+            }else{
+                Tools::setAtividade(0, 9, 0, 'Cals', 'Falha na Tentativa de Alterar Registro');
+                return back()->withErrors('Falha no Processamento');
+            }
+        }
+    }
+
     public function getTiposCals()
     {
         $registros = array(
             array(
                 "id" => 1,
-                "tipo" => "Cadastro"
+                "tipo" => "Módulo Nível 1"
             ),
             array(
                 "id" => 2,
-                "tipo" => "Controle"
+                "tipo" => "Cadastro"
             ),
             array(
                 "id" => 3,
@@ -663,7 +694,7 @@ class CalController extends Controller
         } catch (Exception $e) {
             $except = $e->getMessage();
             //return Tools::setResponse('fail', null, 'Falha ao Obter dados');
-            Tools::setAtividade(0, 8, 0, 'Relatório de Cals', 'Falha no Processamento - '.$except);
+            Tools::setAtividade(0, 8, 0, 'Relatório de '.$request->modulo, 'Falha no Processamento - '.$except);
             $resperr = Tools::setResult('fail', null, 'Falha no Processamento');
             return back()->withErrors($resperr);
 

@@ -8,23 +8,23 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 
 class CfgSistController extends Controller
 {
     public function getAllSession(){
-        /*
-        $query = Config::where('id', '>', 0);
-        $registros = $query->get();     
-        return json_encode($registros);*/
         $gestor = Tools::getGestor();
-        $query = CfgSist::where('fkidgestor', $gestor)->with('config');
+        $query = CfgSist::leftjoin('config', function ($join) use ($gestor) {
+            $join->on('cfgsist.fkidconfig', '=', 'config.id'); 
+        })->select([DB::raw('config.id, config.identificacao, config.status, cfgsist.transtatus, config.tipodado, config.classificacao,
+        config.classificacao, cfgsist.valor1, cfgsist.valor2, config.flagexibe, config.exemplo, cfgsist.fkidconfig')]);
+        $query->where('fkidgestor', $gestor);//->with('config');
         $registros = $query->groupBy('fkidconfig')->get();
-        //return json_encode($registros);
-        return $registros;
+        return json_encode($registros);
+        //return $registros;
     }
-
 
     public function getconfigs(Request $request)
     {

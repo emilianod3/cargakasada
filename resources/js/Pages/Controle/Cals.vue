@@ -18,14 +18,14 @@ const usepage1 = usePage();
 const abaAtiva1 = ref('inicio'); // inicio, cadastro, colunas
 const exibirFiltrosAvancados1 = ref(false);
 const calid1 = propriet1.cal?.cal?.[0];
-const relatorios1 = ref(false);
+const animarelatorios1 = ref(false);
 
 let permissao1 = null;
 let pageatual1 = 1;
 let qtdporpg1 = 10;
-let tempomessage1 = sistemajs.getConfig(13, 'valor1') ?? 6000;
+let tempomessage1 = sistemajs.getCfgSist(13, 'valor1') ?? 5000;
+let exibirmessage1 = sistemajs.getCfgSist(29, 'valor1') ?? 'nao';
 
-const btnnovoregistro = ref(false);
 const clidentificacaoref = ref(null);
 
 // --- FORMULÁRIO DE FILTROS (INERTIA) ---
@@ -57,7 +57,6 @@ const formcad1 = useForm({
     clobserve: '',
 });
 
-
 // --- CARREGAMENTO INICIAL ---
 onMounted(() => {
     // Inicializações se necessário
@@ -76,16 +75,9 @@ function permissaoPrincipal1(){
 
     }
     if(permissao1.inserir != true){
-        btnnovoregistro.value = permissao1.inserir;
-        if (usepage1.props.app_debug) {
-            console.log('Sem Permissão Inserir:', permissao1.inserir);
-        }
+
     }else{
-        btnnovoregistro.value = permissao1.inserir;
-        if (usepage1.props.app_debug) {
-            console.log('Permissão Inserir:', permissao1.inserir);
-        }
-        btnnovoregistro.value = permissao1.inserir;
+
     }
 
     if(permissao1.inserir != true && permissao1.alterar != true){
@@ -115,11 +107,11 @@ const alternarAba1 = (aba = 'inicio') => {
     }
 
     if(aba === 'inicio'){
+        /*
         if (usepage1.props.app_debug) {
             console.log('Limpar Campos do cadastro e listar registros');
-        }        
+        } */       
     }
-
 
     if(aba === 'cadastro'){
         if(permissao1?.alterar || permissao1?.inserir || permissao1?.consultar){
@@ -128,15 +120,17 @@ const alternarAba1 = (aba = 'inicio') => {
             sistemajs.mostrarPopup({ titulo: 'Aviso', conteudo: 'Você não tem Permissão de Acesso.', tipo: 'warning', tempo: tempomessage1 });
             aba = 'inicio';
         }
+        /*
         if (usepage1.props.app_debug) {
             console.log('Limpar Campos e Iniciar cadastro');
-        }        
+        } */       
     }
 
     if(aba === 'colunas'){
+        /*
         if (usepage1.props.app_debug) {
             console.log('Campos de colunas');
-        }        
+        } */       
     }
 
     abaAtiva1.value = aba;
@@ -174,7 +168,6 @@ const paginacaoInteracao1 = computed(() => {
         if (index === 0 || index === totalLinks - 1) return true;
 
         const numPagina = parseInt(link.label);
-        
         // 2. Se não for um número (ex: reticências "..."), mantém na tela
         if (isNaN(numPagina)) return true;
 
@@ -188,7 +181,6 @@ const paginacaoInteracao1 = computed(() => {
         return noMiolo || ehPaginaFinal;
     });
 });
-
 
 /**
  * Reseta o form ao padrões default
@@ -218,98 +210,113 @@ const novoRegistro1 = () => {
 
 // --- SUBMIT DO FORMULÁRIO (SALVAR) ---
 const salvarRegistro1 = () => {
-    formcad1.post(route('controle.cals.salvar'), {
-        preserveScroll: true,
-        preserveState: true,
-        onSuccess: (response) => {
-            sistemajs.mostrarPopup({ titulo: 'Sucesso', conteudo: JSON.parse(usepage1.props.flash?.resultado).message ?? 'Sucesso no Processamento', tipo: 'success', tempo: tempomessage1 });
-            if(sistemajs.getConfigUser(usepage1.props.auth?.user?.id, 17, 'valor1') == 'sim'){ // volta para listagem sim
-                resetFormCad1();
-                abaAtiva1.value = 'inicio';
-            }else{ // continua no cadastro e limpa as variáveis
-                novoRegistro1();
+    if(permissao1.alterar || permissao1.inserir){
+        formcad1.post(route('controle.cals.salvar'), {
+            preserveScroll: true,
+            preserveState: true,
+            onSuccess: (response) => {
+                if(exibirmessage1 === 'sim'){
+                    sistemajs.mostrarPopup({ titulo: 'Sucesso', conteudo: JSON.parse(usepage1.props.flash?.resultado).message ?? 'Sucesso no Processamento', tipo: 'success', tempo: tempomessage1 });
+                }
+                if(sistemajs.getConfigUser(usepage1.props.auth?.user?.id, 17, 'valor1') == 'sim'){ // volta para listagem sim
+                    resetFormCad1();
+                    abaAtiva1.value = 'inicio';
+                }else{ // continua no cadastro e limpa as variáveis
+                    novoRegistro1();
+                }
+            },
+            onError: (errors) => {
+                const mensagemErro = typeof errors === 'string' 
+                    ? errors 
+                    : (Object.values(errors)[0] || 'Impossível Prosseguir com o Processamento');
+                //JSON.parse(errors.resultado).message
+                sistemajs.mostrarPopup({ 
+                    titulo: 'Impossível Prosseguir', 
+                    conteudo: mensagemErro, 
+                    tipo: 'danger', 
+                    tempo: tempomessage1 
+                });
             }
-        },
-        onError: (errors) => {
-            const mensagemErro = typeof errors === 'string' 
-                ? errors 
-                : (Object.values(errors)[0] || 'Impossível Prosseguir com o Processamento');
-            //JSON.parse(errors.resultado).message
-            sistemajs.mostrarPopup({ 
-                titulo: 'Impossível Prosseguir', 
-                conteudo: mensagemErro, 
-                tipo: 'danger', 
-                tempo: 5000 
-            });
-        }
-    });
+        });
+    }
 };
 
 const editarRegistro1 = (registro) => {
-    formcad1.id = registro.id;
-    formcad1.clidentificacao = registro.clidentificacao;
-    formcad1.clbase = registro.clbase;
-    formcad1.clrota = registro.clrota;
-    formcad1.cltipo = registro.cltipo;
-    //formcad1.clstatus = registro.clstatus === 1;
-    formcad1.clstatus = Number(registro.clstatus) === 1 ? 1 : 0;
-    abaAtiva1.value = 'cadastro';
+    if(permissao1.alterar){
+        formcad1.id = registro.id;
+        formcad1.clidentificacao = registro.clidentificacao;
+        formcad1.clbase = registro.clbase;
+        formcad1.clrota = registro.clrota;
+        formcad1.cltipo = registro.cltipo;
+        //formcad1.clstatus = registro.clstatus === 1;
+        formcad1.clstatus = Number(registro.clstatus) === 1 ? 1 : 0;
+        abaAtiva1.value = 'cadastro';
+    }
 };
 
 const apagarRegistro1 = (idreg) => {
-
-    axios.get(route('controle.cals.remover', { id: idreg }))
+    if(permissao1.apagar){
+        axios.get(route('controle.cals.remover', { id: idreg }))
         .then((response) => {
-            // No Axios, a resposta do servidor fica sempre dentro de "response.data"
-            const result = response.data.result;
-            if (result === true) {
-                sistemajs.mostrarPopup({
-                    titulo: 'Sucesso!',
-                    conteudo: response.data.message,
-                    tipo: 'success'
-                });
-            } else {
+            const result = JSON.parse(response.data.resultado);
+            if (result.status === 'fail') {
                 sistemajs.mostrarPopup({
                     titulo: 'Erro no Processamento',
-                    conteudo: 'O usuário não foi localizado ou os dados são inválidos.',
+                    conteudo: result.message,
                     tipo: 'danger'
                 });
+            } else {
+                if(exibirmessage1 === 'sim'){
+                    sistemajs.mostrarPopup({
+                        titulo: 'Sucesso!',
+                        conteudo: result.message,
+                        tipo: 'success'
+                    });
+                }
+                filtrar1(pageatual1);
             }
         })
         .catch((error) => {
-            console.error('Erro na requisição:', error);
             sistemajs.mostrarPopup({
                 titulo: 'Falha',
-                conteudo: 'Impossível processar requisição, tente novamente.',
+                conteudo: 'Impossível Realizar Processamento',
                 tipo: 'danger'
             });
         });
-/*
-let data = {
-            id: idreg,
+    }
+};
+
+const updateRegistro1 = (idreg, campo = 'clstatus') => {
+    if(permissao1.alterar){
+        let data = {
+            idregistro: idreg,
+            campo: campo,
         };
-        //router.get(route('controle.cals.remover', { id: idreg }), {
-    router.post(route('controle.cals.remover2'), data, {
-    preserveState: true,
-    preserveScroll: true,
-    onError: (errors) => { 
+
+        router.post(route('controle.cals.update'), data, {
+            preserveState: true,
+            replace: true,
+            onError: (errors) => { 
                 sistemajs.mostrarPopup({ 
-                    titulo: 'Erro Listagem', 
+                    titulo: 'Falha no Processamento', 
                     conteudo: JSON.parse(errors.resultado).message ?? 'Indeterminado', 
                     tipo: 'danger', 
-                    tempo: 4000 
+                    tempo: tempomessage1 
                 });
             },
             onSuccess: () => {
-                sistemajs.mostrarPopup({ 
-                    titulo: 'OK Listagem', 
-                    conteudo: 'OKOKOKOKO', 
-                    tipo: 'info', 
-                    tempo: 4000 
-                });
-               
+                if(exibirmessage1 === 'sim'){
+                    sistemajs.mostrarPopup({ 
+                        titulo: 'Sucesso no Processamento', 
+                        conteudo: JSON.parse(usepage1.props.flash?.resultado).message ?? 'Indeterminado', 
+                        tipo: 'info', 
+                        tempo: tempomessage1 
+                    });
+                }
+                filtrar1(pageatual1);
             }
-  });*/
+        });
+    }
 };
 
 // --- SUBMISSÃO DO FILTRO / PESQUISA ---
@@ -546,13 +553,13 @@ async function geraRelatorio(extensao = 'pdf', tipo = 0){
                         <!-- INICIO - Botoes de Impressao -->
                         <div class="relative inline-block h-10 shrink-0">
                             <button 
-                                type="button" @click="relatorios1 = !relatorios1" title="Relatórios"
+                                type="button" @click="animarelatorios1 = !animarelatorios1" title="Relatórios"
                                 class="bg-primary hover:bg-primary-hover text-texto-escuro h-10 w-15 rounded-l-lg transition-all cursor-pointer focus:outline-none flex items-center justify-center box-border select-none pr-3 pl-3">
-                                <i class="fas fa-print text-sm transition-transform duration-200 cursor-pointer pl-2 pr-5" :class="{ 'rotate-90 cursor-pointer': relatorios1 }"></i>
+                                <i class="fas fa-print text-sm transition-transform duration-200 cursor-pointer pl-2 pr-5" :class="{ 'rotate-90 cursor-pointer': animarelatorios1 }"></i>
                                 <i class="fas fa-chevron-down text-[10px] pr-3 cursor-pointer"></i>
                             </button>
 
-                            <div v-if="relatorios1" class="absolute left-0 mt-1 w-48 bg-layout-painel border border-comum rounded-lg shadow-xl z-50 overflow-hidden py-1">
+                            <div v-if="animarelatorios1" class="absolute left-0 mt-1 w-48 bg-layout-painel border border-comum rounded-lg shadow-xl z-50 overflow-hidden py-1">
                                 <button 
                                     type="button" title="Gerar Relatório - PDF"
                                     @click="geraRelatorio('pdf')"
@@ -576,7 +583,7 @@ async function geraRelatorio(extensao = 'pdf', tipo = 0){
                                 </button>
                             </div>
 
-                            <div v-if="relatorios1" @click="relatorios1 = false" class="fixed inset-0 z-40"></div>
+                            <div v-if="animarelatorios1" @click="animarelatorios1 = false" class="fixed inset-0 z-40"></div>
                         </div>
                         <!-- FIM - Botoes de Impressao -->
                         
@@ -663,7 +670,7 @@ async function geraRelatorio(extensao = 'pdf', tipo = 0){
 
                 <div class="flex justify-between items-center">
                     <span class="text-xs text-texto-claro/50">Resultados encontrados: {{listagem1?.data?.length || 0 }}</span>
-                    <button @click="novoRegistro1" v-show="btnnovoregistro" class="btn-pill bg-primary hover:bg-primary-hover text-texto-escuro">
+                    <button @click="novoRegistro1" v-show="permissao1?.inserir" class="btn-pill bg-primary hover:bg-primary-hover text-texto-escuro">
                         <i class="fas fa-plus"></i> Novo Registro
                     </button>
                 </div>
@@ -730,6 +737,7 @@ async function geraRelatorio(extensao = 'pdf', tipo = 0){
                                 <button 
                                     type="button"
                                     v-if="item.clstatus === 1" 
+                                    @click="permissao1?.alterar && updateRegistro1(item.id, 'status')"
                                     class="w-6 h-6 flex items-center justify-center rounded-full btn-green select-none cursor-pointer" 
                                     title="Registro Ativo"
                                 >
@@ -737,7 +745,8 @@ async function geraRelatorio(extensao = 'pdf', tipo = 0){
                                 </button>
                                 <button 
                                     type="button"
-                                    v-else 
+                                    v-else
+                                    @click="permissao1?.alterar && updateRegistro1(item.id, 'status')"
                                     class="w-6 h-6 flex items-center justify-center rounded-full btn-red select-none cursor-pointer" 
                                     title="Registro Inativo"
                                 >

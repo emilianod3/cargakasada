@@ -318,9 +318,15 @@ class Tools{
             //Session::forget('tiporaca');
             //Session::forget('unidades');
             //Session::forget('divisoes');
+            /*
             $cacheKeyconfig = 'config_' . $iduser;
             if ($cacheKeyconfig) {
                 Cache::forget($cacheKeyconfig);
+            }*/
+
+            $cacheKeycfgsist = 'cfgsist_' . $iduser;
+            if ($cacheKeycfgsist) {
+                Cache::forget($cacheKeycfgsist);
             }
 
             // 3. Limpa o resto da sessão com os comandos nativos
