@@ -301,7 +301,7 @@ class Tools{
             //Session::forget('cidadesqtd');
             //Session::forget('estados');
             //Session::forget('config');
-            //Session::forget('configuser');
+            Session::forget('configuser');
             //Session::forget('cfgsist');
             Session::forget('cfgusercal');
             //Session::forget('categoria');

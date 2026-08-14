@@ -12,9 +12,9 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
-use Response;
 
 class CalController extends Controller
 {
@@ -55,10 +55,11 @@ class CalController extends Controller
         return $reg;
     }
 
+
     public function removerId(mixed $id)
     {
         $sistemadesativar = env('SISTEMA_DESATIVAR'); /*Desativa ou remove do banco */
-        if($sistemadesativar > 0){
+        //if($sistemadesativar >= 0){
             $reg = Cal::find($id);
             if ($reg->exists && $reg->flagcontrole == 1 && Session::get('user')->grupo->id != 1) {
                 //return Tools::setResponse('fail', null, 'Registro Bloqueado pelo Sistema, para continuar entre em contato com o Suporte');
@@ -67,17 +68,38 @@ class CalController extends Controller
             }            
             $reg->clstatus = 0;
             //return Tools::msgpadrao($reg->save(), 'desativar');
-            return back()->with(Tools::msgpadrao($reg->save(), 'desativar'));
+            //return back()->with(Tools::msgpadrao($reg->save(), 'desativar'));
+            if($reg->save()){
+                //return back()->with(Tools::setResult('success', null, 'Registro Update com Sucesso1'));
+                return response()->json(['result' => true, 'message' => 'Registro removido com Sucesso1']);
+                //return response()->json(Tools::setResult('success', null, 'Registro removido com Sucesso1'))
+   
+
+
+            }else{
+                $resperr = Tools::setResult('fail', null, 'Falha no Processamento 123');
+               //return back()->withErrors($resperr); 
+            }
+
+    /*
         }else{
             $reg = Cal::find($id);
             if ($reg->exists && $reg->flagcontrole == 1 && Session::get('user')->grupo->id != 1) {
                 //return Tools::setResponse('fail', null, 'Registro Bloqueado pelo Sistema, para continuar entre em contato com o Suporte');
                 //return back()->withErrors(Tools::setResult('fail', null, 'Registro Bloqueado pelo Sistema, para continuar entre em contato com o Suporte')); 
                 return back()->with(Tools::setResult('fail', null, 'Registro Bloqueado pelo Sistema, para continuar entre em contato com o Suporte')); 
-            }            
+            }         
+            if($reg->delete()){
+                return back()->with(Tools::setResult('success', null, 'Registro removido com Sucesso1'));
+            }else{
+                $resperr = Tools::setResult('fail', null, 'Falha no Processamento');
+                return back()->withErrors($resperr); 
+            }
             //return Tools::msgpadrao($reg->delete(), 'delete');
-            return back()->with(Tools::msgpadrao($reg->delete(), 'delete'));
-        }
+            //return back()->with(Tools::msgpadrao($reg->delete(), 'delete'));
+
+            
+        }*/
     }
 
     public function removerLote(Request $request)
@@ -192,7 +214,7 @@ class CalController extends Controller
             $validator = Validator::make(
             [
                 'identificacao' => $request->clidentificacao,
-                'tipo' => $request->tipo,   
+                'tipo' => $request->cltipo,   
             ]
             , [
                 'identificacao' => 'required|string|min:5|max:198',
@@ -209,7 +231,9 @@ class CalController extends Controller
             ]);
 
             if($validator->fails()){
-                return Tools::setResponse('fail', [], $validator->errors()->first());
+                //return Tools::setResponse('fail', [], $validator->errors()->first());
+                //return back()->withErrors(Tools::setResponse('fail', null, $validator->errors()->first()));
+                return back()->withErrors($validator->errors()->first());
             }
             
             
@@ -219,7 +243,8 @@ class CalController extends Controller
                 {
                     $reg = Cal::find($request->id);
                     if ($reg->exists && $reg->flagcontrole == 1 && Session::get('user')->grupo->id != 1) {
-                        return Tools::setResponse('fail', null, 'Registro Bloqueado pelo Sistema, para continuar entre em contato com o Suporte');
+                        //return Tools::setResponse('fail', null, 'Registro Bloqueado pelo Sistema, para continuar entre em contato com o Suporte');
+                        return back()->withErrors('Registro Bloqueado pelo Sistema, para continuar entre em contato com o Suporte');
                     }                    
                 }
                 else
@@ -227,32 +252,29 @@ class CalController extends Controller
                     $reg = new Cal();
                 }
                 $reg->clidentificacao = strlen($request->clidentificacao) > 0 ? $request->clidentificacao : '';
-                $reg->clbase = strlen($request->base) > 0 ? $request->base : '';
-                $reg->clrota = strlen($request->rota) > 0 ? $request->rota : '';
-                $reg->cltipo = $request->tipo > 0 ? $request->tipo : 1;
-                $reg->clstatus = $request->fkstatus > 0 ? $request->fkstatus : 0;
-                $reg->clobserve = strlen($request->obs) > 0 ? $request->obs : '';
+                $reg->clbase = strlen($request->clbase) > 0 ? $request->clbase : '';
+                $reg->clrota = strlen($request->clrota) > 0 ? $request->clrota : '';
+                $reg->cltipo = $request->cltipo > 0 ? $request->cltipo : 1;
+                $reg->clstatus = $request->clstatus > 0 ? $request->clstatus : 0;
+                $reg->clobserve = strlen($request->clobserve) > 0 ? $request->clobserve : '';
                 $reg->clversao = Carbon::now()->toDateTimeString();
                 $reg->flagdelete = 0;
                 $reg->flagatualiza = 1;
                 $reg->flaguser = Session::get('user')->id;
                 if($reg->save()){
-                    return back()->with(Tools::setResult('success', $reg, 'Registro Realizado com Sucesso'));
+                    return back()->with(Tools::setResult('success', $reg, 'Processamento Realizado com Sucesso'));
                 }else{
                     Tools::setAtividade(0, 9, 0, 'Cals', 'Falha na Tentativa Salvamento Registro');
-                    $resperr = Tools::setResult('fail', null, 'Falha no Processamento');
-                    return back()->withErrors($resperr);
+                    return back()->withErrors('Falha no Processamento');
                 }
             } catch (Exception $e) {
                 $except = $e->getMessage();
                 Tools::setAtividade(0, 9, 0, 'Cals', 'Falha na Tentativa Salvamento Registro - '.$except);
-                $resperr = Tools::setResult('fail', null, 'Falha no Processamento');
-                return back()->withErrors($resperr);
+                return back()->withErrors('Falha no Processamento');
             }
         }else{
             Tools::setAtividade(0, 9, 0, 'Cals', 'Falha na Tentativa Salvamento Registro');
-            $resperr = Tools::setResult('fail', null, 'Falha no Processamento');
-            return back()->withErrors($resperr);
+            return back()->withErrors('Falha no Processamento');
         }
     }
 
@@ -338,6 +360,7 @@ class CalController extends Controller
 
     public function relatorio(Request $request)
     {
+
         $query = self::initQuery();
         if($request->statusfiltro == 0) {
             $query->where('cal.clstatus','>=', 0);
@@ -359,21 +382,6 @@ class CalController extends Controller
 
         $campoordenar = 'id';
         $campoordenar = $request->campoordem != 'undefined' ? $request->campoordem : 'id';
-
-        /*
-        if(strlen($request->campoPesquisa) > 0) {  //$request->tipofiltro == 'amplo'
-            $query->where('cal.clidentificacao', 'like', '%' . $request->campoPesquisa . '%');
-            $query->orwhere('cal.clobserve', 'like', '%' . $request->campoPesquisa . '%');
-            $query->orwhere('cal.clbase', 'like', '%' . $request->campoPesquisa . '%');
-            $query->orwhere('cal.clrota', 'like', '%' . $request->campoPesquisa . '%');
-            $query->orwhere('cal.id', 'like', '%' . $request->campoPesquisa . '%');
-        }else if(strlen($request->campoPesquisa) > 0 && $request->tipofiltro == 'exato') {  
-            $query->where('cal.clidentificacao', 'like', '%' . $request->campoPesquisa . '%');
-            $query->where('cal.clobserve', 'like', '%' . $request->campoPesquisa . '%');
-            $query->where('cal.clbase', 'like', '%' . $request->campoPesquisa . '%');
-            $query->where('cal.clrota', 'like', '%' . $request->campoPesquisa . '%');
-            $query->where('cal.id', 'like', '%' . $request->campoPesquisa . '%');
-        }*/
 
         if(strlen($request->campoPesquisa) > 0) {  //$request->tipofiltro == 'amplo'
             $termos = array_filter(explode(' ', trim($request->campoPesquisa)));
@@ -407,16 +415,30 @@ class CalController extends Controller
             $query->orderBy($campoordenar, strlen($request->ordem) > 0 ? $request->ordem : 'desc')->groupBy('cal.id');
             $registros = $query->get();
 
-            if($request->extensao == 'csv'){
-                $headers = [
-                    'Código',
-                    'Identificação',
-                    'Destino',
-                    'Tipo',
-                    'Situação',
-                    ''
-                ];
+            $colunasRelatorio = [
+                'id'              => ['label' => 'Código',        'width' => '5%', 'align' => 'center'],
+                'clidentificacao' => ['label' => 'Identificação', 'width' => '35%', 'align' => 'left'],
+                'clrota'          => ['label' => 'Destino',       'width' => '25%', 'align' => 'left'],
+                'cltipo'          => ['label' => 'Tipo',          'width' => '15%', 'align' => 'center'],
+                'clstatus'        => ['label' => 'Situação',      'width' => '15%', 'align' => 'center'],
+                'acoes'           => ['label' => '',      'width' => '5%', 'align' => 'center'],
+            ];
 
+            $theadHtml = '<tr>';
+            foreach ($colunasRelatorio as $coluna) {
+                $theadHtml .= sprintf(
+                    '<th width="%s" class="text-%s">%s</th>',
+                    $coluna['width'],
+                    $coluna['align'],
+                    htmlspecialchars($coluna['label'], ENT_QUOTES, 'UTF-8')
+                );
+            }
+            $theadHtml .= '</tr>';
+
+            $tituloRelatorio = $request->titulorelatorio;
+
+            if($request->extensao == 'csv'){
+                $headers = array_column($colunasRelatorio, 'label');
                 // Delimitador padrão para CSVs que abrem bem no Excel (Ponto e Vírgula)
                 $delimiter = ';';
                 // Cria um stream temporário na memória
@@ -425,7 +447,7 @@ class CalController extends Controller
                 fputcsv($output, $headers, $delimiter);
                 foreach ($registros as $p) {
                     $documento = '';
-                    $ultimaAlteracao = $p->clversao ? Carbon::parse($p->clversao)->format('d/m/Y H:i') : '';
+                    $versaodatahr = $p->clversao ? Carbon::parse($p->clversao)->format('d/m/Y H:i') : '';
                     $assunto = str_replace(["\r", "\n"], ' ', $p->clobserve ?? '');
                     //$totalAnexos = isset($p->anexos) ? count($p->anexos) : 0;            
                     $status = ($p->clstatus ?? 0) == 1 ? 'ATIVO' : 'INATIVO';
@@ -433,9 +455,9 @@ class CalController extends Controller
                     //$visibilidade = ($p->flagexibe ?? 0) == 1 ? 'PÚBLICO' : 'RESTRITO';
 
                     if($p->cltipo == 1){
-                        $tipo = "Cadastro";
+                        $tipo = "Módulo Nível 1";
                     }else if($p->cltipo == 2){
-                        $tipo = "Controle";
+                        $tipo = "Perfil";
                     }else if($p->cltipo == 3){
                         $tipo = "SubCadastro";
                     }
@@ -445,7 +467,7 @@ class CalController extends Controller
                         $p->clrota ?? '',
                         $tipo ?? '',
                         $status,
-                        $ultimaAlteracao,
+                        $versaodatahr,
                     ];
                     
                     fputcsv($output, $row, $delimiter);
@@ -457,7 +479,7 @@ class CalController extends Controller
                 fclose($output); // Fecha o stream temporário
 
                 // 3. RETORNO PARA DOWNLOAD
-                $filename = 'Relatorio_Cals_' . now()->format('dmYHis') . '.csv';
+                $filename = 'Relatorio_'.$request->modulo.'_' . now()->format('dmYHis') . '.csv';
 
                 // O cabeçalho 'text/csv' garante que o arquivo seja baixado corretamente.
                 return Response::make($csvContent, 200, [
@@ -506,155 +528,117 @@ class CalController extends Controller
                     </style>
                     </head><body>';
 
-                $html .= '<h1 style="color: #1a426f; text-align: center; padding-bottom: 10px; font-size: 18pt;">Relação de Cals</h1>';
-                $html .= '<table class="table-report"><thead>
-                    <tr>
-                        <th width="5%">Código</th>
-                        <th width="35%">Identificação</th>
-                        <th width="25%">Destino</th>
-                        <th width="15%">Tipo</th>
-                        <th width="15%">Situação</th>
-                        <th width="5%"></th>
-                    </tr></thead><tbody>';
+                $html .= '<h1 style="color: #1a426f; text-align: center; padding-bottom: 10px; font-size: 18pt;">'.$tituloRelatorio.'</h1>';
+                $html .= '<table class="table-report"><thead>'.$theadHtml.'</thead><tbody>';
 
                 if ($registros->isEmpty()) {
                     $html .= '<tr><td colspan="5" style="text-align: center; font-size: 10pt; color: #343a40;">Nenhum resultado encontrado para o relatório.</td></tr>';
                 } else {
                     foreach ($registros as $p) {
-                        // Tratamento do tipo conforme regras da Cal
+                        $documento = '';
+                        $versaodatahr = $p->clversao ? Carbon::parse($p->clversao)->format('d/m/Y H:i') : '';
+                        $assunto = str_replace(["\r", "\n"], ' ', $p->clobserve ?? '');
+                        //$totalAnexos = isset($p->anexos) ? count($p->anexos) : 0;            
                         $tipo = '';
-                        if ($p->cltipo == 1) {
-                            $tipo = 'Cadastro';
-                        } else if ($p->cltipo == 2) {
-                            $tipo = 'Controle';
-                        } else if ($p->cltipo == 3) {
-                            $tipo = 'SubCadastro';
+                        //$visibilidade = ($p->flagexibe ?? 0) == 1 ? 'PÚBLICO' : 'RESTRITO';
+                        if($p->cltipo == 1){
+                            $tipo = "Módulo Nível 1";
+                        }else if($p->cltipo == 2){
+                            $tipo = "Perfil";
+                        }else if($p->cltipo == 3){
+                            $tipo = "SubCadastro";
                         }
-
-                        // Tratamento de Situação
                         $isAtivo = ($p->clstatus ?? 0) == 1;
                         $statusHtml = $isAtivo 
                             ? '<span class="status-ativo">ATIVO</span>' 
                             : '<span class="status-inativo">INATIVO</span>';
 
-                        // Tratamento da data de última alteração
-                        $ultimaAlteracao = $p->clversao ? \Carbon\Carbon::parse($p->clversao)->format('d/m/Y H:i') : '';
-
                         $html .= '<tr class="text-left">';
-                        
-                        // Coluna: Código
-                        $html .= '<td width="10%" class="text-center"><b>' . htmlspecialchars($p->id) . '</b></td>';
-                        
-                        // Coluna: Identificação
-                        $html .= '<td width="35%">';
-                        $html .= '<span class="main-title"><b>' . htmlspecialchars($p->clidentificacao ?? '') . '</b></span>';
-                        if (!empty($p->clobserve)) {
-                            $html .= '<small style="color: #666666;"><br>' . htmlspecialchars(\Illuminate\Support\Str::limit($p->clobserve, 120)) . '</small>';
-                        }
-                        $html .= '</td>';
-
-                        // Coluna: Destino / Rota
-                        $html .= '<td width="25%">' . htmlspecialchars($p->clrota ?? '') . '</td>';
-
-                        // Coluna: Tipo
-                        $html .= '<td width="15%" class="text-center">' . htmlspecialchars($tipo) . '</td>';
-
-                        // Coluna: Situação e Alteração
-                        $html .= '<td width="15%" class="text-center">';
-                        $html .= $statusHtml;
-                        if ($ultimaAlteracao) {
-                            $html .= '<br><small style="font-size: 8px; color: #555555;"><b>Alt:</b> ' . $ultimaAlteracao . '</small>';
-                        }
-                        $html .= '</td>';
-
+                            $html .= '<td width="'.$colunasRelatorio['id']['width'].'" class="text-center"><b>' . htmlspecialchars($p->id) . '</b></td>';
+                            $html .= '<td width="'.$colunasRelatorio['clidentificacao']['width'].'">';
+                                $html .= '<span class="main-title"><b>' . htmlspecialchars($p->clidentificacao ?? '') . '</b></span>';
+                                if (!empty($p->clobserve)) {
+                                    $html .= '<small style="color: #666666;"><br>' . htmlspecialchars(\Illuminate\Support\Str::limit($p->clobserve, 120)) . '</small>';
+                                }
+                            $html .= '</td>';
+                            $html .= '<td width="'.$colunasRelatorio['clrota']['width'].'">' . htmlspecialchars($p->clrota ?? '') . '</td>';
+                            $html .= '<td width="'.$colunasRelatorio['cltipo']['width'].'" class="text-center">' . htmlspecialchars($tipo) . '</td>';
+                            $html .= '<td width="'.$colunasRelatorio['clstatus']['width'].'" class="text-center">';
+                                $html .= $statusHtml.'<br><small style="font-size: 8px; color: #555555;"> ' . $versaodatahr . '</small>';
+                            $html .= '</td>';
+                            $html .= '<td width="'.$colunasRelatorio['acoes']['width'].'" class="text-center"></td>';
                         $html .= '</tr>';
                     }
                 }
 
                 $html .= '</tbody></table></body></html>';
-                $filename = 'Relatorio_Cals_' . now()->format('dmYHis') . '.doc';
+                $filename = 'Relatorio_'.$request->modulo.'_' . now()->format('dmYHis') . '.doc';
 
-                return \Illuminate\Support\Facades\Response::make($html, 200, [
+                return Response::make($html, 200, [
                     'Content-Type' => 'application/msword',
                     'Content-Disposition' => 'attachment; filename="' . $filename . '"',
                     'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
                     'Expires' => '0',
                     'Pragma' => 'public',
                 ]);
-            }else{
+            } else {
                 $html = '';
-
                 if ($registros->isEmpty()) {
                     $html .= '<tr><td colspan="5" style="text-align: center; font-size: 10pt; color: #343a40; padding: 10px;">Nenhum resultado encontrado para o relatório.</td></tr>';
                 } else {
-                    foreach ($registros as $p) {
-                        // Tratamento do Tipo da Cal
-                        $tipo = '';
-                        if ($p->cltipo == 1) {
-                            $tipo = 'Cadastro';
-                        } else if ($p->cltipo == 2) {
-                            $tipo = 'Controle';
-                        } else if ($p->cltipo == 3) {
-                            $tipo = 'SubCadastro';
-                        }
 
-                        // Tratamento da Situação
+                    foreach ($registros as $p) {
+                        $documento = '';
+                        $versaodatahr = $p->clversao ? Carbon::parse($p->clversao)->format('d/m/Y H:i') : '';
+                        $assunto = str_replace(["\r", "\n"], ' ', $p->clobserve ?? '');
+                        //$totalAnexos = isset($p->anexos) ? count($p->anexos) : 0;            
+                        $tipo = '';
+                        //$visibilidade = ($p->flagexibe ?? 0) == 1 ? 'PÚBLICO' : 'RESTRITO';
+                        if($p->cltipo == 1){
+                            $tipo = "Módulo Nível 1";
+                        }else if($p->cltipo == 2){
+                            $tipo = "Perfil";
+                        }else if($p->cltipo == 3){
+                            $tipo = "SubCadastro";
+                        }
                         $isAtivo = ($p->clstatus ?? 0) == 1;
                         $statusHtml = $isAtivo 
                             ? '<small><span class="status-ativo">ATIVO</span></small>' 
                             : '<small><span class="status-inativo">INATIVO</span></small>';
 
-                        // Formatação de data da última alteração
-                        $ultimaAlteracao = $p->clversao 
-                            ? \Carbon\Carbon::parse($p->clversao)->format('d/m/Y H:i') 
-                            : '';
-
-                        $html .= '<tr class="text-left">';
-                        
-                        // Coluna 1: Código
-                        $html .= '<td width="10%" class="text-center"><b>' . htmlspecialchars($p->id) . '</b></td>';
-
-                        // Coluna 2: Identificação e Observação
-                        $html .= '<td width="35%">';
-                        $html .= '<span class="main-title"><b>' . htmlspecialchars($p->clidentificacao ?? '') . '</b></span>';
+                        $html .= '<tr>';
+                        $html .= '<td width="'.$colunasRelatorio['id']['width'].'" class="text-center"><b>' . htmlspecialchars($p->id) . '</b></td>';
+                        $html .= '<td width="'.$colunasRelatorio['clidentificacao']['width'].'"><b>' . htmlspecialchars($p->clidentificacao ?? '') . '</b>';
                         if (!empty($p->clobserve)) {
-                            $html .= '<small style="color: #555555;"><br><b>Obs: </b>' . htmlspecialchars(\Illuminate\Support\Str::limit($p->clobserve, 120)) . '</small>';
+                            $html .= '<br><small style="color: #555;"><br><b>Obs: </b>' . htmlspecialchars(\Illuminate\Support\Str::limit($p->clobserve, 120)) . '</small>';
                         }
                         $html .= '</td>';
-
-                        // Coluna 3: Destino / Rota
-                        $html .= '<td width="25%">' . htmlspecialchars($p->clrota ?? '') . '</td>';
-
-                        // Coluna 4: Tipo
-                        $html .= '<td width="15%" class="text-center">' . htmlspecialchars($tipo) . '</td>';
-
-                        // Coluna 5: Situação e Alteração
-                        $html .= '<td width="15%" class="text-center">';
-                        $html .= $statusHtml;
-                        if ($ultimaAlteracao) {
-                            $html .= '<br><small style="font-size: 8px; color: #555555;"><b>Alt: </b>' . $ultimaAlteracao . '</small>';
-                        }
+                        $html .= '<td width="'.$colunasRelatorio['clrota']['width'].'">' . htmlspecialchars($p->clrota ?? '') . '</td>';
+                        $html .= '<td width="'.$colunasRelatorio['cltipo']['width'].'" style="text-align: center;">' . htmlspecialchars($tipo) . '</td>';
+                        $html .= '<td width="'.$colunasRelatorio['clstatus']['width'].'" style="text-align: center;">' . $statusHtml;
+                            $html .= '<br><small style="font-size: 8px; color: #555;"><b>Alt: </b>' . $versaodatahr . '</small>';
                         $html .= '</td>';
-
+                        $html .= '<td width="'.$colunasRelatorio['acoes']['width'].'" style="text-align: center;"></td>';
                         $html .= '</tr>';
                     }
                 }
 
-                $fileName = 'Relatorio_Cals_' . time() . '.pdf';
-                $tituloRelatorio = 'Relação de Cals';
+                $fileName = 'Relatorio_'.$request->modulo.'_' . time() . '.pdf';
+                $tituloRelatorio = $request->titulorelatorio ?? 'Relatório';
 
                 // Renderiza a view container que inclui o cabeçalho/estilos da tabela
-                $htmlContent = view('controle.cals_relatorio', [
+                $htmlContent = view('relatorios.cal_relatorio', [
                     'html1' => $html,
-                    'titulo1' => $tituloRelatorio
+                    'titulo1' => $tituloRelatorio,
+                    'head1' => $theadHtml,
                 ])->render();
 
                 // Inicialização da biblioteca de PDF customizada do sistema
                 $pdf = new PDFRELATORIO(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
-                $pdf->SetCreator(env('CLIENT_DATA_NAME', 'CargaFácil'));
-                $pdf->SetAuthor(env('CLIENT_DATA_NAME', 'CargaFácil'));
+                $pdf->SetCreator(env('CLIENT_DATA_NAME', ENV('APP_NAME')));
+                $pdf->SetAuthor(env('CLIENT_DATA_NAME', ENV('APP_NAME')));
                 $pdf->SetTitle($tituloRelatorio);
-                $pdf->SetSubject('Impressão de Relatório de Cals');
+                $pdf->SetSubject('Impressão de '.$tituloRelatorio);
 
                 // Configuração de Margens do Documento
                 $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
@@ -667,18 +651,22 @@ class CalController extends Controller
                 $pdf->SetFont('helvetica', '', 9);
                 $pdf->AddPage();
                 $pdf->writeHTML($htmlContent, true, false, true, false, '');
+                $pdfBinary = $pdf->Output($fileName, 'S');
 
-                // Stream direto para o navegador
-                $pdf->Output($fileName, 'I');
-
-                return response()->make('', 200, [
+                return response($pdfBinary, 200, [
                     'Content-Type' => 'application/pdf',
                     'Content-Disposition' => 'inline; filename="' . $fileName . '"',
-                ]);
+                    'Cache-Control' => 'private, max-age=0, must-revalidate',
+                    'Pragma' => 'public'
+                ]);                
             }
         } catch (Exception $e) {
             $except = $e->getMessage();
-            return Tools::setResponse('fail', null, 'Falha ao obter dados');
+            //return Tools::setResponse('fail', null, 'Falha ao Obter dados');
+            Tools::setAtividade(0, 8, 0, 'Relatório de Cals', 'Falha no Processamento - '.$except);
+            $resperr = Tools::setResult('fail', null, 'Falha no Processamento');
+            return back()->withErrors($resperr);
+
         }
     }
 

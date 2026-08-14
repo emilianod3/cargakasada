@@ -24,7 +24,8 @@
 > Modelos de Arquivos
 Preciso migrar este modulo com os arquivos em anexo onde utilizava laravel e blade e mysql para o meu novo projeto com laravel 12 + vue + inertia + mysql = exemplo do codigo padrao que estou utilizando atualmente no novo projeto = 
 
-CAdastro falta
+atualizar status
+
 
 no lugar ta table colocar div ou container
 como criar componentes do cadastro para diminuir a quantidade de codigo e reutilizar codigo
@@ -45,6 +46,14 @@ composer config audit.block-insecure true
 php artisan --version
 php artisan route:list
 php artisan route:clear
+
+php artisan route:list --name=contro
+
+php artisan route:list --name=controle.gdeclassificacao.lista
+
+php artisan route:list --path=controle/lista
+
+php artisan route:list --name=temporali
 
 php artisan route:clear
 php artisan config:clear

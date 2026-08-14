@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
@@ -43,6 +44,8 @@ class HandleInertiaRequests extends Middleware
         ];*/
         //$serverIp = $_SERVER['SERVER_ADDR'] ?? request()->server('SERVER_ADDR') ?? '127.0.0.1';
         $serverIp = $request->server('SERVER_ADDR', '127.0.0.1');
+
+        $config = $request->session()->get('user') ? Cache::get('config_' . $request->session()->get('user')->id, []) : [];
         
         return array_merge(parent::share($request), [
             'versions' => [
@@ -55,6 +58,8 @@ class HandleInertiaRequests extends Middleware
                 'grupo' => $request->session()->get('grupo'),
                 'permissoes' => $request->session()->get('permissoes'),
                 'cfgusercal' => $request->session()->get('cfgusercal'),
+                'configuser' => $request->session()->get('configuser'),
+                'config' => $config,
             ],
             'sistema' => [
                 'versao'    => config('version.number', '1.0.0'), // Fallback caso não exista

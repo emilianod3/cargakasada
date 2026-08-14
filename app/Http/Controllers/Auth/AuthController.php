@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Http\Controllers\Controle\ConfigUserController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Core\CfgUserCalController;
 use App\Http\Controllers\Core\ConfigController;
@@ -247,7 +248,7 @@ class AuthController extends Controller
 
             //$unidade = new UnidadeController();
             //$unico = new UnicoController();
-            //$configUser = new ConfigUserController();
+            $configUser = new ConfigUserController();
             $config = new ConfigController();
             //$cfgsist = new CfgSistController();
             $cfgUserCal = new CfgUserCalController();
@@ -270,7 +271,7 @@ class AuthController extends Controller
             //Session::put('unicosJuridica', $unico->getJuridica());
             //Session::put('config', $config->getAllSession());
             //Session::put('cfgsist', $cfgsist->getAllSession());
-            //Session::put('configuser', $configUser->getAllSession());
+            Session::put('configuser', $configUser->getAllSession($usuario->id));
             Session::put('cfgusercal', $cfgUserCal->getAllSession($usuario->id));
             //Session::put('cals', $cal->getAll());
 
