@@ -2503,3 +2503,33 @@ export function sanitizeFilename(text) {
             //console.log(input.type);
         }
     }
+
+
+
+    /**
+     * obtem as cals para popular option
+     */
+    export async function getAllCals(){
+        return axios.get(route('controle.cals.getall'))
+        .then((response) => {
+            const dados = response.data?.data || response.data || [];
+            return Array.isArray(dados) ? dados : [];
+        })
+        .catch((error) => {
+            return [];
+        });
+    };
+
+    /**
+     * obtem as Menus para popular option
+     */
+    export async function getAllMenus(){
+        return axios.get(route('controle.menus.getall'))
+        .then((response) => {
+            const dados = response.data?.data || response.data || [];
+            return Array.isArray(dados) ? dados : [];
+        })
+        .catch((error) => {
+            return [];
+        });
+    };

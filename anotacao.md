@@ -24,8 +24,8 @@
 > Modelos de Arquivos
 Preciso migrar este modulo com os arquivos em anexo onde utilizava laravel e blade e mysql para o meu novo projeto com laravel 12 + vue + inertia + mysql = exemplo do codigo padrao que estou utilizando atualmente no novo projeto = 
 
-atualizar status
 
+no apagar confirmar antes
 
 no lugar ta table colocar div ou container
 como criar componentes do cadastro para diminuir a quantidade de codigo e reutilizar codigo

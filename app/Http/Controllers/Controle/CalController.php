@@ -135,21 +135,6 @@ class CalController extends Controller
         $campoordenar = 'id';
         $campoordenar = $request->campoordem != 'undefined' ? $request->campoordem : 'id';
 
-        /*
-        if(strlen($request->campoPesquisa) > 0) {  //$request->tipofiltro == 'amplo'
-            $query->where('cal.clidentificacao', 'like', '%' . $request->campoPesquisa . '%');
-            $query->orwhere('cal.clobserve', 'like', '%' . $request->campoPesquisa . '%');
-            $query->orwhere('cal.clbase', 'like', '%' . $request->campoPesquisa . '%');
-            $query->orwhere('cal.clrota', 'like', '%' . $request->campoPesquisa . '%');
-            $query->orwhere('cal.id', 'like', '%' . $request->campoPesquisa . '%');
-        }else if(strlen($request->campoPesquisa) > 0 && $request->tipofiltro == 'exato') {  
-            $query->where('cal.clidentificacao', 'like', '%' . $request->campoPesquisa . '%');
-            $query->where('cal.clobserve', 'like', '%' . $request->campoPesquisa . '%');
-            $query->where('cal.clbase', 'like', '%' . $request->campoPesquisa . '%');
-            $query->where('cal.clrota', 'like', '%' . $request->campoPesquisa . '%');
-            $query->where('cal.id', 'like', '%' . $request->campoPesquisa . '%');
-        }*/
-
         if(strlen($request->campoPesquisa) > 0) {  //$request->tipofiltro == 'amplo'
             $termos = array_filter(explode(' ', trim($request->campoPesquisa)));
             $query->where(function ($queryGeral) use ($termos) {
@@ -355,6 +340,7 @@ class CalController extends Controller
 
         try {
             //Session::put('grupos', $registros);
+            //return response()->json($registros, 200);
             return json_encode($registros);
         } catch (Exception $e) {
             return [];
