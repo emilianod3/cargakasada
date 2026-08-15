@@ -221,6 +221,7 @@ const salvarRegistro1 = () => {
                 if(sistemajs.getConfigUser(usepage1.props.auth?.user?.id, 17, 'valor1') == 'sim'){ // volta para listagem sim
                     resetFormCad1();
                     abaAtiva1.value = 'inicio';
+                    filtrar1(pageatual1);
                 }else{ // continua no cadastro e limpa as variáveis
                     novoRegistro1();
                 }
@@ -238,6 +239,12 @@ const salvarRegistro1 = () => {
                 });
             }
         });
+    }else{
+        sistemajs.mostrarPopup({
+            titulo: 'Restrições',
+            conteudo: 'Não há Credenciais para Executar esta Ação',
+            tipo: 'warning'
+        });
     }
 };
 
@@ -251,37 +258,68 @@ const editarRegistro1 = (registro) => {
         //formcad1.clstatus = registro.clstatus === 1;
         formcad1.clstatus = Number(registro.clstatus) === 1 ? 1 : 0;
         abaAtiva1.value = 'cadastro';
+    }else{
+        sistemajs.mostrarPopup({
+            titulo: 'Restrições',
+            conteudo: 'Não há Credenciais para Executar esta Ação',
+            tipo: 'warning'
+        });
     }
 };
 
-const apagarRegistro1 = (idreg) => {
+async function apagarRegistro1(idreg)
+{
     if(permissao1.apagar){
-        axios.get(route('controle.cals.remover', { id: idreg }))
-        .then((response) => {
-            const result = JSON.parse(response.data.resultado);
-            if (result.status === 'fail') {
+        let decisaoapagar1 = await sistemajs.mostrarPopupDecisao({
+            titulo: 'Apagar Registro',
+            conteudo: 'Deseja Prosseguir',
+            tipo: 'warning',
+            bloquearCliqueFora: true, // Força a interação com os botões
+            exibirNao: false,
+            exibirCancelar: true,
+            textoSim: 'SIM',
+            textoNao: 'NÃO',
+            textoCancelar: 'CANCELAR'
+        });
+
+        if (decisaoapagar1 === 'sim') {
+            axios.get(route('controle.cals.remover', { id: idreg }))
+            .then((response) => {
+                const result = JSON.parse(response.data.resultado);
+                if (result.status === 'fail') {
+                    sistemajs.mostrarPopup({
+                        titulo: 'Erro no Processamento',
+                        conteudo: result.message,
+                        tipo: 'danger'
+                    });
+                } else {
+                    if(exibirmessage1 === 'sim'){
+                        sistemajs.mostrarPopup({
+                            titulo: 'Sucesso!',
+                            conteudo: result.message,
+                            tipo: 'success'
+                        });
+                    }
+                    filtrar1(pageatual1);
+                }
+            })
+            .catch((error) => {
                 sistemajs.mostrarPopup({
-                    titulo: 'Erro no Processamento',
-                    conteudo: result.message,
+                    titulo: 'Falha',
+                    conteudo: 'Impossível Realizar Processamento',
                     tipo: 'danger'
                 });
-            } else {
-                if(exibirmessage1 === 'sim'){
-                    sistemajs.mostrarPopup({
-                        titulo: 'Sucesso!',
-                        conteudo: result.message,
-                        tipo: 'success'
-                    });
-                }
-                filtrar1(pageatual1);
-            }
-        })
-        .catch((error) => {
-            sistemajs.mostrarPopup({
-                titulo: 'Falha',
-                conteudo: 'Impossível Realizar Processamento',
-                tipo: 'danger'
             });
+        } else if (decisaoapagar1 === 'nao') {
+            //minhaFuncaoParaDescartar();
+        } else {
+            //console.log("Operação cancelada pelo usuário.");
+        }
+    }else{
+        sistemajs.mostrarPopup({
+            titulo: 'Restrições',
+            conteudo: 'Não há Credenciais para Executar esta Ação',
+            tipo: 'warning'
         });
     }
 };
@@ -315,6 +353,12 @@ const updateRegistro1 = (idreg, campo = 'clstatus') => {
                 }
                 filtrar1(pageatual1);
             }
+        });
+    }else{
+        sistemajs.mostrarPopup({
+            titulo: 'Restrições',
+            conteudo: 'Não há Credenciais para Executar esta Ação',
+            tipo: 'warning'
         });
     }
 };
@@ -364,6 +408,12 @@ const filtrar1 = (pg = 1) => {
                 console.log(djson.data);*/
             }
         });
+    }else{
+        sistemajs.mostrarPopup({
+            titulo: 'Restrições',
+            conteudo: 'Não há Credenciais para Executar esta Ação',
+            tipo: 'warning'
+        });
     }
 };
 
@@ -373,7 +423,7 @@ const filtrar1 = (pg = 1) => {
 async function geraRelatorio(extensao = 'pdf', tipo = 0){
 
     try {
-        const urlEndpoint = route('controle.cals.relatorio');
+        const urlEndpoint = route('controle.cals.calrelatorio');
         
         // Constrói o payload extraindo os dados do formulário reativo
         const payload = {
@@ -670,6 +720,17 @@ async function geraRelatorio(extensao = 'pdf', tipo = 0){
 
                 <div class="flex justify-between items-center">
                     <span class="text-xs text-texto-claro/50">Resultados encontrados: {{listagem1?.data?.length || 0 }}</span>
+                    <!-- PAGINAÇÃO -->
+                    <nav class="inline-flex flex-wrap -space-x-px rounded-md shadow-sm" aria-label="Paginação" v-if="listagem1?.data && listagem1.data.length > 0">
+                        <button :disabled="listagem1?.current_page === 1" @click="navegarParaPagina(1)" class="inline-flex items-center px-3 py-2 text-sm transition-all border border-comum text-texto-comum hover:bg-layout-fundo-subtle rounded-l-md" :class="listagem1?.current_page === 1 ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'" title="Primeira Página">
+                            <i class="fa fa-step-backward"></i>
+                        </button>
+                        <button v-for="(link, index) in paginacaoInteracao1" :key="index" :disabled="!link.url" @click="navegarParaPagina(sistemajs.extrairNumeroPaginaPaginacao(link.url))" v-html="sistemajs.traduzirLabelpaginacao(link.label)" class="inline-flex items-center px-3 py-2 text-sm transition-all focus:z-20 border" :class="[link.active ? 'z-10 bg-primary border-primary text-texto-escuro font-semibold' : 'border-comum text-texto-comum hover:bg-layout-fundo-subtle', !link.url ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer']"/>
+                        <button :disabled="listagem1?.current_page === listagem1?.last_page" @click="navegarParaPagina(listagem1?.last_page)" class="inline-flex items-center px-3 py-2 text-sm transition-all border border-comum text-texto-comum hover:bg-layout-fundo-subtle rounded-r-md" :class="listagem1?.current_page === listagem1?.last_page ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'" title="Última Página">
+                            <i class="fa fa-step-forward"></i>
+                        </button>
+                    </nav>
+                    <!-- PAGINAÇÃO -->
                     <button @click="novoRegistro1" v-show="permissao1?.inserir" class="btn-pill bg-primary hover:bg-primary-hover text-texto-escuro">
                         <i class="fas fa-plus"></i> Novo Registro
                     </button>
@@ -707,73 +768,58 @@ async function geraRelatorio(extensao = 'pdf', tipo = 0){
                             :key="item.id" 
                             class="border-b border-comum last:border-b-0 hover:bg-layout-fundo/40 transition-colors"
                             >
-                            <td class="p-3 font-mono font-bold clicavel" @click="permissao1?.alterar ? editarRegistro1(item) : null">{{ item.id }}</td>
-                            
-                            <td class="p-3 font-medium text-texto-claro max-w-55 truncate clicavel" :title="item.clidentificacao" @click="permissao1?.alterar ? editarRegistro1(item) : null">
-                                {{ item.clidentificacao }}
+                            <td class="p-2.5 font-mono font-bold text-xs align-top clicavel" @click="permissao1?.alterar ? editarRegistro1(item) : null">
+                                <div class="line-clamp-6 wrap-break-word">
+                                    {{ item.id }}
+                                </div>
                             </td>
-                            
-                            <td class="p-3 font-mono text-primary max-w-45 truncate clicavel" :title="item.clrota" @click="permissao1?.alterar ? editarRegistro1(item) : null">
-                                {{ item.clrota }}
+                            <td class="p-2.5 font-medium text-texto-claro text-xs min-w-50 align-top clicavel" :title="item.clidentificacao" @click="permissao1?.alterar ? editarRegistro1(item) : null">
+                                <div class="line-clamp-6 wrap-break-word leading-relaxed">
+                                    {{ item.clidentificacao }} 
+                                </div>
                             </td>
-                            
-                            <td class="p-3 text-center whitespace-nowrap clicavel" @click="permissao1?.alterar ? editarRegistro1(item) : null">
-                                <span v-if="item.cltipo === 1" class="bg-comum px-2 py-0.5 rounded border border-comum">
-                                Módulo Nível 1
-                                </span>
-                                <span v-else-if="item.cltipo === 2" class="bg-primary/20 text-primary px-2 py-0.5 rounded border border-primary/30">
-                                Perfil
-                                </span>
-                                <span v-else-if="item.cltipo === 3" class="bg-primary/20 text-primary px-2 py-0.5 rounded border border-primary/30">
-                                Subcadastro
-                                </span>
-                                <span v-else class="bg-layout-fundo px-2 py-0.5 rounded border border-comum">
-                                Indefinido
-                                </span>
+                            <td class="p-2.5 font-medium text-texto-claro text-xs min-w-50 align-top clicavel" :title="item.clrota" @click="permissao1?.alterar ? editarRegistro1(item) : null">
+                                <div class="line-clamp-6 wrap-break-word leading-relaxed">
+                                    {{ item.clrota }} 
+                                </div>
                             </td>
-                            <td class="p-3 text-right whitespace-nowrap">
-                                <div class="flex flex-wrap gap-1 justify-end items-center">
-                                <!-- Indicador de Status -->
-                                <button 
-                                    type="button"
-                                    v-if="item.clstatus === 1" 
-                                    @click="permissao1?.alterar && updateRegistro1(item.id, 'status')"
-                                    class="w-6 h-6 flex items-center justify-center rounded-full btn-green select-none cursor-pointer" 
-                                    title="Registro Ativo"
-                                >
-                                    <i class="fas fa-check text-[10px]"></i>
-                                </button>
-                                <button 
-                                    type="button"
-                                    v-else
-                                    @click="permissao1?.alterar && updateRegistro1(item.id, 'status')"
-                                    class="w-6 h-6 flex items-center justify-center rounded-full btn-red select-none cursor-pointer" 
-                                    title="Registro Inativo"
-                                >
-                                    <i class="fas fa-exclamation-triangle text-[10px]"></i>
-                                </button>
+                            <td class="p-2.5 font-medium text-texto-claro text-xs min-w-50 clicavel" @click="permissao1?.alterar ? editarRegistro1(item) : null">
+                                <div class="flex flex-wrap gap-1 items-center line-clamp-6 wrap-break-word">
+                                    <span v-if="item.cltipo === 1" class="bg-comum px-2 py-0.5 rounded border border-comum">
+                                        Módulo Nível 1
+                                    </span>
+                                    <span v-else-if="item.cltipo === 2" class="bg-primary/20 text-primary px-2 py-0.5 rounded border border-primary/30">
+                                        Perfil
+                                    </span>
+                                    <span v-else-if="item.cltipo === 3" class="bg-primary/20 text-primary px-2 py-0.5 rounded border border-primary/30">
+                                        Subcadastro
+                                    </span>
+                                    <span v-else class="bg-layout-fundo px-2 py-0.5 rounded border border-comum">
+                                        Indefinido
+                                    </span>
+                                </div>
+                            </td>
 
-                                <!-- Ação Editar (Passando o Objeto Reativo Completo) -->
-                                <button 
-                                    type="button"
-                                    v-if="permissao1?.alterar || permissao1?.alterar" 
-                                    @click="editarRegistro1(item)" 
-                                    class="w-6 h-6 flex items-center justify-center rounded-full btn-blue select-none cursor-pointer" 
-                                    title="Editar Registro"
-                                >
-                                    <i class="fas fa-edit text-[10px]"></i>
-                                </button>
+          
+                            <td class="p-2.5 text-right align-top">
+                                <div class="flex flex-wrap gap-1 justify-end items-center line-clamp-6 wrap-break-word">
+                                    <!-- Indicador de Status -->
+                                    <button  type="button" v-if="item.clstatus === 1"  @click="permissao1?.alterar && updateRegistro1(item.id, 'status')" class="w-6 h-6 flex items-center justify-center rounded-full btn-green select-none cursor-pointer" title="Registro Ativo">
+                                        <i class="fas fa-check text-[10px]"></i>
+                                    </button>
+                                    <button type="button" v-else @click="permissao1?.alterar && updateRegistro1(item.id, 'status')" class="w-6 h-6 flex items-center justify-center rounded-full btn-red select-none cursor-pointer" title="Registro Inativo">
+                                        <i class="fas fa-exclamation-triangle text-[10px]"></i>
+                                    </button>
 
-                                <!-- Ação Apagar -->
-                                <button 
-                                    type="button"
-                                    v-if="permissao1?.apagar || permissao1?.apagar" 
-                                    @click="apagarRegistro1(item.id)" 
-                                    class="w-6 h-6 flex items-center justify-center rounded-full btn-red select-none cursor-pointer" 
-                                    title="Apagar Registro"
-                                >
-                                    <i class="fas fa-trash-alt text-[10px]"></i>
-                                </button>
+                                    <!-- Ação Editar (Passando o Objeto Reativo Completo) -->
+                                    <button type="button" v-if="permissao1?.alterar || permissao1?.alterar" @click="editarRegistro1(item)" class="w-6 h-6 flex items-center justify-center rounded-full btn-blue select-none cursor-pointer" title="Editar Registro">
+                                        <i class="fas fa-edit text-[10px]"></i>
+                                    </button>
+
+                                    <!-- Ação Apagar -->
+                                    <button type="button" v-if="permissao1?.apagar || permissao1?.apagar" @click="apagarRegistro1(item.id)" class="w-6 h-6 flex items-center justify-center rounded-full btn-red select-none cursor-pointer" title="Apagar Registro">
+                                        <i class="fas fa-trash-alt text-[10px]"></i>
+                                    </button>
                                 </div>
                             </td>                 
                             </tr>
@@ -895,7 +941,7 @@ async function geraRelatorio(extensao = 'pdf', tipo = 0){
             <!-- INICIO - CADASTRO-->
             <div v-if="abaAtiva1 === 'cadastro'" class="bg-layout-painel border border-comum rounded-lg p-6 shadow-sm">
                 <form @submit.prevent="salvarRegistro1" class="flex flex-col gap-5">
-                    
+                    <input type="hidden" v-model="formcad1.id"/>
                     <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
                         <div class="flex flex-col gap-1 md:col-span-3">
                             <label class="text-sm font-medium text-texto-claro/80">Identificação <span class="dadorequerido">*</span></label>
