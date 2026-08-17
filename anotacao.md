@@ -25,7 +25,8 @@
 Preciso migrar este modulo com os arquivos em anexo onde utilizava laravel e blade e mysql para o meu novo projeto com laravel 12 + vue + inertia + mysql = exemplo do codigo padrao que estou utilizando atualmente no novo projeto = 
 
 
-no apagar confirmar antes
+parei depois que criei Menu cadastro
+mas tem que fazer a coluna de Colunas da Cal
 
 no lugar ta table colocar div ou container
 como criar componentes do cadastro para diminuir a quantidade de codigo e reutilizar codigo

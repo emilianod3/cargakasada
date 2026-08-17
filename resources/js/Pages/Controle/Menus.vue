@@ -26,7 +26,7 @@ let permissao1 = null;
 let pageatual1 = 1;
 let qtdporpg1 = 10;
 let tempomessage1 = sistemajs.getCfgSist(13, 'valor1') ?? 5000;
-let exibirmessage1 = sistemajs.getCfgSist(29, 'valor1') ?? 'nao';
+let exibirmessage1 = sistemajs.getCfgSist(35, 'valor1') ?? 'nao';
 let allCals = ref([]);
 let allMenus = ref([]);
 

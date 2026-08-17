@@ -2152,7 +2152,7 @@ export function sanitizeFilename(text) {
         configUserDefiniPrazoTramite = getConfigForUser_({{Session::get('user')->id ?? 0}}, 16);      
         configUserCarregaListaSalvar = getConfigForUser_({{Session::get('user')->id ?? 0}}, 17);
         let tempomessage1 = sistemajs.getCfgSist(13, 'valor1') ?? 5000
-        let exibirmessage1 = sistemajs.getCfgSist(29, 'valor1') ?? 'nao';
+        let exibirmessage1 = sistemajs.getCfgSist(35, 'valor1') ?? 'nao';
      */
     /*export function getConfigUser(idUser, idconfiguser){ 
         const page = usePage();
